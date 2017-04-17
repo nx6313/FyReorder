@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.EmbossMaskFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -31,8 +32,20 @@ public class CircularImage extends MaskedImage {
         Bitmap.Config localConfig = Bitmap.Config.ARGB_8888;
         Bitmap localBitmap = Bitmap.createBitmap(i, j, localConfig);
         Canvas localCanvas = new Canvas(localBitmap);
-        Paint localPaint = new Paint(1);
-        localPaint.setColor(Color.parseColor("#78D4AC"));
+        Paint localPaint = new Paint();
+        localPaint.setAntiAlias(true);
+        localPaint.setStrokeWidth(1f);
+        // 设置光源的方向
+        float[] direction = new float[]{ 1, 1, 1 };
+        //设置环境光亮度
+        float light = 0.4f;
+        // 选择要应用的反射等级
+        float specular = 6;
+        // 向mask应用一定级别的模糊
+        float blur = 3.5f;
+        EmbossMaskFilter emboss = new EmbossMaskFilter(direction, light, specular, blur);
+        localPaint.setMaskFilter(emboss);
+        localPaint.setColor(Color.parseColor("#F3F3F3"));
         float f1 = getWidth();
         float f2 = getHeight();
         RectF localRectF = new RectF(0.0F, 0.0F, f1, f2);

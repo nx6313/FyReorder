@@ -55,7 +55,10 @@ public abstract class MaskedImage extends ImageView {
             }
             float f1 = getWidth();
             float f2 = getHeight();
-            int i = paramCanvas.saveLayer(0.0F, 0.0F, f1, f2, null, Canvas.ALL_SAVE_FLAG);
+            int i = paramCanvas.saveLayer(0.0F, 0.0F, f1, f2, null, Canvas.MATRIX_SAVE_FLAG
+                    | Canvas.CLIP_SAVE_FLAG | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
+                    | Canvas.FULL_COLOR_LAYER_SAVE_FLAG
+                    | Canvas.CLIP_TO_LAYER_SAVE_FLAG | Canvas.ALL_SAVE_FLAG);
             int j = getWidth();
             int k = getHeight();
             localDrawable.setBounds(0, 0, j, k);

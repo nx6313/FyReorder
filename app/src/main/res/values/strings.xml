@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">赋渔接单</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_order">订单</string>
+    <string name="title_activity_order">已接订单</string>
     <string name="title_activity_user_center">个人中心</string>
+    <string name="title_activity_user_data">个人资料</string>
 </resources>

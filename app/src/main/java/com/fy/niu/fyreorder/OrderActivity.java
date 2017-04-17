@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
-import com.fy.niu.fyreorder.fragment.MainOrderFragment;
+import com.fy.niu.fyreorder.fragment.HasOrderFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class OrderActivity extends AppCompatActivity {
     private ViewPagerIndicator orderIndicator;
 
     private List<String> mTitles = Arrays.asList("今日接单", "上周接单", "上月接单");
-    private List<MainOrderFragment> mContents = new ArrayList<>();
+    private List<HasOrderFragment> mContents = new ArrayList<>();
     private FragmentPagerAdapter mAdapter;
 
     @Override
@@ -67,7 +67,7 @@ public class OrderActivity extends AppCompatActivity {
 
     private void initDatas() {
         for(String title : mTitles){
-            MainOrderFragment fragment = MainOrderFragment.newInstance(title);
+            HasOrderFragment fragment = HasOrderFragment.newInstance(title);
             mContents.add(fragment);
         }
 
