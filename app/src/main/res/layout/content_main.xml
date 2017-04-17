@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.fy.niu.fyreorder.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        android:id="@+id/mainTopLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#50a18d"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="显示学校信息"
+            android:textSize="18sp"
+            android:textColor="#e1e1e1"
+            android:padding="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="男 / 女"
+            android:textSize="18sp"
+            android:textColor="#e1e1e1"
+            android:padding="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mainPageContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@+id/mainTopLayout"
+        android:layout_above="@+id/main_app_footer">
+
+        <com.fy.niu.fyreorder.customView.ViewPagerIndicator
+            android:id="@+id/mainIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="#50a18d"
+            android:orientation="horizontal">
+        </com.fy.niu.fyreorder.customView.ViewPagerIndicator>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/mainViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </android.support.v4.view.ViewPager>
+
+    </LinearLayout>
+
+    <include android:id="@+id/main_app_footer"
+        layout="@layout/app_footer" />
+</RelativeLayout>
