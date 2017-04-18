@@ -37,14 +37,15 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_marginTop="-80dp"
-            android:src="@drawable/default_user_head_1"/>
+            android:src="@drawable/file"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:textSize="16sp"
+            android:layout_marginTop="14dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
             android:text="暂无订单"/>
     </LinearLayout>
 </LinearLayout>
