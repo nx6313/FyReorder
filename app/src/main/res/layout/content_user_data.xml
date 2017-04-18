@@ -2,15 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_user_center"
+    android:id="@+id/content_user_data"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.fy.niu.fyreorder.UserCenterActivity"
-    tools:showIn="@layout/activity_user_center">
+    tools:context="com.fy.niu.fyreorder.UserDataActivity"
+    tools:showIn="@layout/activity_user_data">
 
     <LinearLayout
-        android:id="@+id/orderUserBgLayout"
+        android:id="@+id/userDataBgLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/order_user_bg"
@@ -19,25 +19,16 @@
         android:orientation="vertical">
 
         <com.fy.niu.fyreorder.customView.CircularImage
-            android:id="@+id/userHeadImg"
-            android:layout_width="74dp"
-            android:layout_height="74dp"
+            android:id="@+id/userDataHeadImg"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
             android:layout_gravity="center"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:textColor="#292929"
-            android:textSize="18sp"
-            android:text="姓名"/>
     </LinearLayout>
 
     <com.fy.niu.fyreorder.customView.ElasticScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/orderUserBgLayout"
+        android:layout_below="@+id/userDataBgLayout"
         android:scrollbars="none"
         android:scrollbarThumbVertical="@color/colorScroll"
         android:overScrollMode="never"
@@ -57,8 +48,7 @@
                 android:background="@drawable/menu_item_style_1"
                 android:clickable="true"
                 android:descendantFocusability="blocksDescendants"
-                android:orientation="horizontal"
-                android:onClick="toUserData">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="35dp"
@@ -74,7 +64,7 @@
                     android:gravity="left"
                     android:padding="15dp"
                     android:textSize="16sp"
-                    android:text="个人资料"/>
+                    android:text="姓名"/>
             </LinearLayout>
 
             <LinearLayout
@@ -84,8 +74,7 @@
                 android:background="@drawable/menu_item_style_1"
                 android:clickable="true"
                 android:descendantFocusability="blocksDescendants"
-                android:orientation="horizontal"
-                android:onClick="toHasReceiveOrder">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="35dp"
@@ -101,7 +90,59 @@
                     android:gravity="left"
                     android:padding="15dp"
                     android:textSize="16sp"
-                    android:text="已接订单"/>
+                    android:text="院校"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/menu_item_style_1"
+                android:clickable="true"
+                android:descendantFocusability="blocksDescendants"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/default_user_head_1"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:padding="15dp"
+                    android:textSize="16sp"
+                    android:text="联系方式"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/menu_item_style_1"
+                android:clickable="true"
+                android:descendantFocusability="blocksDescendants"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/default_user_head_1"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:padding="15dp"
+                    android:textSize="16sp"
+                    android:text="部门"/>
             </LinearLayout>
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>

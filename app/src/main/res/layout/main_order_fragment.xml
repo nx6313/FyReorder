@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.fy.niu.fyreorder.customView.ElasticScrollView
+        android:id="@+id/mainOrderScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:scrollbarThumbVertical="@color/colorScroll"
+        android:overScrollMode="never"
+        android:scrollbarSize="2dp"
+        android:gravity="center|top"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/mainOrderDataLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|top"
+            android:orientation="vertical"
+            android:paddingBottom="100dp">
+        </LinearLayout>
+    </com.fy.niu.fyreorder.customView.ElasticScrollView>
+
+    <LinearLayout
+        android:id="@+id/noMainOrderDataLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="-80dp"
+            android:src="@drawable/default_user_head_1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:text="暂无订单"/>
+    </LinearLayout>
+</LinearLayout>

@@ -15,7 +15,9 @@ import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button mainPageOrderBt; // 主页订单按钮
@@ -56,8 +58,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initDatas() {
-        for(String title : mTitles){
-            MainOrderFragment fragment = MainOrderFragment.newInstance(title);
+        // 请求数据库获取数据
+        Map<String, List<String>> orderDataMap = new HashMap<>();
+        List<String> weiJieOrderList = new ArrayList<>();
+        weiJieOrderList.add("测试数据1");
+        weiJieOrderList.add("测试数据2");
+        List<String> yiJieOrderList = new ArrayList<>();
+        orderDataMap.put("weiJie", weiJieOrderList);
+        orderDataMap.put("yiJie", yiJieOrderList);
+        for(Map.Entry<String, List<String>> orderMap : orderDataMap.entrySet()){
+            MainOrderFragment fragment = MainOrderFragment.newInstance(orderMap.getValue());
             mContents.add(fragment);
         }
 
