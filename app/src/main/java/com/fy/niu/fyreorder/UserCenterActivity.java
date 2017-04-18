@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
 
@@ -19,6 +20,9 @@ public class UserCenterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_center);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // 处理为标题居中
+        ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         setupActionBar();
 

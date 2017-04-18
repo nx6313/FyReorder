@@ -13,9 +13,11 @@
         android:id="@+id/mainTopLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#50a18d"
+        android:background="@drawable/menu_item_style_2"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:clickable="true"
+        android:descendantFocusability="blocksDescendants"
         android:orientation="horizontal">
 
         <TextView
@@ -24,7 +26,7 @@
             android:layout_weight="2"
             android:text="显示学校信息"
             android:textSize="18sp"
-            android:textColor="#e1e1e1"
+            android:textColor="#f1ecec"
             android:padding="10dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"/>
@@ -35,7 +37,7 @@
             android:layout_weight="1"
             android:text="男 / 女"
             android:textSize="18sp"
-            android:textColor="#e1e1e1"
+            android:textColor="#f1ecec"
             android:padding="10dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"/>
@@ -46,14 +48,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_below="@+id/mainTopLayout"
-        android:layout_above="@+id/main_app_footer">
+        android:layout_below="@+id/mainTopLayout">
 
         <com.fy.niu.fyreorder.customView.ViewPagerIndicator
             android:id="@+id/mainIndicator"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:background="#50a18d"
+            android:background="#ec796a"
             android:orientation="horizontal">
         </com.fy.niu.fyreorder.customView.ViewPagerIndicator>
 
@@ -65,7 +66,4 @@
         </android.support.v4.view.ViewPager>
 
     </LinearLayout>
-
-    <include android:id="@+id/main_app_footer"
-        layout="@layout/app_footer" />
 </RelativeLayout>

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.customView.ElasticScrollView;
-import com.fy.niu.fyreorder.util.SerializableList;
+import com.fy.niu.fyreorder.util.SerializableStringList;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MainOrderFragment extends Fragment {
     private List<String> mOrderDataList;
-    public static final String BUNDLE_DATA_LIST = "title";
+    public static final String BUNDLE_DATA_LIST = "orderDataList";
 
     @Nullable
     @Override
@@ -31,7 +31,7 @@ public class MainOrderFragment extends Fragment {
         Bundle bundle = getArguments();
         if(bundle != null){
             Serializable orderDataSerializable = bundle.getSerializable(BUNDLE_DATA_LIST);
-            mOrderDataList = ((SerializableList) orderDataSerializable).getList();
+            mOrderDataList = ((SerializableStringList) orderDataSerializable).getList();
         }
 
         View view = inflater.inflate(R.layout.main_order_fragment, null);
@@ -63,7 +63,7 @@ public class MainOrderFragment extends Fragment {
 
     public static MainOrderFragment newInstance(List<String> orderData){
         Bundle bundle = new Bundle();
-        SerializableList orderDataList = new SerializableList();
+        SerializableStringList orderDataList = new SerializableStringList();
         orderDataList.setList(orderData);
         bundle.putSerializable(BUNDLE_DATA_LIST, orderDataList);
 

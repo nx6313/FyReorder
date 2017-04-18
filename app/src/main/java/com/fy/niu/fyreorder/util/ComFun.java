@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -255,5 +256,19 @@ public class ComFun {
         //执行的数据类型
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         mContext.startActivity(intent);
+    }
+
+    /**
+     * 为View设置字体
+     * @param context
+     * @param view
+     * @param fontName
+     */
+    public static void setFont(Context context, TextView view, String fontName){
+        if(!strNull(fontName)){
+            fontName = "nsjmmt.ttf";
+        }
+        Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + fontName);
+        view.setTypeface(face);
     }
 }

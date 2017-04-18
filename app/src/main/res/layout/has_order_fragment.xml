@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#f1d8d8">
 
     <com.fy.niu.fyreorder.customView.ElasticScrollView
         android:layout_width="match_parent"
@@ -17,7 +18,74 @@
             android:layout_height="wrap_content"
             android:gravity="center|top"
             android:orientation="vertical"
-            android:paddingBottom="100dp">
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/has_order_card_bg"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/orderNumLabelTv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="20"
+                    android:textSize="32sp"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp"
+                    android:gravity="center"
+                    android:background="@drawable/has_order_card_bg_left"
+                    android:text="日接单数"/>
+
+                <TextView
+                    android:id="@+id/orderNumTv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="11"
+                    android:paddingRight="15dp"
+                    android:textSize="35sp"
+                    android:gravity="center"
+                    android:text="999"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/has_order_card_bg"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/orderMoneyLabelTv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="20"
+                    android:textSize="32sp"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp"
+                    android:gravity="center"
+                    android:background="@drawable/has_order_card_bg_left"
+                    android:text="日工资"/>
+
+                <TextView
+                    android:id="@+id/orderMoneyTv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="11"
+                    android:paddingRight="15dp"
+                    android:textSize="35sp"
+                    android:gravity="center"
+                    android:text="￥12"/>
+            </LinearLayout>
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>
 

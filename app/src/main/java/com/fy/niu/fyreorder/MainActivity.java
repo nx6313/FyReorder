@@ -8,20 +8,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button mainPageOrderBt; // 主页订单按钮
-    private Button mainPageUserCenterBt; // 主页个人中心按钮
+    private LinearLayout mainTopLayout; // 主页个人中心按钮
 
     private ViewPager mainViewPager;
     private ViewPagerIndicator mainIndicator;
@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // 处理为标题居中
+        ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         initView();
         initDatas();
@@ -48,10 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        mainPageOrderBt = (Button) findViewById(R.id.mainPageOrderBt);
-        mainPageUserCenterBt = (Button) findViewById(R.id.mainPageUserCenterBt);
-        mainPageOrderBt.setOnClickListener(this);
-        mainPageUserCenterBt.setOnClickListener(this);
+        mainTopLayout = (LinearLayout) findViewById(R.id.mainTopLayout);
+        mainTopLayout.setOnClickListener(this);
 
         mainViewPager = (ViewPager) findViewById(R.id.mainViewPager);
         mainIndicator = (ViewPagerIndicator) findViewById(R.id.mainIndicator);
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initDatas() {
         // 请求数据库获取数据
-        Map<String, List<String>> orderDataMap = new HashMap<>();
+        Map<String, List<String>> orderDataMap = new LinkedHashMap<>();
         List<String> weiJieOrderList = new ArrayList<>();
         weiJieOrderList.add("测试数据1");
         weiJieOrderList.add("测试数据2");
@@ -86,11 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.mainPageOrderBt){
-            // 点击主页订单按钮
-            Intent orderIntent = new Intent(MainActivity.this, OrderActivity.class);
-            startActivity(orderIntent);
-        }else if(v.getId() == R.id.mainPageUserCenterBt){
+        if(v.getId() == R.id.mainTopLayout){
             // 点击主页个人中心按钮
             Intent userCenterIntent = new Intent(MainActivity.this, UserCenterActivity.class);
             startActivity(userCenterIntent);

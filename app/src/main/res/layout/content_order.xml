@@ -14,7 +14,7 @@
         android:id="@+id/orderIndicator"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="#50a18d"
+        android:background="#ec796a"
         android:orientation="horizontal">
     </com.fy.niu.fyreorder.customView.ViewPagerIndicator>
 
@@ -28,7 +28,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#50a18d"
+        android:background="#ec796a"
         android:padding="10dp"
         android:orientation="horizontal">
 

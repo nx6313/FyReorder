@@ -8,13 +8,16 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.HasOrderFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderActivity extends AppCompatActivity {
     private ViewPager orderViewPager;
@@ -30,6 +33,9 @@ public class OrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // 处理为标题居中
+        ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         setupActionBar();
 
@@ -66,8 +72,21 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void initDatas() {
-        for(String title : mTitles){
-            HasOrderFragment fragment = HasOrderFragment.newInstance(title);
+        Map<String, List<Object>> hasOrderDataMap = new LinkedHashMap<>();
+        List<Object> todayHasOrderList = new ArrayList<>();
+        todayHasOrderList.add(14);
+        todayHasOrderList.add(50);
+        List<Object> lastWeekHasOrderList = new ArrayList<>();
+        lastWeekHasOrderList.add(36);
+        lastWeekHasOrderList.add(75);
+        List<Object> lastMonthHasOrderList = new ArrayList<>();
+        lastMonthHasOrderList.add(68);
+        lastMonthHasOrderList.add(158);
+        hasOrderDataMap.put("today", todayHasOrderList);
+        hasOrderDataMap.put("lastWeek", lastWeekHasOrderList);
+        hasOrderDataMap.put("lastMonth", lastMonthHasOrderList);
+        for(Map.Entry<String, List<Object>> hasOrderMap : hasOrderDataMap.entrySet()){
+            HasOrderFragment fragment = HasOrderFragment.newInstance(hasOrderMap.getKey(), hasOrderMap.getValue());
             mContents.add(fragment);
         }
 
