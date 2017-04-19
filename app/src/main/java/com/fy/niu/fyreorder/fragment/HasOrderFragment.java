@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.R;
-import com.fy.niu.fyreorder.util.SerializableIntList;
 import com.fy.niu.fyreorder.util.SerializableObjectList;
 
 import java.io.Serializable;
@@ -60,7 +59,7 @@ public class HasOrderFragment extends Fragment {
         Typeface faceLabel = Typeface.createFromAsset(getContext().getAssets(), "fonts/nsjmmt.ttf");
         orderNumLabelTv.setTypeface(faceLabel);
         orderMoneyLabelTv.setTypeface(faceLabel);
-        Typeface faceMoney = Typeface.createFromAsset(getContext().getAssets(), "fonts/309.ttf");
+        Typeface faceMoney = Typeface.createFromAsset(getContext().getAssets(), "fonts/font_309.ttf");
         orderNumTv.setTypeface(faceMoney);
         orderMoneyTv.setTypeface(faceMoney);
 
