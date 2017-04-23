@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.HasOrderFragment;
+import com.fy.niu.fyreorder.util.ComFun;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,9 @@ public class OrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ComFun.addToActiveActivityList(OrderActivity.this);
+
         // 处理为标题居中
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);

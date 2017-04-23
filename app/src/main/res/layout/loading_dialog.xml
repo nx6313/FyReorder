@@ -5,10 +5,10 @@
     android:layout_height="wrap_content"
     android:background="@drawable/loading_border"
     android:orientation="vertical"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:paddingLeft="12dp"
-    android:paddingRight="12dp"
+    android:paddingTop="30dp"
+    android:paddingBottom="30dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
     android:gravity="center">
 
         <com.ant.liao.GifView
@@ -20,7 +20,9 @@
             android:id="@+id/loadingTip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:textSize="14sp"
+            android:textColor="#4e4e4e"
+            android:textSize="18sp"
             android:text="努力加载中，请稍后"/>
 </LinearLayout>

@@ -37,6 +37,7 @@ public class ViewPagerIndicator extends LinearLayout {
     private int mTabVisibleCount;
     private static final int COUNT_DEFAULT_TAB = 2;
     private List<String> mTitles;
+    private int indicatorColor = Color.parseColor("#ffffff");
 
     public ViewPagerIndicator(Context context) {
         this(context, null);
@@ -51,6 +52,7 @@ public class ViewPagerIndicator extends LinearLayout {
         // 获取可见Tab数量
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ViewPagerIndicator);
         mTabVisibleCount = a.getInt(R.styleable.ViewPagerIndicator_visible_tab_count, COUNT_DEFAULT_TAB);
+        indicatorColor = a.getInt(R.styleable.ViewPagerIndicator_indicator_color, Color.parseColor("#ffffff"));
         if(mTabVisibleCount < 0){
             mTabVisibleCount = COUNT_DEFAULT_TAB;
         }
@@ -58,7 +60,7 @@ public class ViewPagerIndicator extends LinearLayout {
         // 初始化画笔
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.parseColor("#FFFFFF"));
+        mPaint.setColor(indicatorColor);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setPathEffect(new CornerPathEffect(3));
     }

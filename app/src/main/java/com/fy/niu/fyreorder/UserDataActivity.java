@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
+import com.fy.niu.fyreorder.util.ComFun;
 
 public class UserDataActivity extends AppCompatActivity {
     private CircularImage userDataHeadImg;
@@ -18,6 +19,9 @@ public class UserDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_data);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ComFun.addToActiveActivityList(UserDataActivity.this);
+
         // 处理为标题居中
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);

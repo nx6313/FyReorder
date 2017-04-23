@@ -8,8 +8,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,6 +22,8 @@ import com.fy.niu.fyreorder.R;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 18230 on 2017/4/17.
@@ -27,6 +31,28 @@ import java.math.BigDecimal;
 
 public class ComFun {
     private static Toast mToast = null;
+    public static List<Activity> activityActiveList = new ArrayList<>();
+
+    /**
+     * 向当前活动的ActivityList中添加项
+     * @param activity
+     */
+    public static void addToActiveActivityList(Activity activity){
+        if(!activityActiveList.contains(activity)){
+            activityActiveList.add(activity);
+        }
+    }
+
+    /**
+     * 清空所有当前活动的Activity
+     */
+    public static void clearAllActiveActivity(){
+        for(Activity activity : activityActiveList){
+            if(!activity.isFinishing()){
+                activity.finish();
+            }
+        }
+    }
 
     /**
      * 显示Toast提示信息
@@ -93,6 +119,17 @@ public class ComFun {
     }
 
     /**
+     * 获得屏幕宽度
+     * @return
+     */
+    public static int getScreenWidth() {
+        WindowManager wm = (WindowManager) MyApplication.getInstance().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(outMetrics);
+        return outMetrics.widthPixels;
+    }
+
+    /**
      * 显示加载框
      * @param activity
      * @param loadingTipValue
@@ -101,6 +138,11 @@ public class ComFun {
     public static void showLoading(Activity activity, String loadingTipValue){
         loadingDialog = new AlertDialog.Builder(activity).setCancelable(false).create();
         loadingDialog.show();
+        WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
+        params.width = getScreenWidth() * 3 / 4;
+        //params.height = 200;
+        loadingDialog.getWindow().setAttributes(params);
+
         Window win = loadingDialog.getWindow();
         View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
         win.setContentView(loadingView);
@@ -124,6 +166,11 @@ public class ComFun {
     public static AlertDialog showLoading(Activity activity, String loadingTipValue, boolean cancelable){
         loadingDialog = new AlertDialog.Builder(activity).setCancelable(cancelable).create();
         loadingDialog.show();
+        WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
+        params.width = getScreenWidth() * 3 / 4;
+        //params.height = 200;
+        loadingDialog.getWindow().setAttributes(params);
+
         Window win = loadingDialog.getWindow();
         View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
         win.setContentView(loadingView);
@@ -142,9 +189,8 @@ public class ComFun {
 
     /**
      * 隐藏加载框
-     * @param activity
      */
-    public static void hideLoading(Activity activity){
+    public static void hideLoading(){
         if(loadingDialog != null && loadingDialog.isShowing()){
             loadingDialog.dismiss();
         }

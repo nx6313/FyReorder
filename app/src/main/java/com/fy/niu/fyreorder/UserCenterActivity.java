@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
+import com.fy.niu.fyreorder.util.ComFun;
 
 public class UserCenterActivity extends AppCompatActivity {
     private CircularImage userHeadImg;
@@ -20,6 +21,9 @@ public class UserCenterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_center);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ComFun.addToActiveActivityList(UserCenterActivity.this);
+
         // 处理为标题居中
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -67,6 +71,17 @@ public class UserCenterActivity extends AppCompatActivity {
     public void toHasReceiveOrder(View view){
         Intent hasReceiveOrderIntent = new Intent(UserCenterActivity.this, OrderActivity.class);
         startActivity(hasReceiveOrderIntent);
+    }
+
+    /**
+     * 用户退出登录
+     * @param view
+     */
+    public void toUserLoginOut(View view){
+        // 清空后退栈
+        ComFun.clearAllActiveActivity();
+        Intent welcomeIntent = new Intent(UserCenterActivity.this, WelcomeActivity.class);
+        startActivity(welcomeIntent);
     }
 
 }
