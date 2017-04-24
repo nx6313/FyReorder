@@ -10,7 +10,7 @@
 
     <style name="AppTheme.AppLauncher">
         <!-- Customize your theme here. -->
-        <item name="android:windowBackground">@drawable/welcome_bg_lian</item>
+        <item name="android:windowBackground">@drawable/welcome</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
