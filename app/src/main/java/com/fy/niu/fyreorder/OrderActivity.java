@@ -51,6 +51,7 @@ public class OrderActivity extends AppCompatActivity {
 
         orderViewPager.setAdapter(mAdapter);
         orderIndicator.setViewPager(orderViewPager, 0);
+        orderViewPager.setOffscreenPageLimit(mTitles.size());
     }
 
     private void setupActionBar() {

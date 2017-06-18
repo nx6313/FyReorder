@@ -80,8 +80,8 @@ public class UserCenterActivity extends AppCompatActivity {
     public void toUserLoginOut(View view){
         // 清空后退栈
         ComFun.clearAllActiveActivity();
-        Intent welcomeIntent = new Intent(UserCenterActivity.this, WelcomeActivity.class);
-        startActivity(welcomeIntent);
+        Intent loginIntent = new Intent(UserCenterActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
     }
 
 }

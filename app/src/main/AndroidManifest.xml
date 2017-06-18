@@ -13,8 +13,7 @@
             android:name=".WelcomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.AppLauncher"
-            android:launchMode="singleInstance">
+            android:theme="@style/AppTheme.AppLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,10 +21,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".OrderActivity"

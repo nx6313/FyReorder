@@ -6,81 +6,39 @@
     android:layout_height="match_parent"
     tools:context="com.fy.niu.fyreorder.WelcomeActivity">
 
-    <RelativeLayout
-        android:id="@+id/login_layout"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/welcomeViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#df4444">
+    </android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        android:id="@+id/guide_ll_point"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/login_bg_round_rect"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="80dp"
-        android:paddingTop="25dp"
-        android:paddingBottom="40dp"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone">
+    </LinearLayout>
 
-        <com.fy.niu.fyreorder.customView.CircularImage
-            android:id="@+id/login_logo"
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-            android:layout_centerHorizontal="true"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/login_logo"
-            android:gravity="center"
-            android:layout_marginTop="15dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:orientation="vertical">
-
-            <com.fy.niu.fyreorder.customView.ClearEditText
-                android:id="@+id/tvLoginName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:textColor="#2d2d2d"
-                android:textColorHint="#6e6e6e"
-                android:drawableLeft="@drawable/icon_login_name"
-                android:drawablePadding="10dp"
-                android:background="@drawable/bg_edittext_selector"
-                android:hint="输入登录账号" />
-
-            <com.fy.niu.fyreorder.customView.ClearEditText
-                android:id="@+id/tvLoginPwd"
-                android:inputType="textPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="8dp"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:textColor="#2d2d2d"
-                android:textColorHint="#6e6e6e"
-                android:drawableLeft="@drawable/icon_pwd"
-                android:drawablePadding="10dp"
-                android:background="@drawable/bg_edittext_selector"
-                android:hint="输入登录密码"/>
-
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginTop="35dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#f2f2f2"
-                android:background="@drawable/edit_table_btn_style"
-                android:text="登   录"/>
-        </LinearLayout>
-    </RelativeLayout>
-
+    <TextView
+        android:id="@+id/welcomeToAppMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/guide_btn_selector"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#3b3b3b"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:onClick="toAppMain"
+        android:visibility="gone"
+        android:text="立即体验"/>
 </RelativeLayout>
