@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.fy.niu.fyreorder.customView.CircularImage;
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
+import com.fy.niu.fyreorder.model.Order;
 import com.fy.niu.fyreorder.util.ComFun;
 
 import java.util.ArrayList;
@@ -74,14 +75,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initDatas() {
         // 请求数据库获取数据
-        Map<String, List<String>> orderDataMap = new LinkedHashMap<>();
-        List<String> weiJieOrderList = new ArrayList<>();
-        weiJieOrderList.add("测试数据1");
-        weiJieOrderList.add("测试数据2");
-        List<String> yiJieOrderList = new ArrayList<>();
+        Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
+        List<Order> weiJieOrderList = new ArrayList<>();
+        List<Order> yiJieOrderList = new ArrayList<>();
+        for(int i = 0; i < 2; i++){
+            Order order = new Order();
+            order.setUserName("用户" + i);
+            order.setUserPhone("213542336" + i);
+            order.setSchool("魔鬼学院");
+            order.setAddress("鬼楼 603室");
+            order.setPayWay("微信支付");
+            order.setOrderTime("2017-10-16 13:39");
+            order.setRemark("哇哈哈哈");
+            order.setState(2);
+            List<Order.BuyContent> buyContentList = new ArrayList<>();
+            for(int j = 0; j < 2; j++){
+                Order.BuyContent buyContent = new Order.BuyContent();
+                buyContent.setName("冰红茶");
+                buyContent.setImgPath("https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2821201063,1180291039&fm=117&gp=0.jpg");
+                buyContent.setBuyCount(2);
+                buyContent.setMoney("4");
+                buyContentList.add(buyContent);
+            }
+            order.setOrderDetail(buyContentList);
+            weiJieOrderList.add(order);
+        }
         orderDataMap.put("weiJie", weiJieOrderList);
         orderDataMap.put("yiJie", yiJieOrderList);
-        for(Map.Entry<String, List<String>> orderMap : orderDataMap.entrySet()){
+        for(Map.Entry<String, List<Order>> orderMap : orderDataMap.entrySet()){
             MainOrderFragment fragment = MainOrderFragment.newInstance(orderMap.getValue());
             mContents.add(fragment);
         }
