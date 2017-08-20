@@ -36,15 +36,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".UserCenterActivity"
-            android:label="@string/title_activity_user_center"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".UserDataActivity"
             android:label="@string/title_activity_user_data"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
+
+    <receiver android:name="com.fy.niu.fyreorder.broadcastReceiver.MessageReceiver" >
+        <intent-filter>
+            <!-- 接收消息透传 -->
+            <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
+            <!-- 监听注册、反注册、设置/删除标签、通知被点击等处理结果 -->
+            <action android:name="com.tencent.android.tpush.action.FEEDBACK" />
+        </intent-filter>
+    </receiver>
 
 </manifest>
