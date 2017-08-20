@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.fy.niu.fyreorder.UserCenterActivity">
+    tools:context="com.fy.niu.fyreorder.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,6 +20,13 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:titleTextColor="@color/colorTitleBar">
 
+            <com.fy.niu.fyreorder.customView.CircularImage
+                android:id="@+id/mainUserHeadImg"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="left"
+                android:onClick="toggleMenu"/>
+
             <TextView
                 android:id="@+id/toolbarTitleTv"
                 android:layout_width="wrap_content"
@@ -32,6 +39,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_user_center" />
+    <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -9,10 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
+import com.fy.niu.fyreorder.customView.SlideMenu;
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 import com.fy.niu.fyreorder.model.Order;
@@ -24,9 +24,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
     private long exitTime;
-    private LinearLayout mainTopLayout; // 主页个人中心按钮
+    private SlideMenu leftMenu; // 左侧菜单
+    private CircularImage userHeadImg;
 
     private ViewPager mainViewPager;
     private ViewPagerIndicator mainIndicator;
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mainUserHeadImg = (CircularImage) toolbar.findViewById(R.id.mainUserHeadImg);
         mainUserHeadImg.setImageResource(R.drawable.default_user_head_1);
-        mainUserHeadImg.setOnClickListener(this);
 
         initView();
         initDatas();
@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        mainTopLayout = (LinearLayout) findViewById(R.id.mainTopLayout);
-        mainTopLayout.setOnClickListener(this);
-        mainTopLayout.setVisibility(View.GONE);
+        leftMenu = (SlideMenu) findViewById(R.id.leftMenu);
+        userHeadImg = (CircularImage) findViewById(R.id.userHeadImg);
+        userHeadImg.setImageResource(R.drawable.default_user_head_1);
 
         mainViewPager = (ViewPager) findViewById(R.id.mainViewPager);
         mainIndicator = (ViewPagerIndicator) findViewById(R.id.mainIndicator);
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
         List<Order> weiJieOrderList = new ArrayList<>();
         List<Order> yiJieOrderList = new ArrayList<>();
-        for(int i = 0; i < 2; i++){
+        for(int i = 0; i < 4; i++){
             Order order = new Order();
             order.setUserName("用户" + i);
             order.setUserPhone("213542336" + i);
@@ -121,19 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.mainTopLayout){
-            // 点击主页个人中心按钮
-            Intent userCenterIntent = new Intent(MainActivity.this, UserCenterActivity.class);
-            startActivity(userCenterIntent);
-        }else if(v.getId() == R.id.mainUserHeadImg){
-            // 点击主页个人头像按钮
-            Intent userCenterIntent = new Intent(MainActivity.this, UserCenterActivity.class);
-            startActivity(userCenterIntent);
-        }
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -145,5 +132,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return true;
+    }
+
+    /**
+     * 打开或关闭菜单
+     * @param view
+     */
+    public void toggleMenu(View view){
+        leftMenu.toggle();
+    }
+
+    /**
+     * 跳转到个人资料
+     * @param view
+     */
+    public void toUserData(View view){
+        Intent userDataIntent = new Intent(MainActivity.this, UserDataActivity.class);
+        startActivity(userDataIntent);
+    }
+
+    /**
+     * 跳转到已接订单
+     * @param view
+     */
+    public void toHasReceiveOrder(View view){
+        Intent hasReceiveOrderIntent = new Intent(MainActivity.this, OrderActivity.class);
+        startActivity(hasReceiveOrderIntent);
+    }
+
+    /**
+     * 用户退出登录
+     * @param view
+     */
+    public void toUserLoginOut(View view){
+        // 清空后退栈
+        ComFun.clearAllActiveActivity();
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
     }
 }

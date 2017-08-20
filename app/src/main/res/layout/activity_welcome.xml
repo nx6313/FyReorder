@@ -11,19 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        android:background="#df4444">
+        android:background="#398fa4">
     </android.support.v4.view.ViewPager>
-
-    <LinearLayout
-        android:id="@+id/guide_ll_point"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dp"
-        android:gravity="center_horizontal"
-        android:visibility="gone">
-    </LinearLayout>
 
     <TextView
         android:id="@+id/welcomeToAppMain"

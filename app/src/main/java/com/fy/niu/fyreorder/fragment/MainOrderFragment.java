@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextPaint;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +68,19 @@ public class MainOrderFragment extends Fragment {
             receivedOrderLayout.setBackgroundResource(R.drawable.order_card_bg);
             receivedOrderLayout.setPadding(DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10));
             receivedOrderLayout.setOrientation(LinearLayout.VERTICAL);
+            receivedOrderLayout.setTag("close");
+            receivedOrderLayout.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    if(v.getTag() == "close"){
+                        v.setTag("open");
+                        v.findViewWithTag("orderDetailLayout").setVisibility(View.VISIBLE);
+                    }else{
+                        v.setTag("close");
+                        v.findViewWithTag("orderDetailLayout").setVisibility(View.GONE);
+                    }
+                }
+            });
 
             // 添加姓名、手机号
             LinearLayout line1 = new LinearLayout(getActivity());
@@ -152,13 +167,19 @@ public class MainOrderFragment extends Fragment {
 
             receivedOrderLayout.addView(line4);
 
+            LinearLayout orderDetailLayout = new LinearLayout(getActivity());
+            LinearLayout.LayoutParams orderDetailLayoutLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            orderDetailLayout.setLayoutParams(orderDetailLayoutLp);
+            orderDetailLayout.setOrientation(LinearLayout.VERTICAL);
+            orderDetailLayout.setTag("orderDetailLayout");
+
             // 添加购买详情信息部分
             if(orderData.getOrderDetail().size() > 0){
                 View line = new View(getActivity());
                 line.setBackgroundColor(Color.parseColor("#242424"));
                 LinearLayout.LayoutParams lineLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, DisplayUtil.dip2px(getActivity(), 1));
                 line.setLayoutParams(lineLp);
-                receivedOrderLayout.addView(line);
+                orderDetailLayout.addView(line);
                 for(Order.BuyContent buyContent : orderData.getOrderDetail()){
                     LinearLayout line5 = new LinearLayout(getActivity());
                     LinearLayout.LayoutParams line5Lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -172,9 +193,34 @@ public class MainOrderFragment extends Fragment {
                     drawableManager.fetchDrawableOnThread(buyContent.getImgPath(), imgShow);
                     line5.addView(imgShow);
 
-                    receivedOrderLayout.addView(line5);
+                    orderDetailLayout.addView(line5);
                 }
             }
+            orderDetailLayout.setVisibility(View.GONE);
+            receivedOrderLayout.addView(orderDetailLayout);
+
+            // 添加接单按钮
+            LinearLayout receiveBtnLayout = new LinearLayout(getActivity());
+            LinearLayout.LayoutParams receiveBtnLayoutLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            receiveBtnLayoutLp.setMargins(DisplayUtil.dip2px(getActivity(), 8), DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 8), DisplayUtil.dip2px(getActivity(), 10));
+            receiveBtnLayout.setLayoutParams(receiveBtnLayoutLp);
+            receiveBtnLayout.setBackgroundResource(R.drawable.menu_item_style_1);
+            receiveBtnLayout.setClickable(true);
+            receiveBtnLayout.setDescendantFocusability(LinearLayout.FOCUS_BLOCK_DESCENDANTS);
+            receiveBtnLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            TextView tvReceive = new TextView(getActivity());
+            LinearLayout.LayoutParams tvReceiveLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            tvReceive.setLayoutParams(tvReceiveLp);
+            tvReceive.setPadding(DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10), DisplayUtil.dip2px(getActivity(), 10));
+            tvReceive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            tvReceive.setGravity(Gravity.CENTER);
+            tvReceive.setText("接   单");
+            TextPaint tvReceiveTp = tvReceive.getPaint();
+            tvReceiveTp.setFakeBoldText(true);
+            receiveBtnLayout.addView(tvReceive);
+
+            receivedOrderLayout.addView(receiveBtnLayout);
 
             mainOrderDataLayout.addView(receivedOrderLayout);
         }

@@ -31,13 +31,9 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
     private FragmentPagerAdapter mAdapter;
     private List<GuideFragment> mContents = new ArrayList<>();
 
-    private LinearLayout guide_ll_point; // 放置圆点
     private TextView welcomeToAppMain;
 
     private List<Integer> welcomeImgIdList = new ArrayList<>(); // 图片资源的数组
-    // 实例化原点View
-    private ImageView iv_point;
-    private ImageView[] ivPointArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,23 +49,16 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         welcomeViewPager = (ViewPager) findViewById(R.id.welcomeViewPager);
         welcomeViewPager.setVisibility(View.GONE);
 
-        guide_ll_point = (LinearLayout) findViewById(R.id.guide_ll_point);
-        guide_ll_point.setVisibility(View.GONE);
-
         welcomeToAppMain = (TextView) findViewById(R.id.welcomeToAppMain);
         welcomeToAppMain.setVisibility(View.GONE);
 
         // 添加欢迎页图片
         welcomeImgIdList.add(R.drawable.guide_1);
         welcomeImgIdList.add(R.drawable.guide_2);
+        welcomeImgIdList.add(R.drawable.guide_3);
 
         // 加载ViewPager
         initViewPager();
-
-        // 加载底部圆点
-        if(welcomeImgIdList.size() > 1){
-            initPoint();
-        }
 
         mWelcomeHandler = new Handler();
         mWelcomeTesk = new WelcomeTask();
@@ -104,32 +93,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         welcomeViewPager.setOnPageChangeListener(this);
     }
 
-    /**
-     * 加载底部圆点
-     */
-    private void initPoint() {
-        guide_ll_point.removeAllViews();
-        // 根据ViewPager的item数量实例化数组
-        ivPointArray = new ImageView[welcomeImgIdList.size()];
-
-        // 循环新建底部圆点ImageView，将生成的ImageView保存到数组中
-        int size = welcomeImgIdList.size();
-        for (int i = 0;i<size;i++){
-            iv_point = new ImageView(this);
-            //iv_point.setLayoutParams(new ViewGroup.LayoutParams(40, 40));
-            iv_point.setPadding(30, 0, 30, 0);//left,top,right,bottom
-            ivPointArray[i] = iv_point;
-            // 第一个页面需要设置为选中状态，这里采用两张不同的图片
-            if (i == 0){
-                iv_point.setBackgroundResource(R.drawable.pointer_full);
-            }else{
-                iv_point.setBackgroundResource(R.drawable.pointer_empty);
-            }
-            // 将数组中的ImageView加入到ViewGroup
-            guide_ll_point.addView(ivPointArray[i]);
-        }
-    }
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -137,21 +100,11 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
 
     @Override
     public void onPageSelected(int position) {
-        // 循环设置当前页的标记图
-        int length = welcomeImgIdList.size();
-        for (int i = 0;i<length;i++){
-            ivPointArray[position].setBackgroundResource(R.drawable.pointer_full);
-            if (position != i){
-                ivPointArray[i].setBackgroundResource(R.drawable.pointer_empty);
-            }
-        }
         //判断是否是最后一页，若是则显示按钮
         if (position == welcomeImgIdList.size() - 1){
             welcomeToAppMain.setVisibility(View.VISIBLE);
-            guide_ll_point.setVisibility(View.GONE);
         }else {
             welcomeToAppMain.setVisibility(View.GONE);
-            guide_ll_point.setVisibility(View.VISIBLE);
         }
     }
 
@@ -172,7 +125,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             // 如果没有欢迎页展示，则直接进入登录页面
             if(welcomeImgIdList.size() > 0 && true){
                 welcomeViewPager.setVisibility(View.VISIBLE);
-                guide_ll_point.setVisibility(View.VISIBLE);
                 welcomeViewPager.setCurrentItem(0);
 
                 if(welcomeImgIdList.size() == 1){
