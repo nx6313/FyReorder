@@ -7,6 +7,7 @@ package com.fy.niu.fyreorder.util;
 public class Constants {
     public static final String OVERALL_TAG = "FyreorderHotel";
     public static final int REQUEST_TIMEOUT = 10000;
+    public static final String HTTP_URL_BASE = "https://www.suda60.com/fymall/";
 
     /**
      * 广播Action：获取网络数据成功

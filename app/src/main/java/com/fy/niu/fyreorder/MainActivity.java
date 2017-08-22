@@ -124,11 +124,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (System.currentTimeMillis() - exitTime > 2000) {
-                ComFun.showToast(this, "再按一次离开", 2000);
-                exitTime = System.currentTimeMillis();
-            } else {
-                System.exit(0);
+            if(leftMenu.isOpen()){
+                leftMenu.toggle();
+            }else{
+                if (System.currentTimeMillis() - exitTime > 2000) {
+                    ComFun.showToast(this, "再按一次离开", 2000);
+                    exitTime = System.currentTimeMillis();
+                } else {
+                    System.exit(0);
+                }
             }
         }
         return true;

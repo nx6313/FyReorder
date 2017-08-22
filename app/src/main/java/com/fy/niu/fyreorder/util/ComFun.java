@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
@@ -32,6 +33,14 @@ import java.util.List;
 public class ComFun {
     private static Toast mToast = null;
     public static List<Activity> activityActiveList = new ArrayList<>();
+    public enum JSON_TYPE{
+        /**JSONObject*/
+        JSON_TYPE_OBJECT,
+        /**JSONArray*/
+        JSON_TYPE_ARRAY,
+        /**不是JSON格式的字符串*/
+        JSON_TYPE_ERROR
+    }
 
     /**
      * 向当前活动的ActivityList中添加项
@@ -316,5 +325,27 @@ public class ComFun {
         }
         Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + fontName);
         view.setTypeface(face);
+    }
+
+    /**
+     * 获取JSON类型 (JSONObject 还是 JSONArray)
+     * @param str
+     * @return
+     */
+    public static JSON_TYPE getJSONType(String str){
+        if(TextUtils.isEmpty(str)){
+            return JSON_TYPE.JSON_TYPE_ERROR;
+        }
+
+        final char[] strChar = str.substring(0, 1).toCharArray();
+        final char firstChar = strChar[0];
+
+        if(firstChar == '{'){
+            return JSON_TYPE.JSON_TYPE_OBJECT;
+        }else if(firstChar == '['){
+            return JSON_TYPE.JSON_TYPE_ARRAY;
+        }else{
+            return JSON_TYPE.JSON_TYPE_ERROR;
+        }
     }
 }

@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,7 +24,16 @@ import android.widget.Toast;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
 import com.fy.niu.fyreorder.customView.ClearEditText;
+import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
+import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
+import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
+import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
+import com.fy.niu.fyreorder.util.ConnectorInventory;
+import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private ClearEditText tvLoginName;
     private ClearEditText tvLoginPwd;
     private Button btnLogin;
+    private long exitTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +83,42 @@ public class LoginActivity extends AppCompatActivity {
                     btnLogin.requestFocus();
                     ComFun.showLoading(LoginActivity.this, "登陆中，请稍后...", false);
                     // 执行登录任务
-                    Map<String, String> paramsMap = new HashMap<>();
-                    paramsMap.put("loginName", tvLoginName.getText().toString().trim());
-                    paramsMap.put("loginPwd", tvLoginPwd.getText().toString().trim());
-                    //AllRequestUtil.UserLogin(WelcomeActivity.this, new RequestParams(paramsMap));
-                    // 暂时线直接进入主页
-                    mLoginHandler = new Handler();
-                    mLoginTesk = new LoginTask();
-                    mLoginHandler.postDelayed(mLoginTesk, 1000);
+                    String devToken = SharedPreferencesTool.getFromShared(LoginActivity.this, "fyBaseData", "userToken");
+                    RequestParams params = new RequestParams();
+                    Log.d("登陆中 ====== ", "设备 Token：" + devToken);
+                    params.put("token", devToken);
+                    params.put("loginName", tvLoginName.getText().toString().trim());
+                    params.put("passWord", tvLoginPwd.getText().toString().trim());
+                    ConnectorInventory.userLogin(LoginActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                        @Override
+                        public void onFinish() {
+                            ComFun.hideLoading();
+                        }
+
+                        @Override
+                        public void onSuccess(Object responseObj) {
+                            try {
+                                JSONObject data = new JSONObject(responseObj.toString());
+                                if(data.get("result").equals("success")){
+                                    // 保存登录用户信息
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("userId").toString());
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("ifGive").toString());
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("ifOpen").toString());
+                                    ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
+                                    mLoginHandler = new Handler();
+                                    mLoginTesk = new LoginTask();
+                                    mLoginHandler.postDelayed(mLoginTesk, 1000);
+                                }else{
+                                    ComFun.showToast(LoginActivity.this, "账号或密码错误", Toast.LENGTH_LONG);
+                                }
+                            } catch (JSONException e) {}
+                        }
+
+                        @Override
+                        public void onFailure(OkHttpException okHttpE) {
+                            ComFun.showToast(LoginActivity.this, "登录异常，请稍后重试", Toast.LENGTH_LONG);
+                        }
+                    }));
                 }else{
                     if(!ComFun.strNull(tvLoginName.getText().toString())){
                         ComFun.showToast(LoginActivity.this, "请输入登录账号", Toast.LENGTH_SHORT);
@@ -166,10 +207,11 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if(login_layout != null && login_layout.getVisibility() == View.VISIBLE){
+            if (System.currentTimeMillis() - exitTime > 2000) {
+                ComFun.showToast(this, "再按一次离开", 2000);
+                exitTime = System.currentTimeMillis();
+            } else {
                 System.exit(0);
-            }else{
-                // 欢迎页面屏蔽后退键事件
             }
         }
         return true;

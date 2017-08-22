@@ -131,4 +131,8 @@ public class SlideMenu extends HorizontalScrollView {
             openMenu();
         }
     }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
 }

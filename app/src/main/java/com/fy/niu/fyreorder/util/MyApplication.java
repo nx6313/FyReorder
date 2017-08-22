@@ -27,6 +27,7 @@ public class MyApplication extends Application {
         XGPushManager.registerPush(getApplicationContext(), new XGIOperateCallback() {
             @Override
             public void onSuccess(Object data, int i) {
+                SharedPreferencesTool.addOrUpdate(getApplicationContext(), "fyBaseData", "userToken", data.toString());
                 Log.d("TPush", "注册成功，设备token为：" + data);
             }
 

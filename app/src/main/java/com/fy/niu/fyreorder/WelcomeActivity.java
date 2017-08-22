@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.fy.niu.fyreorder.fragment.GuideFragment;
 import com.fy.niu.fyreorder.util.ComFun;
+import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
     private TextView welcomeToAppMain;
 
     private List<Integer> welcomeImgIdList = new ArrayList<>(); // 图片资源的数组
+    private String toPageType = "toLogin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +54,26 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         welcomeToAppMain = (TextView) findViewById(R.id.welcomeToAppMain);
         welcomeToAppMain.setVisibility(View.GONE);
 
-        // 添加欢迎页图片
-        welcomeImgIdList.add(R.drawable.guide_1);
-        welcomeImgIdList.add(R.drawable.guide_2);
-        welcomeImgIdList.add(R.drawable.guide_3);
+        String loginUserId = SharedPreferencesTool.getFromShared(WelcomeActivity.this, "fyLoginUserInfo", "userId");
+        if(ComFun.strNull(loginUserId)){
+            // 已登陆过，直接进入程序
+            toPageType = "toMain";
+            mWelcomeHandler = new Handler();
+            mWelcomeTesk = new WelcomeTask();
+            mWelcomeHandler.postDelayed(mWelcomeTesk, 2000);
+        }else{
+            // 添加欢迎页图片
+            welcomeImgIdList.add(R.drawable.guide_1);
+            welcomeImgIdList.add(R.drawable.guide_2);
+            welcomeImgIdList.add(R.drawable.guide_3);
 
-        // 加载ViewPager
-        initViewPager();
+            // 加载ViewPager
+            initViewPager();
 
-        mWelcomeHandler = new Handler();
-        mWelcomeTesk = new WelcomeTask();
-        mWelcomeHandler.postDelayed(mWelcomeTesk, 2000);
+            mWelcomeHandler = new Handler();
+            mWelcomeTesk = new WelcomeTask();
+            mWelcomeHandler.postDelayed(mWelcomeTesk, 2000);
+        }
     }
 
     /**
@@ -123,17 +134,22 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             // 如果有欢迎页展示，并且用户是第一次使用软件，则显示欢迎页图片
             // 如果有欢迎页展示，但用户不是第一次使用软件，则直接进入登录页面
             // 如果没有欢迎页展示，则直接进入登录页面
-            if(welcomeImgIdList.size() > 0 && true){
+            if(welcomeImgIdList.size() > 0 && toPageType.equals("toLogin")){
                 welcomeViewPager.setVisibility(View.VISIBLE);
                 welcomeViewPager.setCurrentItem(0);
 
                 if(welcomeImgIdList.size() == 1){
                     welcomeToAppMain.setVisibility(View.VISIBLE);
                 }
-            }else{
+            }else if(toPageType.equals("toLogin")){
                 // 直接进入登录页面
                 Intent loginIntent = new Intent(WelcomeActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
+                WelcomeActivity.this.finish();
+            }else if(toPageType.equals("toMain")){
+                // 直接进入程序首页
+                Intent mainIntent = new Intent(WelcomeActivity.this, MainActivity.class);
+                startActivity(mainIntent);
                 WelcomeActivity.this.finish();
             }
         }

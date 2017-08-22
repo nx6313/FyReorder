@@ -2,8 +2,6 @@ package com.fy.niu.fyreorder.okHttpUtil.request;
 
 import android.content.Context;
 
-import com.fy.niu.fyreorder.util.PropertiesUtil;
-
 import java.io.File;
 import java.util.Map;
 
@@ -18,15 +16,9 @@ import okhttp3.RequestBody;
  * 负责创建各种类型的请求对象，包括get, post, 文件上传类型, 文件下载类型
  */
 public class CommonRequest {
-    public static String IP_CONFIG;
-    public static String TOMCAT_PORT;
     public static String PROJECT_NAME = "FyreorderServer";
-    public static String URI_PER;
 
     public static Request createPostRequest(Context context, String url, RequestParams params) {
-        IP_CONFIG = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "ipconfig");
-        TOMCAT_PORT = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "port");
-        URI_PER = "http://"+ IP_CONFIG +":"+ TOMCAT_PORT +"/"+ PROJECT_NAME +"/";
 
         FormBody.Builder mFormBodyBuild = new FormBody.Builder();
 
@@ -43,15 +35,11 @@ public class CommonRequest {
             }
         }
         FormBody mFormBody = mFormBodyBuild.build();
-        return new Request.Builder().url(URI_PER + url).post(mFormBody).build();
+        return new Request.Builder().url(url).post(mFormBody).build();
     }
 
     public static Request createGetRequest(Context context, String url, RequestParams params) {
-        IP_CONFIG = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "ipconfig");
-        TOMCAT_PORT = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "port");
-        URI_PER = "http://"+ IP_CONFIG +":"+ TOMCAT_PORT +"/"+ PROJECT_NAME +"/";
-
-        StringBuilder urlBuilder = new StringBuilder(URI_PER + url).append("?");
+        StringBuilder urlBuilder = new StringBuilder(url).append("?");
 
         // 默认加上当前登录用户Id
 //        String userId = SharedPreferencesTool.getFromShared(context, "BouilliProInfo", "userId");
@@ -83,10 +71,6 @@ public class CommonRequest {
      * @return
      */
     public static Request createMultiPostRequest(Context context, String url, RequestParams params) {
-        IP_CONFIG = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "ipconfig");
-        TOMCAT_PORT = PropertiesUtil.getPropertiesURL("fyreorder.prop", context, "port");
-        URI_PER = "http://"+ IP_CONFIG +":"+ TOMCAT_PORT +"/"+ PROJECT_NAME +"/";
-
         MultipartBody.Builder requestBody = new MultipartBody.Builder();
         requestBody.setType(MultipartBody.FORM);
 
@@ -110,6 +94,6 @@ public class CommonRequest {
                 }
             }
         }
-        return new Request.Builder().url(URI_PER + url).post(requestBody.build()).build();
+        return new Request.Builder().url(url).post(requestBody.build()).build();
     }
 }
