@@ -124,7 +124,7 @@ public class CommonJsonCallback implements Callback {
                 JSONArray dataJsonArr = new JSONArray(responseObj.toString());
                 result.put("dataList", dataJsonArr);
             }else{
-                new Exception("返回JSON数据格式错误").printStackTrace();
+                new Exception("返回JSON数据格式错误，访问地址：" + url + "，返回值为：" + responseObj.toString()).printStackTrace();
             }
             if (!result.has(RESULT_CODE)) {
                 // 如果返回JSON中没有 RESULT_CODE 值，则默认是返回成功状态，未返回JSON中添加上该参数值

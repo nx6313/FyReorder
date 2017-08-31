@@ -4,14 +4,24 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
 import com.fy.niu.fyreorder.util.ComFun;
+import com.fy.niu.fyreorder.util.DBOpenHelper;
+import com.fy.niu.fyreorder.util.DBUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class UserDataActivity extends AppCompatActivity {
     private CircularImage userDataHeadImg;
+    private TextView tvUserInfoName;
+    private TextView tvUserInfoSchool;
+    private TextView tvUserInfoPhone;
+    private TextView tvUserInfoOrg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +61,19 @@ public class UserDataActivity extends AppCompatActivity {
     private void initView() {
         userDataHeadImg = (CircularImage) findViewById(R.id.userDataHeadImg);
         userDataHeadImg.setImageResource(R.drawable.default_user_head_1);
+
+        tvUserInfoName = (TextView) findViewById(R.id.tvUserInfoName);
+        tvUserInfoSchool = (TextView) findViewById(R.id.tvUserInfoSchool);
+        tvUserInfoPhone = (TextView) findViewById(R.id.tvUserInfoPhone);
+        tvUserInfoOrg = (TextView) findViewById(R.id.tvUserInfoOrg);
+        JSONObject userInfo = DBUtil.find(new DBOpenHelper(UserDataActivity.this), "userInfo", new String[] { "userName", "roleName", "telephone", "orgName" },
+                null, null, null, null, null, null);
+        try {
+            tvUserInfoName.setText(userInfo.getString("userName"));
+            tvUserInfoSchool.setText(userInfo.getString("roleName"));
+            tvUserInfoPhone.setText(userInfo.getString("telephone"));
+            tvUserInfoOrg.setText(userInfo.getString("orgName"));
+        } catch (JSONException e) {}
     }
 
 }

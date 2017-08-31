@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.fy.niu.fyreorder.MainActivity">
+    tools:context="com.fy.niu.fyreorder.TaskActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,13 +20,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:titleTextColor="@color/colorTitleBar">
 
-            <com.fy.niu.fyreorder.customView.CircularImage
-                android:id="@+id/mainUserHeadImg"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="left"
-                android:onClick="toggleMenu"/>
-
             <TextView
                 android:id="@+id/toolbarTitleTv"
                 android:layout_width="wrap_content"
@@ -35,24 +28,10 @@
                 android:textSize="20sp"
                 android:textColor="@color/colorTitleBar"
                 android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/toolbarTaskTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="20dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="任务"
-                android:textSize="16sp"
-                android:textColor="@color/colorTitleBar"
-                android:textStyle="bold"
-                android:onClick="toTaskListActivity"/>
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_task" />
 
 </android.support.design.widget.CoordinatorLayout>

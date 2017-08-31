@@ -105,6 +105,14 @@ public class SlideMenu extends HorizontalScrollView {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if(isOpen) {
+            return super.onInterceptTouchEvent(ev);
+        }
+        return false;
+    }
+
+    @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         float curX = Math.abs(l);

@@ -24,6 +24,7 @@
             android:layout_gravity="center"/>
 
         <TextView
+            android:id="@+id/leftMenuUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -37,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/orderUserBgLayout"
-        android:layout_above="@+id/orderUserLoginOutLayout"
+        android:layout_above="@+id/orderBottomDoLayout"
         android:scrollbars="none"
         android:scrollbarThumbVertical="@color/colorScroll"
         android:overScrollMode="never"
@@ -111,27 +112,59 @@
     </com.fy.niu.fyreorder.customView.ElasticScrollView>
 
     <LinearLayout
-        android:id="@+id/orderUserLoginOutLayout"
+        android:id="@+id/orderBottomDoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/menu_item_style_2"
-        android:clickable="true"
-        android:descendantFocusability="blocksDescendants"
-        android:orientation="horizontal"
-        android:onClick="toUserLoginOut">
+        android:orientation="vertical">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/orderUserIfOpenLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:textSize="18sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:text="退出登录"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/order_if_open_style"
+            android:clickable="true"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="horizontal"
+            android:tag="false"
+            android:onClick="toUserIfOpen">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="点击开始接单"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/orderUserLoginOutLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/menu_item_style_2"
+            android:clickable="true"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="horizontal"
+            android:onClick="toUserLoginOut">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="退出登录"/>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

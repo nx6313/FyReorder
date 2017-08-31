@@ -70,13 +70,14 @@
                     android:text="姓名"/>
 
                 <TextView
+                    android:id="@+id/tvUserInfoName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="left"
                     android:padding="15dp"
                     android:textSize="16sp"
-                    android:text="张三丰"/>
+                    android:text="~"/>
             </LinearLayout>
 
             <LinearLayout
@@ -108,13 +109,14 @@
                     android:text="院校"/>
 
                 <TextView
+                    android:id="@+id/tvUserInfoSchool"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="left"
                     android:padding="15dp"
                     android:textSize="16sp"
-                    android:text="加里敦大学"/>
+                    android:text="~"/>
             </LinearLayout>
 
             <LinearLayout
@@ -146,6 +148,7 @@
                     android:text="联系方式"/>
 
                 <TextView
+                    android:id="@+id/tvUserInfoPhone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
@@ -153,7 +156,7 @@
                     android:padding="15dp"
                     android:textSize="16sp"
                     android:inputType="phone"
-                    android:text="18634570937"/>
+                    android:text="~"/>
             </LinearLayout>
 
             <LinearLayout
@@ -185,13 +188,14 @@
                     android:text="部门"/>
 
                 <TextView
+                    android:id="@+id/tvUserInfoOrg"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="left"
                     android:padding="15dp"
                     android:textSize="16sp"
-                    android:text="货运部门"/>
+                    android:text="~"/>
             </LinearLayout>
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>

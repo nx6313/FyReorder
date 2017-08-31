@@ -21,10 +21,15 @@ import android.widget.Toast;
 import com.ant.liao.GifView;
 import com.fy.niu.fyreorder.R;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 18230 on 2017/4/17.
@@ -94,10 +99,28 @@ public class ComFun {
      * 判断对象不为空
      *
      * @param str
+     * @param flags
+     *            为可选参数，如果需要进一步判断List/Map/Array中的数量是否为0，可传入true；否则可不传（参数一为List/
+     *            Map/Array类型时有效）
      * @return
      */
-    public static boolean strNull(Object str) {
+    public static boolean strNull(Object str, boolean... flags) {
         if (str != null && str != "" && !str.equals("")) {
+            if (flags != null && flags.length > 0 && flags[0]) {
+                if (ArrayList.class.isInstance(str)) {
+                    if ((((List<?>) str).size() == 0)) {
+                        return false;
+                    }
+                } else if (HashMap.class.isInstance(str)) {
+                    if ((((Map<?, ?>) str).size() == 0)) {
+                        return false;
+                    }
+                } else if (str.getClass().isArray()) {
+                    if (Arrays.asList(str).size() == 0) {
+                        return false;
+                    }
+                }
+            }
             return true;
         } else {
             return false;

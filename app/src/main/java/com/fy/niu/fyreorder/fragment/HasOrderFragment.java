@@ -45,12 +45,18 @@ public class HasOrderFragment extends Fragment {
         if(hasOrderDataType.equals("today")){
             orderNumLabelTv.setText("日接单数");
             orderMoneyLabelTv.setText("日工资");
+            orderNumTv.setTag("tvDayNum");
+            orderMoneyTv.setTag("tvDayCharge");
         }else if(hasOrderDataType.equals("lastWeek")){
             orderNumLabelTv.setText("周接单数");
             orderMoneyLabelTv.setText("周工资");
+            orderNumTv.setTag("tvWeekNum");
+            orderMoneyTv.setTag("tvWeekCharge");
         }else if(hasOrderDataType.equals("lastMonth")){
             orderNumLabelTv.setText("月接单数");
             orderMoneyLabelTv.setText("月工资");
+            orderNumTv.setTag("tvMonthNum");
+            orderMoneyTv.setTag("tvMonthCharge");
         }
         orderNumTv.setText(String.valueOf(mHasOrderDataList.get(0)));
         orderMoneyTv.setText("￥" + String.valueOf(new BigDecimal(Double.parseDouble(String.valueOf(mHasOrderDataList.get(1))))));

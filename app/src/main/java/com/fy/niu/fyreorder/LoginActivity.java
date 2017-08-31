@@ -101,9 +101,12 @@ public class LoginActivity extends AppCompatActivity {
                                 JSONObject data = new JSONObject(responseObj.toString());
                                 if(data.get("result").equals("success")){
                                     // 保存登录用户信息
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("userId").toString());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("ifGive").toString());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.get("ifOpen").toString());
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.getString("userId"));
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginName", tvLoginName.getText().toString().trim());
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginPass", tvLoginPwd.getText().toString().trim());
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
                                     ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
                                     mLoginHandler = new Handler();
                                     mLoginTesk = new LoginTask();

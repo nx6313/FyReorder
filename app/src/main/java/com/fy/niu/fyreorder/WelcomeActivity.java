@@ -57,11 +57,17 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         String loginUserId = SharedPreferencesTool.getFromShared(WelcomeActivity.this, "fyLoginUserInfo", "userId");
         if(ComFun.strNull(loginUserId)){
             // 已登陆过，直接进入程序
-            toPageType = "toMain";
+            boolean needLogin = SharedPreferencesTool.getBooleanFromShared(WelcomeActivity.this, "fyLoginUserInfo", "needLogin");
+            if(needLogin){
+                toPageType = "toLogin";
+            }else{
+                toPageType = "toMain";
+            }
             mWelcomeHandler = new Handler();
             mWelcomeTesk = new WelcomeTask();
             mWelcomeHandler.postDelayed(mWelcomeTesk, 2000);
         }else{
+            toPageType = "toWelcome";
             // 添加欢迎页图片
             welcomeImgIdList.add(R.drawable.guide_1);
             welcomeImgIdList.add(R.drawable.guide_2);
@@ -134,7 +140,7 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             // 如果有欢迎页展示，并且用户是第一次使用软件，则显示欢迎页图片
             // 如果有欢迎页展示，但用户不是第一次使用软件，则直接进入登录页面
             // 如果没有欢迎页展示，则直接进入登录页面
-            if(welcomeImgIdList.size() > 0 && toPageType.equals("toLogin")){
+            if(welcomeImgIdList.size() > 0 && toPageType.equals("toWelcome")){
                 welcomeViewPager.setVisibility(View.VISIBLE);
                 welcomeViewPager.setCurrentItem(0);
 
@@ -149,6 +155,7 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             }else if(toPageType.equals("toMain")){
                 // 直接进入程序首页
                 Intent mainIntent = new Intent(WelcomeActivity.this, MainActivity.class);
+                mainIntent.putExtra("needSilentLogin", true);
                 startActivity(mainIntent);
                 WelcomeActivity.this.finish();
             }

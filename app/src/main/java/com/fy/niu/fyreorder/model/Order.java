@@ -8,15 +8,102 @@ import java.util.List;
  */
 
 public class Order implements Serializable {
+    private String id;
+    private String idenCode; // 完成码
+    private String floorId;
+    private String floorName;
+    private int orderState;
+    private int orderType; // 1 微信  2货到
+    private String orderDate;
+    private String orderNumber;
+    private String orderPrice;
+    private String addressDetail;
     private String userName;
     private String userPhone;
     private String school;
-    private String address;
-    private String payWay;
-    private String orderTime;
     private List<BuyContent> orderDetail;
     private String remark; // 给商家的留言
     private int state; // 已接1、未接2
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdenCode() {
+        return idenCode;
+    }
+
+    public void setIdenCode(String idenCode) {
+        this.idenCode = idenCode;
+    }
+
+    public String getFloorId() {
+        return floorId;
+    }
+
+    public void setFloorId(String floorId) {
+        this.floorId = floorId;
+    }
+
+    public String getFloorName() {
+        return floorName;
+    }
+
+    public void setFloorName(String floorName) {
+        this.floorName = floorName;
+    }
+
+    public int getOrderState() {
+        return orderState;
+    }
+
+    public void setOrderState(int orderState) {
+        this.orderState = orderState;
+    }
+
+    public int getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(int orderType) {
+        this.orderType = orderType;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public String getOrderPrice() {
+        return orderPrice;
+    }
+
+    public void setOrderPrice(String orderPrice) {
+        this.orderPrice = orderPrice;
+    }
+
+    public String getAddressDetail() {
+        return addressDetail;
+    }
+
+    public void setAddressDetail(String addressDetail) {
+        this.addressDetail = addressDetail;
+    }
 
     public String getUserName() {
         return userName;
@@ -40,30 +127,6 @@ public class Order implements Serializable {
 
     public void setSchool(String school) {
         this.school = school;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPayWay() {
-        return payWay;
-    }
-
-    public void setPayWay(String payWay) {
-        this.payWay = payWay;
-    }
-
-    public String getOrderTime() {
-        return orderTime;
-    }
-
-    public void setOrderTime(String orderTime) {
-        this.orderTime = orderTime;
     }
 
     public List<BuyContent> getOrderDetail() {
@@ -91,17 +154,42 @@ public class Order implements Serializable {
     }
 
     public static class BuyContent implements Serializable {
-        private String imgPath;
+        private String proId;
+        private String url;
         private String name;
-        private String money;
-        private int buyCount;
+        private String price;
+        private int num;
 
-        public String getImgPath() {
-            return imgPath;
+        public String getProId() {
+            return proId;
         }
 
-        public void setImgPath(String imgPath) {
-            this.imgPath = imgPath;
+        public void setProId(String proId) {
+            this.proId = proId;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
+
+        public int getNum() {
+            return num;
+        }
+
+        public void setNum(int num) {
+            this.num = num;
         }
 
         public String getName() {
@@ -110,22 +198,6 @@ public class Order implements Serializable {
 
         public void setName(String name) {
             this.name = name;
-        }
-
-        public String getMoney() {
-            return money;
-        }
-
-        public void setMoney(String money) {
-            this.money = money;
-        }
-
-        public int getBuyCount() {
-            return buyCount;
-        }
-
-        public void setBuyCount(int buyCount) {
-            this.buyCount = buyCount;
         }
     }
 }
