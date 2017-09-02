@@ -584,11 +584,11 @@ public class MainActivity extends AppCompatActivity
         MenuItem navMenuItemFlooeChange = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String ifFloorChange = navMenuItemFlooeChange.getTitleCondensed().toString();
         if(ifFloorChange.equals("all")){
-            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
+            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
             navMenuItemFlooeChange.setTitleCondensed("self");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：" + floorName + " 』");
         }else{
-            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
+            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
             navMenuItemFlooeChange.setTitleCondensed("all");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
         }
