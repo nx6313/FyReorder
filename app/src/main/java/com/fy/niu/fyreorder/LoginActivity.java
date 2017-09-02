@@ -108,6 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floor", data.getString("floor"));
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floorName", data.getString("floorName"));
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
                                     ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
                                     mLoginHandler = new Handler();

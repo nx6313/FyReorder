@@ -27,17 +27,16 @@
                 android:layout_gravity="left"
                 android:clickable="true"
                 android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:onClick="toggleLeftMenu"/>
+                android:focusableInTouchMode="true" />
 
             <TextView
                 android:id="@+id/toolbarTitleTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="20sp"
                 android:textColor="@color/colorTitleBar"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/toolbarTaskTv"
@@ -45,13 +44,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginRight="20dp"
+                android:onClick="toTaskListActivity"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="任务"
-                android:textSize="16sp"
                 android:textColor="@color/colorTitleBar"
-                android:textStyle="bold"
-                android:onClick="toTaskListActivity"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

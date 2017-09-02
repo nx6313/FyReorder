@@ -87,6 +87,12 @@ public class MainActivity extends AppCompatActivity
 
         mainUserHeadImg = (CircularImage) toolbar.findViewById(R.id.mainUserHeadImg);
         mainUserHeadImg.setImageResource(R.drawable.default_user_head_1);
+        mainUserHeadImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleLeftMenu();
+            }
+        });
 
         initView();
 
@@ -208,6 +214,7 @@ public class MainActivity extends AppCompatActivity
         mainIndicator = (ViewPagerIndicator) findViewById(R.id.mainIndicator);
 
         String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
+        String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         if(!ifGive.equals("0")){
@@ -215,7 +222,7 @@ public class MainActivity extends AppCompatActivity
         }else{
             if(receiveSelfFloor.equals("self")){
                 navMenuItemSelectSelfFloor.setTitleCondensed("self");
-                navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：本楼层 』");
+                navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：" + floorName + " 』");
             }else{
                 navMenuItemSelectSelfFloor.setTitleCondensed("all");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：所有 』");
@@ -430,21 +437,26 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_user_info:
+                drawer.closeDrawer(GravityCompat.START);
                 toUserData();
                 break;
             case R.id.nav_has_order:
+                drawer.closeDrawer(GravityCompat.START);
                 toHasReceiveOrder();
                 break;
             case R.id.nav_open_give:
                 toUserIfOpen();
                 break;
             case R.id.nav_select_self_floor:
+                drawer.closeDrawer(GravityCompat.START);
                 toFloorChange();
                 break;
             case R.id.nav_update:
+                drawer.closeDrawer(GravityCompat.START);
                 ComFun.showToast(this, "正在开发中，敬请期待", 2000);
                 break;
             case R.id.nav_exit:
@@ -475,9 +487,8 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 打开或关闭菜单
-     * @param view
      */
-    public void toggleLeftMenu(View view){
+    public void toggleLeftMenu() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.openDrawer(GravityCompat.START);
     }
@@ -569,17 +580,20 @@ public class MainActivity extends AppCompatActivity
      * 切换接单楼层
      */
     public void toFloorChange() {
+        String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
         MenuItem navMenuItemFlooeChange = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String ifFloorChange = navMenuItemFlooeChange.getTitleCondensed().toString();
         if(ifFloorChange.equals("all")){
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
             navMenuItemFlooeChange.setTitleCondensed("self");
-            navMenuItemFlooeChange.setTitle("楼层切换『 当前为：本楼层 』");
+            navMenuItemFlooeChange.setTitle("楼层切换『 当前为：" + floorName + " 』");
         }else{
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
             navMenuItemFlooeChange.setTitleCondensed("all");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
         }
+        // 刷新订单列表
+        initDatas(false);
     }
 
     class mHandler extends Handler {
