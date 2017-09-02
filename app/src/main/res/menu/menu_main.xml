@@ -1,10 +1,42 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.fy.niu.fyreorder.MainActivity">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_user_info"
+            android:icon="@drawable/user_nan"
+            android:title="个人资料" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_has_order"
+            android:icon="@drawable/file"
+            android:title="已接订单" />
+    </group>
+
+    <item android:title="操作选项">
+        <menu>
+            <item
+                android:id="@+id/nav_open_give"
+                android:titleCondensed="false"
+                android:title="点击开始接单" />
+            <item
+                android:id="@+id/nav_select_self_floor"
+                android:titleCondensed="all"
+                android:title="楼层切换『 当前为：所有 』" />
+        </menu>
+    </item>
+
+    <item android:title="程序相关设置">
+        <menu>
+            <item
+                android:id="@+id/nav_update"
+                android:title="检查新版本" />
+            <item
+                android:id="@+id/nav_exit"
+                android:title="退出登录" />
+        </menu>
+    </item>
 </menu>

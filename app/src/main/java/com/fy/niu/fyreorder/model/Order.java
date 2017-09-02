@@ -17,6 +17,8 @@ public class Order implements Serializable {
     private String orderDate;
     private String orderNumber;
     private String orderPrice;
+    private String couponPrice;
+    private String servicePrice;
     private String addressDetail;
     private String userName;
     private String userPhone;
@@ -95,6 +97,22 @@ public class Order implements Serializable {
 
     public void setOrderPrice(String orderPrice) {
         this.orderPrice = orderPrice;
+    }
+
+    public String getCouponPrice() {
+        return couponPrice;
+    }
+
+    public void setCouponPrice(String couponPrice) {
+        this.couponPrice = couponPrice;
+    }
+
+    public String getServicePrice() {
+        return servicePrice;
+    }
+
+    public void setServicePrice(String servicePrice) {
+        this.servicePrice = servicePrice;
     }
 
     public String getAddressDetail() {

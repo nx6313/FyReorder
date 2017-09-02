@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fy.niu.fyreorder.OrderActivity;
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.util.SerializableObjectList;
+import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -29,6 +31,7 @@ public class HasOrderFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        String userType = SharedPreferencesTool.getFromShared(getActivity(), "fyLoginUserInfo", "ifGive");
         Bundle bundle = getArguments();
         if(bundle != null){
             hasOrderDataType = bundle.getString(BUNDLE_DATA_TYPE);
@@ -43,18 +46,33 @@ public class HasOrderFragment extends Fragment {
         TextView orderMoneyLabelTv = (TextView) view.findViewById(R.id.orderMoneyLabelTv);
         TextView orderMoneyTv = (TextView) view.findViewById(R.id.orderMoneyTv);
         if(hasOrderDataType.equals("today")){
-            orderNumLabelTv.setText("日接单数");
-            orderMoneyLabelTv.setText("日工资");
+            if(!userType.equals("0")){
+                orderNumLabelTv.setText("日订单数");
+                orderMoneyLabelTv.setText("日所得");
+            }else{
+                orderNumLabelTv.setText("日接单数");
+                orderMoneyLabelTv.setText("日工资");
+            }
             orderNumTv.setTag("tvDayNum");
             orderMoneyTv.setTag("tvDayCharge");
         }else if(hasOrderDataType.equals("lastWeek")){
-            orderNumLabelTv.setText("周接单数");
-            orderMoneyLabelTv.setText("周工资");
+            if(!userType.equals("0")){
+                orderNumLabelTv.setText("周订单数");
+                orderMoneyLabelTv.setText("周所得");
+            }else{
+                orderNumLabelTv.setText("周接单数");
+                orderMoneyLabelTv.setText("周工资");
+            }
             orderNumTv.setTag("tvWeekNum");
             orderMoneyTv.setTag("tvWeekCharge");
         }else if(hasOrderDataType.equals("lastMonth")){
-            orderNumLabelTv.setText("月接单数");
-            orderMoneyLabelTv.setText("月工资");
+            if(!userType.equals("0")){
+                orderNumLabelTv.setText("月订单数");
+                orderMoneyLabelTv.setText("月所得");
+            }else{
+                orderNumLabelTv.setText("月接单数");
+                orderMoneyLabelTv.setText("月工资");
+            }
             orderNumTv.setTag("tvMonthNum");
             orderMoneyTv.setTag("tvMonthCharge");
         }

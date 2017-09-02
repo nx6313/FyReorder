@@ -1,8 +1,11 @@
 package com.fy.niu.fyreorder.util;
 
 import android.app.Application;
+import android.app.Notification;
+import android.media.RingtoneManager;
 import android.util.Log;
 
+import com.tencent.android.tpush.XGCustomPushNotificationBuilder;
 import com.tencent.android.tpush.XGIOperateCallback;
 import com.tencent.android.tpush.XGPushConfig;
 import com.tencent.android.tpush.XGPushManager;
@@ -36,5 +39,12 @@ public class MyApplication extends Application {
                 Log.d("TPush", "注册失败，错误码：" + errCode + ",错误信息：" + msg);
             }
         });
+//        XGCustomPushNotificationBuilder build = new XGCustomPushNotificationBuilder();
+//        build.setSound(RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_ALARM)) // 设置声音
+                // setSound(
+                // Uri.parse("android.resource://" + getPackageName()
+                // + "/" + R.raw.wind)) 设定Raw下指定声音文件
+//                .setDefaults(Notification.DEFAULT_VIBRATE) // 震动
+//                .setFlags(Notification.FLAG_NO_CLEAR); // 是否可清除
     }
 }

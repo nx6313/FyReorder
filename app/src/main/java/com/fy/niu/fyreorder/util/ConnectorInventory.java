@@ -65,4 +65,11 @@ public class ConnectorInventory {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "toSetUserIfOpen", params), dataHandle);
     }
 
+    /**
+     * 修改密码
+     */
+    public static void updateUserPass(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "toUpdateUserPass", params), dataHandle);
+    }
+
 }

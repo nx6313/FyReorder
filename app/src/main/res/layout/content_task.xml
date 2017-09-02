@@ -25,30 +25,4 @@
         android:layout_height="0dp"
         android:layout_weight="1">
     </android.support.v4.view.ViewPager>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ec796a"
-        android:padding="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="总接单数：100"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="#eaeaea"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="总工资：100000 元"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="#eaeaea"/>
-    </LinearLayout>
 </LinearLayout>

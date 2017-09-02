@@ -1,24 +1,33 @@
 package com.fy.niu.fyreorder;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
-import com.fy.niu.fyreorder.customView.ElasticScrollView;
-import com.fy.niu.fyreorder.customView.SlideMenu;
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 import com.fy.niu.fyreorder.model.Order;
@@ -30,6 +39,7 @@ import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
+import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import org.json.JSONArray;
@@ -42,15 +52,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+    public static Handler mHandler = null;
+    public static final int MSG_UPDATE_ORDER_STATE = 1;
+    public static final int MSG_REF_ORDER_LSIT = 2;
     private long exitTime;
-    private SlideMenu leftMenu; // 左侧菜单
+    private NavigationView navigationView;
     private CircularImage userHeadImg;
 
     private ViewPager mainViewPager;
     private ViewPagerIndicator mainIndicator;
-
-    private LinearLayout orderUserIfOpenLayout;
 
     private List<String> mTitles = Arrays.asList("未接订单", "已接订单");
     private List<MainOrderFragment> mContents = new ArrayList<>();
@@ -71,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        mHandler = new MainActivity.mHandler();
+
         mainUserHeadImg = (CircularImage) toolbar.findViewById(R.id.mainUserHeadImg);
         mainUserHeadImg.setImageResource(R.drawable.default_user_head_1);
 
@@ -84,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             userSilentLogin(userAccountNum, userAccountPass);
         }else{
             initUserData();
-            initDatas();
+            initDatas(false);
         }
 
         mainIndicator.setVisibleTabCount(mTitles.size());
@@ -111,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Object responseObj) {
                 try {
+                    Log.d("静默登陆成功，用户信息", responseObj.toString());
                     JSONObject data = new JSONObject(responseObj.toString());
                     if(data.get("result").equals("success")){
-                        Log.d("静默登陆完成 ====== ", "开始获取用户数据");
                         initUserData();
-                        initDatas();
+                        initDatas(false);
                     }else{
                         // 登录失败，提示用户，需要手动重新登录
                         ComFun.showToast(MainActivity.this, "登录失效，需重新登录", Toast.LENGTH_SHORT);
@@ -144,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Object responseObj) {
                 try {
+                    Log.d("用户信息成功", responseObj.toString());
+                    DBUtil.deleteAll(new DBOpenHelper(MainActivity.this), "userInfo");
                     JSONObject userInfoJson = new JSONObject(responseObj.toString());
                     String userId = userInfoJson.getString("userId");
                     String floor = userInfoJson.getString("floor");
@@ -168,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
                     values.put("type", type);
                     values.put("orgName", orgName);
                     values.put("telephone", telephone);
-                    DBUtil.deleteAll(new DBOpenHelper(MainActivity.this), "userInfo");
                     DBUtil.save(new DBOpenHelper(MainActivity.this), "userInfo", values);
                     // 更新UI
                     ((TextView) findViewById(R.id.leftMenuUserName)).setText(userName);
@@ -183,19 +198,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        leftMenu = (SlideMenu) findViewById(R.id.leftMenu);
-        userHeadImg = (CircularImage) findViewById(R.id.userHeadImg);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);
+        navigationView.setNavigationItemSelectedListener(this);
+        userHeadImg = (CircularImage) navigationView.getHeaderView(0).findViewById(R.id.userHeadImg);
         userHeadImg.setImageResource(R.drawable.default_user_head_1);
 
         mainViewPager = (ViewPager) findViewById(R.id.mainViewPager);
         mainIndicator = (ViewPagerIndicator) findViewById(R.id.mainIndicator);
 
-        orderUserIfOpenLayout = (LinearLayout) findViewById(R.id.orderUserIfOpenLayout);
+        String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
+        MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
+        String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+        if(!ifGive.equals("0")){
+            navMenuItemSelectSelfFloor.setVisible(false);
+        }else{
+            if(receiveSelfFloor.equals("self")){
+                navMenuItemSelectSelfFloor.setTitleCondensed("self");
+                navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：本楼层 』");
+            }else{
+                navMenuItemSelectSelfFloor.setTitleCondensed("all");
+                navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：所有 』");
+            }
+        }
 
+        MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         String ifOpen = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifOpen");
         if(ifOpen.equals("1")){
-            orderUserIfOpenLayout.setTag("true");
-            ((TextView) orderUserIfOpenLayout.getChildAt(0)).setText("当前正在听单中，点击停止接单");
+            navMenuItemOpenGive.setTitleCondensed("true");
+            navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
         }
 
         Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
@@ -220,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private void initDatas() {
+    private void initDatas(final boolean isRefFlag) {
         final Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
         orderDataMap.put("weiJie", new ArrayList<Order>());
         orderDataMap.put("yiJie", new ArrayList<Order>());
@@ -228,9 +259,15 @@ public class MainActivity extends AppCompatActivity {
         // 请求数据库获取数据
         ComFun.showLoading(MainActivity.this, "正在获取订单列表，请稍后");
         final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+        String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
+        String floor = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floor");
+        String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         params.put("ifTake", "0");
+        if(ifGive.equals("0") && receiveSelfFloor.equals("self")){
+            params.put("floor", floor);
+        }
         ConnectorInventory.getOrderList(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
@@ -256,6 +293,9 @@ public class MainActivity extends AppCompatActivity {
                 ConnectorInventory.getOrderList(MainActivity.this, params2, new DisposeDataHandle(new DisposeDataListener() {
                     @Override
                     public void onFinish() {
+                        if(isRefFlag){
+                            hideRefLayout();
+                        }
                         ComFun.hideLoading();
                     }
 
@@ -286,10 +326,24 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
+                if(isRefFlag){
+                    hideRefLayout();
+                }
                 ComFun.hideLoading();
                 ComFun.showToast(MainActivity.this, "获取未接订单数据异常", Toast.LENGTH_SHORT);
             }
         }));
+    }
+
+    private void hideRefLayout() {
+        SwipeRefreshLayout mainOrderSwipeRefresh_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_weiJie");
+        SwipeRefreshLayout noMainOrderDataLayout_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_weiJie");
+        SwipeRefreshLayout mainOrderSwipeRefresh_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_yiJie");
+        SwipeRefreshLayout noMainOrderDataLayout_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_yiJie");
+        mainOrderSwipeRefresh_weiJie.setRefreshing(false);
+        noMainOrderDataLayout_weiJie.setRefreshing(false);
+        mainOrderSwipeRefresh_yiJie.setRefreshing(false);
+        noMainOrderDataLayout_yiJie.setRefreshing(false);
     }
 
     private List<Order> getOrderListFromJson(JSONArray dataList) {
@@ -307,12 +361,19 @@ public class MainActivity extends AppCompatActivity {
                 order.setOrderDate(orderDataJson.getString("orderDate"));
                 order.setOrderNumber(orderDataJson.getString("orderNumber"));
                 order.setOrderPrice(orderDataJson.getString("orderPrice"));
+                order.setCouponPrice(orderDataJson.getString("newUser"));
+                order.setServicePrice(orderDataJson.getString("service"));
                 order.setAddressDetail(orderDataJson.getString("addressDetail"));
 
-                order.setUserName("用户" + i);
-                order.setUserPhone("213542336" + i);
-                order.setSchool("魔鬼学院");
-                order.setRemark("哇哈哈哈");
+                if(orderDataJson.has("perName")){
+                    order.setUserName(orderDataJson.getString("perName"));
+                }
+                if(orderDataJson.has("perTel")){
+                    order.setUserPhone(orderDataJson.getString("perTel"));
+                }
+                if(orderDataJson.has("remark")){
+                    order.setRemark(orderDataJson.getString("remark"));
+                }
                 order.setState(2);
 
                 JSONArray buyContentJsonArr = orderDataJson.getJSONArray("children");
@@ -323,9 +384,9 @@ public class MainActivity extends AppCompatActivity {
                     buyContent.setProId(buyContentJsonObj.getString("proId"));
                     buyContent.setNum(buyContentJsonObj.getInt("num"));
                     buyContent.setPrice(buyContentJsonObj.getString("price"));
+                    buyContent.setName(buyContentJsonObj.getString("proName"));
                     buyContent.setUrl(buyContentJsonObj.getString("url"));
 
-                    buyContent.setName("冰红茶");
                     buyContentList.add(buyContent);
                 }
                 order.setOrderDetail(buyContentList);
@@ -336,43 +397,70 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateOrderViewPager(Map<String, List<Order>> orderDataMap) {
-        ElasticScrollView mainOrderScrollView_weiJie = (ElasticScrollView) mainViewPager.findViewWithTag("orderScrollView_weiJie");
-        LinearLayout noMainOrderDataLayout_weiJie = (LinearLayout) mainViewPager.findViewWithTag("noDataLayout_weiJie");
-        ElasticScrollView mainOrderScrollView_yiJie = (ElasticScrollView) mainViewPager.findViewWithTag("orderScrollView_yiJie");
-        LinearLayout noMainOrderDataLayout_yiJie = (LinearLayout) mainViewPager.findViewWithTag("noDataLayout_yiJie");
-        if(mainOrderScrollView_weiJie != null && noMainOrderDataLayout_weiJie != null &&
-                mainOrderScrollView_yiJie != null && noMainOrderDataLayout_yiJie != null){
+        SwipeRefreshLayout mainOrderSwipeRefresh_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_weiJie");
+        SwipeRefreshLayout noMainOrderDataLayout_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_weiJie");
+        SwipeRefreshLayout mainOrderSwipeRefresh_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_yiJie");
+        SwipeRefreshLayout noMainOrderDataLayout_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_yiJie");
+        if(mainOrderSwipeRefresh_weiJie != null && noMainOrderDataLayout_weiJie != null &&
+                mainOrderSwipeRefresh_yiJie != null && noMainOrderDataLayout_yiJie != null){
             List<Order> weiJieOrderListNew = orderDataMap.get("weiJie");
             List<Order> yiJieOrderListNew = orderDataMap.get("yiJie");
             if(ComFun.strNull(weiJieOrderListNew, true)){
                 noMainOrderDataLayout_weiJie.setVisibility(View.GONE);
-                mainOrderScrollView_weiJie.setVisibility(View.VISIBLE);
-                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderScrollView_weiJie.findViewById(R.id.mainOrderDataLayout);
+                mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
+                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
                 MainOrderFragment.createMainOrderView(MainActivity.this, mainOrderDataLayout, weiJieOrderListNew);
             }else{
-                mainOrderScrollView_weiJie.setVisibility(View.GONE);
+                mainOrderSwipeRefresh_weiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
             }
             if(ComFun.strNull(yiJieOrderListNew, true)){
                 noMainOrderDataLayout_yiJie.setVisibility(View.GONE);
-                mainOrderScrollView_yiJie.setVisibility(View.VISIBLE);
-                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderScrollView_yiJie.findViewById(R.id.mainOrderDataLayout);
+                mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
+                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
                 MainOrderFragment.createMainOrderView(MainActivity.this, mainOrderDataLayout, yiJieOrderListNew);
             }else{
-                mainOrderScrollView_yiJie.setVisibility(View.GONE);
+                mainOrderSwipeRefresh_yiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_yiJie.setVisibility(View.VISIBLE);
             }
         }
     }
 
     @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.nav_user_info:
+                toUserData();
+                break;
+            case R.id.nav_has_order:
+                toHasReceiveOrder();
+                break;
+            case R.id.nav_open_give:
+                toUserIfOpen();
+                break;
+            case R.id.nav_select_self_floor:
+                toFloorChange();
+                break;
+            case R.id.nav_update:
+                ComFun.showToast(this, "正在开发中，敬请期待", 2000);
+                break;
+            case R.id.nav_exit:
+                toUserLoginOut();
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if(leftMenu.isOpen()){
-                leftMenu.toggle();
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if(drawer.isDrawerOpen(GravityCompat.START)){
+                drawer.closeDrawer(GravityCompat.START);
             }else{
                 if (System.currentTimeMillis() - exitTime > 2000) {
                     ComFun.showToast(this, "再按一次离开", 2000);
@@ -389,8 +477,9 @@ public class MainActivity extends AppCompatActivity {
      * 打开或关闭菜单
      * @param view
      */
-    public void toggleMenu(View view){
-        leftMenu.toggle();
+    public void toggleLeftMenu(View view){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.openDrawer(GravityCompat.START);
     }
 
     /**
@@ -404,27 +493,24 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 跳转到个人资料
-     * @param view
      */
-    public void toUserData(View view){
+    public void toUserData(){
         Intent userDataIntent = new Intent(MainActivity.this, UserDataActivity.class);
         startActivity(userDataIntent);
     }
 
     /**
      * 跳转到已接订单
-     * @param view
      */
-    public void toHasReceiveOrder(View view){
+    public void toHasReceiveOrder(){
         Intent hasReceiveOrderIntent = new Intent(MainActivity.this, OrderActivity.class);
         startActivity(hasReceiveOrderIntent);
     }
 
     /**
      * 用户退出登录
-     * @param view
      */
-    public void toUserLoginOut(View view){
+    public void toUserLoginOut(){
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈
         ComFun.clearAllActiveActivity();
@@ -434,11 +520,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 用户开启或关闭接单
-     * @param view
      */
-    public void toUserIfOpen(View view){
-        final View thisView = view;
-        final String ifOpenFlag = (String) view.getTag();
+    public void toUserIfOpen(){
+        final MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
+        final String ifOpenFlag = navMenuItemOpenGive.getTitleCondensed().toString();
         ComFun.showLoading(MainActivity.this, "正在处理，请稍后");
         final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
         RequestParams params = new RequestParams();
@@ -457,12 +542,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Object responseObj) {
                 if(ifOpenFlag.equals("true")){
-                    thisView.setTag("false");
-                    ((TextView) ((LinearLayout) thisView).getChildAt(0)).setText("点击开始接单");
+                    SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "0");
+                    navMenuItemOpenGive.setTitleCondensed("false");
+                    navMenuItemOpenGive.setTitle("点击开始接单");
                     ComFun.showToast(MainActivity.this, "成功停止接单啦", Toast.LENGTH_SHORT);
                 }else{
-                    thisView.setTag("true");
-                    ((TextView) ((LinearLayout) thisView).getChildAt(0)).setText("当前正在听单中，点击停止接单");
+                    SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "1");
+                    navMenuItemOpenGive.setTitleCondensed("true");
+                    navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
                     ComFun.showToast(MainActivity.this, "成功开始接单啦", Toast.LENGTH_SHORT);
                 }
             }
@@ -476,5 +563,123 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }));
+    }
+
+    /**
+     * 切换接单楼层
+     */
+    public void toFloorChange() {
+        MenuItem navMenuItemFlooeChange = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
+        String ifFloorChange = navMenuItemFlooeChange.getTitleCondensed().toString();
+        if(ifFloorChange.equals("all")){
+            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
+            navMenuItemFlooeChange.setTitleCondensed("self");
+            navMenuItemFlooeChange.setTitle("楼层切换『 当前为：本楼层 』");
+        }else{
+            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
+            navMenuItemFlooeChange.setTitleCondensed("all");
+            navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
+        }
+    }
+
+    class mHandler extends Handler {
+        public mHandler() {
+        }
+
+        public mHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle b = msg.getData();
+            switch (msg.what) {
+                case MSG_UPDATE_ORDER_STATE:
+                    final String orderId = b.getString("orderId");
+                    int orderState = b.getInt("orderState");
+                    // 送货的  未接单 3 已接单 4
+                    // 商家    未接单 2 已接单 3
+                    if(orderState == 4){
+                        // 需要完成订单验证码
+                        final EditText etCompCode = new EditText(MainActivity.this);
+                        etCompCode.setPadding(DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16), DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16));
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("请输入订单验收码").setIcon(R.drawable.edit).setView(etCompCode).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ComFun.hideLoading();
+                            }
+                        });
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String compCode = etCompCode.getText().toString();
+                                if(ComFun.strNull(compCode.trim())){
+                                    updateOrderState(orderId, compCode.trim());
+                                }else{
+                                    updateOrderState(orderId, "unCode");
+                                }
+                            }
+                        });
+                        builder.show();
+                    }else{
+                        updateOrderState(orderId, null);
+                    }
+                    break;
+                case MSG_REF_ORDER_LSIT:
+                    initDatas(true);
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    }
+
+    private void updateOrderState(String orderId, String orderCode) {
+        if(orderCode == null){
+            ComFun.showLoading(MainActivity.this, "操作处理中，请稍后");
+        }else{
+            if(!orderCode.equals("unCode")){
+                ComFun.showLoading(MainActivity.this, "操作处理中，请稍后");
+            }else{
+                ComFun.hideLoading();
+            }
+        }
+        if(orderCode == null || (orderCode != null && !orderCode.equals("unCode"))){
+            final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+            RequestParams params = new RequestParams();
+            params.put("userId", userId);
+            params.put("orderId", orderId);
+            if(orderCode != null && !orderCode.equals("unCode")){
+                params.put("idenCode", orderCode);
+            }
+            ConnectorInventory.updateOrderState(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                @Override
+                public void onFinish() {
+                    ComFun.hideLoading();
+                }
+
+                @Override
+                public void onSuccess(Object responseObj) {
+                    try {
+                        JSONObject resuleJson = new JSONObject(responseObj.toString());
+                        String code = resuleJson.getString("code");
+                        if(code.equals("ajaxSuccess")){
+                            ComFun.showToast(MainActivity.this, "操作成功", Toast.LENGTH_SHORT);
+                            // 刷新订单列表
+                            initDatas(false);
+                        }else if(code.equals("error")){
+                            ComFun.showToast(MainActivity.this, "验证码错误，请重新输入验证码", Toast.LENGTH_SHORT);
+                        }else{
+                            ComFun.showToast(MainActivity.this, "操作处理异常，请稍后重试", Toast.LENGTH_SHORT);
+                        }
+                    } catch (JSONException e) {}
+                }
+
+                @Override
+                public void onFailure(OkHttpException okHttpE) {
+                    ComFun.showToast(MainActivity.this, "操作处理失败，请稍后重试", Toast.LENGTH_SHORT);
+                }
+            }));
+        }
     }
 }

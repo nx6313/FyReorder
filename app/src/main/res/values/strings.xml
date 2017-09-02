@@ -5,4 +5,5 @@
     <string name="title_activity_task">发布任务</string>
     <string name="title_activity_user_center">个人中心</string>
     <string name="title_activity_user_data">个人资料</string>
+    <string name="title_activity_update_pwd">修改密码</string>
 </resources>

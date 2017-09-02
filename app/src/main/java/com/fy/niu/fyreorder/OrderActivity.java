@@ -39,9 +39,11 @@ public class OrderActivity extends AppCompatActivity {
     private TextView receiveOrderSumNum;
     private TextView receiveOrderSumCharge;
 
-    private List<String> mTitles = Arrays.asList("今日接单", "上周接单", "上月接单");
+    private List<String> mTitles = Arrays.asList("昨日接单", "上周接单", "上月接单");
     private List<HasOrderFragment> mContents = new ArrayList<>();
     private FragmentPagerAdapter mAdapter;
+
+    private String userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,14 @@ public class OrderActivity extends AppCompatActivity {
 
         setupActionBar();
 
+        userType = SharedPreferencesTool.getFromShared(OrderActivity.this, "fyLoginUserInfo", "ifGive");
+
         initView();
         initDatas();
+
+        if(!userType.equals("0")){
+            mTitles = Arrays.asList("昨日订单", "上周订单", "上月订单");
+        }
 
         orderIndicator.setVisibleTabCount(mTitles.size());
         orderIndicator.setTabItemTitles(mTitles);
@@ -92,8 +100,13 @@ public class OrderActivity extends AppCompatActivity {
 
         receiveOrderSumNum = (TextView) findViewById(R.id.receiveOrderSumNum);
         receiveOrderSumCharge = (TextView) findViewById(R.id.receiveOrderSumCharge);
-        receiveOrderSumNum.setText("总接单数：0");
-        receiveOrderSumCharge.setText("总工资：0 元");
+        if(!userType.equals("0")){
+            receiveOrderSumNum.setText("总订单数：0");
+            receiveOrderSumCharge.setText("总赚得：0 元");
+        }else{
+            receiveOrderSumNum.setText("总接单数：0");
+            receiveOrderSumCharge.setText("总工资：0 元");
+        }
 
         Map<String, List<Object>> hasOrderDataMap = new LinkedHashMap<>();
         List<Object> todayHasOrderList = new ArrayList<>();
@@ -173,8 +186,13 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void updateOrderViewPager(ReceivedOrderData receivedOrderData) {
-        receiveOrderSumNum.setText("总接单数：" + receivedOrderData.getSumNum());
-        receiveOrderSumCharge.setText("总工资：" + receivedOrderData.getSumCharge() + " 元");
+        if(!userType.equals("0")){
+            receiveOrderSumNum.setText("总订单数：" + receivedOrderData.getSumNum());
+            receiveOrderSumCharge.setText("总赚得：" + receivedOrderData.getSumCharge() + " 元");
+        }else{
+            receiveOrderSumNum.setText("总接单数：" + receivedOrderData.getSumNum());
+            receiveOrderSumCharge.setText("总工资：" + receivedOrderData.getSumCharge() + " 元");
+        }
 
         TextView tvDayNum = (TextView) orderViewPager.findViewWithTag("tvDayNum");
         TextView tvDayCharge = (TextView) orderViewPager.findViewWithTag("tvDayCharge");

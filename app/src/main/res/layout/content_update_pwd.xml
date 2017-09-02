@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.fy.niu.fyreorder.UpdatePwdActivity"
+    tools:showIn="@layout/activity_update_pwd">
+
+    <com.fy.niu.fyreorder.customView.ElasticScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|top"
+        android:overScrollMode="never"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/colorScroll"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="旧密码："/>
+
+                <EditText
+                    android:id="@+id/etPwdOld"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:hint="请输入旧密码"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="新密码："/>
+
+                <EditText
+                    android:id="@+id/etPwdNew"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:hint="请输入新密码"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="再次输入新密码："/>
+
+                <EditText
+                    android:id="@+id/etPwdReNew"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:hint="请再次输入新密码"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/orderUserLoginOutLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/menu_item_style_2"
+                android:clickable="true"
+                android:descendantFocusability="blocksDescendants"
+                android:orientation="horizontal"
+                android:onClick="doUpdatePwd">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="#F2F2F2"
+                    android:text="提交修改"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.fy.niu.fyreorder.customView.ElasticScrollView>
+</RelativeLayout>

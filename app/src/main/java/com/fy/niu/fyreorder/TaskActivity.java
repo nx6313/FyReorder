@@ -104,8 +104,8 @@ public class TaskActivity extends AppCompatActivity {
                 try {
                     JSONObject orderDataJson = new JSONObject(responseObj.toString());
                     JSONArray dataList = orderDataJson.getJSONArray("dataList");
+                    Log.d(" ==== 任务列表数据 === ", " ===> " + dataList);
                     if(dataList.length() > 0){
-                        Log.d(" ==== 订单列表数据 === ", " ===> " + dataList);
 
                     }else{
 

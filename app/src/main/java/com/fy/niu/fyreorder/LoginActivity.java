@@ -98,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Object responseObj) {
                             try {
+                                Log.d("登录成功，用户信息", responseObj.toString());
                                 JSONObject data = new JSONObject(responseObj.toString());
                                 if(data.get("result").equals("success")){
                                     // 保存登录用户信息
@@ -106,6 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginPass", tvLoginPwd.getText().toString().trim());
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
+                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floor", data.getString("floor"));
                                     SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
                                     ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
                                     mLoginHandler = new Handler();
