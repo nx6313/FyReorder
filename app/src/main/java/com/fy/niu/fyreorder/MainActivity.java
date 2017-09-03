@@ -3,6 +3,7 @@ package com.fy.niu.fyreorder;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     public static Handler mHandler = null;
     public static final int MSG_UPDATE_ORDER_STATE = 1;
     public static final int MSG_REF_ORDER_LSIT = 2;
+    public static final int MSG_CALL_USER_PHONE = 3;
     private long exitTime;
     private NavigationView navigationView;
     private CircularImage userHeadImg;
@@ -417,7 +419,7 @@ public class MainActivity extends AppCompatActivity
                 mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
                 LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
-                MainOrderFragment.createMainOrderView(MainActivity.this, mainOrderDataLayout, weiJieOrderListNew);
+                MainOrderFragment.createMainOrderView(MainActivity.this, "weiJie", mainOrderDataLayout, weiJieOrderListNew);
             }else{
                 mainOrderSwipeRefresh_weiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
@@ -427,7 +429,7 @@ public class MainActivity extends AppCompatActivity
                 mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
                 LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
-                MainOrderFragment.createMainOrderView(MainActivity.this, mainOrderDataLayout, yiJieOrderListNew);
+                MainOrderFragment.createMainOrderView(MainActivity.this, "yiJie", mainOrderDataLayout, yiJieOrderListNew);
             }else{
                 mainOrderSwipeRefresh_yiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_yiJie.setVisibility(View.VISIBLE);
@@ -642,6 +644,16 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case MSG_REF_ORDER_LSIT:
                     initDatas(true);
+                    break;
+                case MSG_CALL_USER_PHONE:
+                    String userPhone = b.getString("userPhone");
+                    try {
+                        Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + userPhone));
+                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        MainActivity.this.startActivity(callIntent);
+                    } catch (SecurityException e) {
+                        ComFun.showToast(MainActivity.this, "您可能没有提供拨打电话的权限，给小渔开放权限后再试试吧", Toast.LENGTH_LONG);
+                    }
                     break;
             }
             super.handleMessage(msg);

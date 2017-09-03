@@ -48,6 +48,11 @@ public class DateFormatUtil {
     public static final String MMDDHHMM = "MM月dd日 HH:mm";
 
     /**
+     * 时间格式"M-d HH:mm"
+     */
+    public static final String MDHHMM = "MM-dd HH:mm";
+
+    /**
      * yyyy-MM-dd HH:mm:ss
      */
     public static final String TYPE = "yyyy-MM-dd HH:mm:ss";

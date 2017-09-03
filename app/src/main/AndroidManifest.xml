@@ -12,6 +12,8 @@
         </intent-filter>
     </receiver>
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
         android:name=".util.MyApplication"
         android:allowBackup="true"
