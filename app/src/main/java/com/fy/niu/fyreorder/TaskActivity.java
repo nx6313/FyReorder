@@ -1,19 +1,25 @@
 package com.fy.niu.fyreorder;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
-import com.fy.niu.fyreorder.fragment.HasOrderFragment;
 import com.fy.niu.fyreorder.fragment.HasTaskFragment;
+import com.fy.niu.fyreorder.model.Task;
 import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
@@ -33,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskActivity extends AppCompatActivity {
+    public static Handler mHandler = null;
+    public static final int MSG_REF_TASK_LSIT = 1;
     private ViewPager taskViewPager;
     private ViewPagerIndicator taskIndicator;
 
@@ -53,10 +61,12 @@ public class TaskActivity extends AppCompatActivity {
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        mHandler = new TaskActivity.mHandler();
+
         setupActionBar();
 
         initView();
-        initDatas();
+        initDatas(false);
 
         taskIndicator.setVisibleTabCount(mTitles.size());
         taskIndicator.setTabItemTitles(mTitles);
@@ -86,53 +96,13 @@ public class TaskActivity extends AppCompatActivity {
     private void initView() {
         taskViewPager = (ViewPager) findViewById(R.id.taskViewPager);
         taskIndicator = (ViewPagerIndicator) findViewById(R.id.taskIndicator);
-    }
 
-    private void initDatas() {
-        ComFun.showLoading(TaskActivity.this, "正在获取任务列表，请稍后");
-        String userId = SharedPreferencesTool.getFromShared(TaskActivity.this, "fyLoginUserInfo", "userId");
-        RequestParams params = new RequestParams();
-        params.put("userId", userId);
-        ConnectorInventory.getTaskList(TaskActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
-            @Override
-            public void onFinish() {
-                ComFun.hideLoading();
-            }
+        Map<String, List<Task>> hasTaskDataMap = new LinkedHashMap<>();
+        hasTaskDataMap.put("weiJie", new ArrayList<Task>());
+        hasTaskDataMap.put("yiJie", new ArrayList<Task>());
+        hasTaskDataMap.put("finished", new ArrayList<Task>());
 
-            @Override
-            public void onSuccess(Object responseObj) {
-                try {
-                    JSONObject orderDataJson = new JSONObject(responseObj.toString());
-                    JSONArray dataList = orderDataJson.getJSONArray("dataList");
-                    Log.d(" ==== 任务列表数据 === ", " ===> " + dataList);
-                    if(dataList.length() > 0){
-
-                    }else{
-
-                    }
-                } catch (JSONException e) {}
-            }
-
-            @Override
-            public void onFailure(OkHttpException okHttpE) {
-                Log.d(" ==== 获取任务数据error === ", " ===> " + okHttpE);
-            }
-        }));
-
-        Map<String, List<Object>> hasTaskDataMap = new LinkedHashMap<>();
-        List<Object> todayHasOrderList = new ArrayList<>();
-        todayHasOrderList.add(14);
-        todayHasOrderList.add(50);
-        List<Object> lastWeekHasOrderList = new ArrayList<>();
-        lastWeekHasOrderList.add(36);
-        lastWeekHasOrderList.add(75);
-        List<Object> lastMonthHasOrderList = new ArrayList<>();
-        lastMonthHasOrderList.add(68);
-        lastMonthHasOrderList.add(158);
-        hasTaskDataMap.put("today", todayHasOrderList);
-        hasTaskDataMap.put("lastWeek", lastWeekHasOrderList);
-        hasTaskDataMap.put("lastMonth", lastMonthHasOrderList);
-        for(Map.Entry<String, List<Object>> hasTaskMap : hasTaskDataMap.entrySet()){
+        for (Map.Entry<String, List<Task>> hasTaskMap : hasTaskDataMap.entrySet()) {
             HasTaskFragment fragment = HasTaskFragment.newInstance(hasTaskMap.getKey(), hasTaskMap.getValue());
             mContents.add(fragment);
         }
@@ -148,6 +118,152 @@ public class TaskActivity extends AppCompatActivity {
                 return mContents.size();
             }
         };
+    }
+
+    private void initDatas(final boolean isRefFlag) {
+        ComFun.showLoading(TaskActivity.this, "正在获取任务列表，请稍后");
+        String userId = SharedPreferencesTool.getFromShared(TaskActivity.this, "fyLoginUserInfo", "userId");
+        RequestParams params = new RequestParams();
+        params.put("userId", userId);
+        ConnectorInventory.getTaskList(TaskActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+            @Override
+            public void onFinish() {
+                if (isRefFlag) {
+                    hideRefLayout();
+                }
+                ComFun.hideLoading();
+            }
+
+            @Override
+            public void onSuccess(Object responseObj) {
+                try {
+                    JSONObject orderDataJson = new JSONObject(responseObj.toString());
+                    JSONArray dataList = orderDataJson.getJSONArray("dataList");
+                    Log.d(" ==== 任务列表数据 === ", " ===> " + dataList);
+                    if (dataList.length() > 0) {
+                        Map<String, List<Task>> hasTaskDataMap = getTaskListFromJson(dataList);
+                        // 刷新布局
+                        refTaskListView(hasTaskDataMap);
+                    }
+                } catch (JSONException e) {
+                }
+            }
+
+            @Override
+            public void onFailure(OkHttpException okHttpE) {
+                Log.d(" ==== 获取任务数据error === ", " ===> " + okHttpE);
+            }
+        }));
+    }
+
+    private void hideRefLayout() {
+        SwipeRefreshLayout mainTaskSwipeRefresh_weiJie = (SwipeRefreshLayout) taskViewPager.findViewWithTag("taskSwipeRefresh_weiJie");
+        SwipeRefreshLayout noMainTaskDataLayout_weiJie = (SwipeRefreshLayout) taskViewPager.findViewWithTag("noDataLayout_weiJie");
+        SwipeRefreshLayout mainTaskSwipeRefresh_yiJie = (SwipeRefreshLayout) taskViewPager.findViewWithTag("taskSwipeRefresh_yiJie");
+        SwipeRefreshLayout noMainTaskDataLayout_yiJie = (SwipeRefreshLayout) taskViewPager.findViewWithTag("noDataLayout_yiJie");
+        SwipeRefreshLayout mainTaskSwipeRefresh_finished = (SwipeRefreshLayout) taskViewPager.findViewWithTag("taskSwipeRefresh_finished");
+        SwipeRefreshLayout noMainTaskDataLayout_finished = (SwipeRefreshLayout) taskViewPager.findViewWithTag("noDataLayout_finished");
+        mainTaskSwipeRefresh_weiJie.setRefreshing(false);
+        noMainTaskDataLayout_weiJie.setRefreshing(false);
+        mainTaskSwipeRefresh_yiJie.setRefreshing(false);
+        noMainTaskDataLayout_yiJie.setRefreshing(false);
+        mainTaskSwipeRefresh_finished.setRefreshing(false);
+        noMainTaskDataLayout_finished.setRefreshing(false);
+    }
+
+    private Map<String, List<Task>> getTaskListFromJson(JSONArray dataList) {
+        Map<String, List<Task>> hasTaskDataMap = new LinkedHashMap<>();
+        List<Task> weiJie = new ArrayList<>();
+        List<Task> yiJie = new ArrayList<>();
+        List<Task> finished = new ArrayList<>();
+
+        for (int i = 0; i < dataList.length(); i++) {
+            try {
+                JSONObject taskJson = dataList.getJSONObject(i);
+                if (taskJson.has("id")) {
+                    String id = taskJson.getString("id");
+                    if (ComFun.strNull(id) && !id.equals("null")) {
+                        String date = taskJson.getString("date");
+                        String name = taskJson.getString("name");
+                        String content = taskJson.has("content") ? taskJson.getString("content") : "";
+                        Task task = new Task();
+                        task.setId(id);
+                        task.setDate(date);
+                        task.setName(name);
+                        task.setContent(content);
+                        weiJie.add(task);
+                    }
+                } else if (taskJson.has("idOnder")) {
+                    String idOnder = taskJson.getString("idOnder");
+                    if (ComFun.strNull(idOnder) && !idOnder.equals("null")) {
+                        String dateOnder = taskJson.getString("dateOnder");
+                        String nameOnder = taskJson.getString("nameOnder");
+                        String contentOnder = taskJson.has("contentOnder") ? taskJson.getString("contentOnder") : "";
+                        Task task = new Task();
+                        task.setId(idOnder);
+                        task.setDate(dateOnder);
+                        task.setName(nameOnder);
+                        task.setContent(contentOnder);
+                        yiJie.add(task);
+                    }
+                } else if (taskJson.has("idFin")) {
+                    String idFin = taskJson.getString("idFin");
+                    if (ComFun.strNull(idFin) && !idFin.equals("null")) {
+                        String dateFin = taskJson.getString("dateFin");
+                        String nameFin = taskJson.getString("nameFin");
+                        String contentFin = taskJson.has("contentFin") ? taskJson.getString("contentFin") : "";
+                        Task task = new Task();
+                        task.setId(idFin);
+                        task.setDate(dateFin);
+                        task.setName(nameFin);
+                        task.setContent(contentFin);
+                        finished.add(task);
+                    }
+                }
+            } catch (JSONException e) {
+            }
+        }
+
+        hasTaskDataMap.put("weiJie", weiJie);
+        hasTaskDataMap.put("yiJie", yiJie);
+        hasTaskDataMap.put("finished", finished);
+        return hasTaskDataMap;
+    }
+
+    private void refTaskListView(Map<String, List<Task>> hasTaskDataMap) {
+        for (Map.Entry<String, List<Task>> map : hasTaskDataMap.entrySet()) {
+            SwipeRefreshLayout mainTaskSwipeRefresh = (SwipeRefreshLayout) taskViewPager.findViewWithTag("taskSwipeRefresh_" + map.getKey());
+            SwipeRefreshLayout noMainTaskDataLayout = (SwipeRefreshLayout) taskViewPager.findViewWithTag("noDataLayout_" + map.getKey());
+            if (map.getValue().size() > 0) {
+                noMainTaskDataLayout.setVisibility(View.GONE);
+                mainTaskSwipeRefresh.setVisibility(View.VISIBLE);
+                LinearLayout mainTaskDataLayout = (LinearLayout) mainTaskSwipeRefresh.findViewById(R.id.mainTaskDataLayout);
+                HasTaskFragment.createMainTaskView(TaskActivity.this, map.getKey(), mainTaskDataLayout, map.getValue());
+            } else {
+                mainTaskSwipeRefresh.setVisibility(View.GONE);
+                noMainTaskDataLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    class mHandler extends Handler {
+        public mHandler() {
+        }
+
+        public mHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle b = msg.getData();
+            switch (msg.what) {
+                case MSG_REF_TASK_LSIT:
+                    initDatas(true);
+                    break;
+            }
+            super.handleMessage(msg);
+        }
     }
 
 }

@@ -54,9 +54,7 @@ public class MainOrderFragment extends Fragment {
             public void onRefresh() {
                 // 发送刷新订单Handler
                 Message msg = new Message();
-                Bundle data = new Bundle();
                 msg.what = MainActivity.MSG_REF_ORDER_LSIT;
-                msg.setData(data);
                 MainActivity.mHandler.sendMessage(msg);
             }
         });
@@ -65,9 +63,7 @@ public class MainOrderFragment extends Fragment {
             public void onRefresh() {
                 // 发送刷新订单Handler
                 Message msg = new Message();
-                Bundle data = new Bundle();
                 msg.what = MainActivity.MSG_REF_ORDER_LSIT;
-                msg.setData(data);
                 MainActivity.mHandler.sendMessage(msg);
             }
         });
@@ -77,7 +73,6 @@ public class MainOrderFragment extends Fragment {
             noMainOrderDataLayout.setVisibility(View.GONE);
             mainOrderSwipeRefresh.setVisibility(View.VISIBLE);
             LinearLayout mainOrderDataLayout = (LinearLayout) view.findViewById(R.id.mainOrderDataLayout);
-            mainOrderDataLayout.removeAllViews();
             // 生成订单数据
             createMainOrderView(getActivity(), pageType, mainOrderDataLayout, mOrderDataList);
         } else {
@@ -88,6 +83,7 @@ public class MainOrderFragment extends Fragment {
     }
 
     public static void createMainOrderView(final Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> mOrderDataList) {
+        mainOrderDataLayout.removeAllViews();
         // 0学生  1商超   2外卖
         // 送货的  未接单 3 已接单 4
         // 商家    未接单 2 已接单 3

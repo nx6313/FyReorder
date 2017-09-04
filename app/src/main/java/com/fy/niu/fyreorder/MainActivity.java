@@ -100,11 +100,11 @@ public class MainActivity extends AppCompatActivity
 
         // 用户静默登录
         boolean needSilentLogin = getIntent().getBooleanExtra("needSilentLogin", false);
-        if(needSilentLogin){
+        if (needSilentLogin) {
             String userAccountNum = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userLoginName");
             String userAccountPass = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userLoginPass");
             userSilentLogin(userAccountNum, userAccountPass);
-        }else{
+        } else {
             initUserData();
             initDatas(false);
         }
@@ -135,14 +135,15 @@ public class MainActivity extends AppCompatActivity
                 try {
                     Log.d("静默登陆成功，用户信息", responseObj.toString());
                     JSONObject data = new JSONObject(responseObj.toString());
-                    if(data.get("result").equals("success")){
+                    if (data.get("result").equals("success")) {
                         initUserData();
                         initDatas(false);
-                    }else{
+                    } else {
                         // 登录失败，提示用户，需要手动重新登录
                         ComFun.showToast(MainActivity.this, "登录失效，需重新登录", Toast.LENGTH_SHORT);
                     }
-                } catch (JSONException e) {}
+                } catch (JSONException e) {
+                }
             }
 
             @Override
@@ -195,7 +196,8 @@ public class MainActivity extends AppCompatActivity
                     DBUtil.save(new DBOpenHelper(MainActivity.this), "userInfo", values);
                     // 更新UI
                     ((TextView) findViewById(R.id.leftMenuUserName)).setText(userName);
-                } catch (JSONException e) {}
+                } catch (JSONException e) {
+                }
             }
 
             @Override
@@ -219,13 +221,13 @@ public class MainActivity extends AppCompatActivity
         String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
-        if(!ifGive.equals("0")){
+        if (!ifGive.equals("0")) {
             navMenuItemSelectSelfFloor.setVisible(false);
-        }else{
-            if(receiveSelfFloor.equals("self")){
+        } else {
+            if (receiveSelfFloor.equals("self")) {
                 navMenuItemSelectSelfFloor.setTitleCondensed("self");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：" + floorName + " 』");
-            }else{
+            } else {
                 navMenuItemSelectSelfFloor.setTitleCondensed("all");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：所有 』");
             }
@@ -233,7 +235,7 @@ public class MainActivity extends AppCompatActivity
 
         MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         String ifOpen = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifOpen");
-        if(ifOpen.equals("1")){
+        if (ifOpen.equals("1")) {
             navMenuItemOpenGive.setTitleCondensed("true");
             navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
         }
@@ -242,7 +244,7 @@ public class MainActivity extends AppCompatActivity
         orderDataMap.put("weiJie", new ArrayList<Order>());
         orderDataMap.put("yiJie", new ArrayList<Order>());
 
-        for(Map.Entry<String, List<Order>> orderMap : orderDataMap.entrySet()){
+        for (Map.Entry<String, List<Order>> orderMap : orderDataMap.entrySet()) {
             MainOrderFragment fragment = MainOrderFragment.newInstance(orderMap.getKey(), orderMap.getValue());
             mContents.add(fragment);
         }
@@ -274,7 +276,7 @@ public class MainActivity extends AppCompatActivity
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         params.put("ifTake", "0");
-        if(ifGive.equals("0") && receiveSelfFloor.equals("self")){
+        if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {
             params.put("floor", floor);
         }
         ConnectorInventory.getOrderList(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -288,21 +290,22 @@ public class MainActivity extends AppCompatActivity
                     JSONObject orderDataJson = new JSONObject(responseObj.toString());
                     JSONArray dataList = orderDataJson.getJSONArray("dataList");
                     Log.d(" ==== 未接订单列表数据 === ", " ===> " + dataList);
-                    if(dataList.length() > 0){
+                    if (dataList.length() > 0) {
                         List<Order> weiJieOrderList = getOrderListFromJson(dataList);
                         orderDataMap.put("weiJie", weiJieOrderList);
-                    }else{
+                    } else {
                         List<Order> weiJieOrderList = new ArrayList<>();
                         orderDataMap.put("weiJie", weiJieOrderList);
                     }
-                } catch (JSONException e) {}
+                } catch (JSONException e) {
+                }
                 RequestParams params2 = new RequestParams();
                 params2.put("userId", userId);
                 params2.put("ifTake", "1");
                 ConnectorInventory.getOrderList(MainActivity.this, params2, new DisposeDataHandle(new DisposeDataListener() {
                     @Override
                     public void onFinish() {
-                        if(isRefFlag){
+                        if (isRefFlag) {
                             hideRefLayout();
                         }
                         ComFun.hideLoading();
@@ -314,14 +317,15 @@ public class MainActivity extends AppCompatActivity
                             JSONObject orderDataJson = new JSONObject(responseObj.toString());
                             JSONArray dataList = orderDataJson.getJSONArray("dataList");
                             Log.d(" ==== 已接订单列表数据 === ", " ===> " + dataList);
-                            if(dataList.length() > 0){
+                            if (dataList.length() > 0) {
                                 List<Order> yiJieOrderList = getOrderListFromJson(dataList);
                                 orderDataMap.put("yiJie", yiJieOrderList);
-                            }else{
+                            } else {
                                 List<Order> yiJieOrderList = new ArrayList<>();
                                 orderDataMap.put("yiJie", yiJieOrderList);
                             }
-                        } catch (JSONException e) {}
+                        } catch (JSONException e) {
+                        }
                         // 更新数据
                         updateOrderViewPager(orderDataMap);
                     }
@@ -335,7 +339,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if(isRefFlag){
+                if (isRefFlag) {
                     hideRefLayout();
                 }
                 ComFun.hideLoading();
@@ -357,7 +361,7 @@ public class MainActivity extends AppCompatActivity
 
     private List<Order> getOrderListFromJson(JSONArray dataList) {
         List<Order> orderList = new ArrayList<>();
-        for(int i = 0; i < dataList.length(); i++){
+        for (int i = 0; i < dataList.length(); i++) {
             try {
                 JSONObject orderDataJson = dataList.getJSONObject(i);
                 Order order = new Order();
@@ -374,20 +378,20 @@ public class MainActivity extends AppCompatActivity
                 order.setServicePrice(orderDataJson.getString("service"));
                 order.setAddressDetail(orderDataJson.getString("addressDetail"));
 
-                if(orderDataJson.has("perName")){
+                if (orderDataJson.has("perName")) {
                     order.setUserName(orderDataJson.getString("perName"));
                 }
-                if(orderDataJson.has("perTel")){
+                if (orderDataJson.has("perTel")) {
                     order.setUserPhone(orderDataJson.getString("perTel"));
                 }
-                if(orderDataJson.has("remark")){
+                if (orderDataJson.has("remark")) {
                     order.setRemark(orderDataJson.getString("remark"));
                 }
                 order.setState(2);
 
                 JSONArray buyContentJsonArr = orderDataJson.getJSONArray("children");
                 List<Order.BuyContent> buyContentList = new ArrayList<>();
-                for(int j = 0; j < buyContentJsonArr.length(); j++){
+                for (int j = 0; j < buyContentJsonArr.length(); j++) {
                     JSONObject buyContentJsonObj = buyContentJsonArr.getJSONObject(j);
                     Order.BuyContent buyContent = new Order.BuyContent();
                     buyContent.setProId(buyContentJsonObj.getString("proId"));
@@ -400,7 +404,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 order.setOrderDetail(buyContentList);
                 orderList.add(order);
-            } catch (JSONException e) {}
+            } catch (JSONException e) {
+            }
         }
         return orderList;
     }
@@ -410,27 +415,27 @@ public class MainActivity extends AppCompatActivity
         SwipeRefreshLayout noMainOrderDataLayout_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_weiJie");
         SwipeRefreshLayout mainOrderSwipeRefresh_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_yiJie");
         SwipeRefreshLayout noMainOrderDataLayout_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_yiJie");
-        if(mainOrderSwipeRefresh_weiJie != null && noMainOrderDataLayout_weiJie != null &&
-                mainOrderSwipeRefresh_yiJie != null && noMainOrderDataLayout_yiJie != null){
+        if (mainOrderSwipeRefresh_weiJie != null && noMainOrderDataLayout_weiJie != null &&
+                mainOrderSwipeRefresh_yiJie != null && noMainOrderDataLayout_yiJie != null) {
             List<Order> weiJieOrderListNew = orderDataMap.get("weiJie");
             List<Order> yiJieOrderListNew = orderDataMap.get("yiJie");
-            if(ComFun.strNull(weiJieOrderListNew, true)){
+            if (ComFun.strNull(weiJieOrderListNew, true)) {
                 noMainOrderDataLayout_weiJie.setVisibility(View.GONE);
                 mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
                 LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
                 MainOrderFragment.createMainOrderView(MainActivity.this, "weiJie", mainOrderDataLayout, weiJieOrderListNew);
-            }else{
+            } else {
                 mainOrderSwipeRefresh_weiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
             }
-            if(ComFun.strNull(yiJieOrderListNew, true)){
+            if (ComFun.strNull(yiJieOrderListNew, true)) {
                 noMainOrderDataLayout_yiJie.setVisibility(View.GONE);
                 mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
                 LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
                 mainOrderDataLayout.removeAllViews();
                 MainOrderFragment.createMainOrderView(MainActivity.this, "yiJie", mainOrderDataLayout, yiJieOrderListNew);
-            }else{
+            } else {
                 mainOrderSwipeRefresh_yiJie.setVisibility(View.GONE);
                 noMainOrderDataLayout_yiJie.setVisibility(View.VISIBLE);
             }
@@ -473,9 +478,9 @@ public class MainActivity extends AppCompatActivity
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if(drawer.isDrawerOpen(GravityCompat.START)){
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
-            }else{
+            } else {
                 if (System.currentTimeMillis() - exitTime > 2000) {
                     ComFun.showToast(this, "再按一次离开", 2000);
                     exitTime = System.currentTimeMillis();
@@ -497,6 +502,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 跳转到任务列表页面
+     *
      * @param view
      */
     public void toTaskListActivity(View view) {
@@ -507,7 +513,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * 跳转到个人资料
      */
-    public void toUserData(){
+    public void toUserData() {
         Intent userDataIntent = new Intent(MainActivity.this, UserDataActivity.class);
         startActivity(userDataIntent);
     }
@@ -515,7 +521,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * 跳转到已接订单
      */
-    public void toHasReceiveOrder(){
+    public void toHasReceiveOrder() {
         Intent hasReceiveOrderIntent = new Intent(MainActivity.this, OrderActivity.class);
         startActivity(hasReceiveOrderIntent);
     }
@@ -523,7 +529,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * 用户退出登录
      */
-    public void toUserLoginOut(){
+    public void toUserLoginOut() {
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈
         ComFun.clearAllActiveActivity();
@@ -534,16 +540,16 @@ public class MainActivity extends AppCompatActivity
     /**
      * 用户开启或关闭接单
      */
-    public void toUserIfOpen(){
+    public void toUserIfOpen() {
         final MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         final String ifOpenFlag = navMenuItemOpenGive.getTitleCondensed().toString();
         ComFun.showLoading(MainActivity.this, "正在处理，请稍后");
         final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
         RequestParams params = new RequestParams();
         params.put("userId", userId);
-        if(ifOpenFlag.equals("true")){
+        if (ifOpenFlag.equals("true")) {
             params.put("ifOpen", "0");
-        }else{
+        } else {
             params.put("ifOpen", "1");
         }
         ConnectorInventory.setUserIfOpen(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -554,12 +560,12 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(Object responseObj) {
-                if(ifOpenFlag.equals("true")){
+                if (ifOpenFlag.equals("true")) {
                     SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "0");
                     navMenuItemOpenGive.setTitleCondensed("false");
                     navMenuItemOpenGive.setTitle("点击开始接单");
                     ComFun.showToast(MainActivity.this, "成功停止接单啦", Toast.LENGTH_SHORT);
-                }else{
+                } else {
                     SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "1");
                     navMenuItemOpenGive.setTitleCondensed("true");
                     navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
@@ -569,9 +575,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if(ifOpenFlag.equals("true")){
+                if (ifOpenFlag.equals("true")) {
                     ComFun.showToast(MainActivity.this, "停止接单失败，请稍后重试", Toast.LENGTH_SHORT);
-                }else{
+                } else {
                     ComFun.showToast(MainActivity.this, "开启接单失败，请稍后重试", Toast.LENGTH_SHORT);
                 }
             }
@@ -585,11 +591,11 @@ public class MainActivity extends AppCompatActivity
         String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
         MenuItem navMenuItemFlooeChange = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String ifFloorChange = navMenuItemFlooeChange.getTitleCondensed().toString();
-        if(ifFloorChange.equals("all")){
+        if (ifFloorChange.equals("all")) {
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
             navMenuItemFlooeChange.setTitleCondensed("self");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：" + floorName + " 』");
-        }else{
+        } else {
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
             navMenuItemFlooeChange.setTitleCondensed("all");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
@@ -615,7 +621,7 @@ public class MainActivity extends AppCompatActivity
                     int orderState = b.getInt("orderState");
                     // 送货的  未接单 3 已接单 4
                     // 商家    未接单 2 已接单 3
-                    if(orderState == 4){
+                    if (orderState == 4) {
                         // 需要完成订单验证码
                         final EditText etCompCode = new EditText(MainActivity.this);
                         etCompCode.setPadding(DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16), DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16));
@@ -630,15 +636,15 @@ public class MainActivity extends AppCompatActivity
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String compCode = etCompCode.getText().toString();
-                                if(ComFun.strNull(compCode.trim())){
+                                if (ComFun.strNull(compCode.trim())) {
                                     updateOrderState(orderId, compCode.trim());
-                                }else{
+                                } else {
                                     updateOrderState(orderId, "unCode");
                                 }
                             }
                         });
                         builder.show();
-                    }else{
+                    } else {
                         updateOrderState(orderId, null);
                     }
                     break;
@@ -661,21 +667,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateOrderState(String orderId, String orderCode) {
-        if(orderCode == null){
+        if (orderCode == null) {
             ComFun.showLoading(MainActivity.this, "操作处理中，请稍后");
-        }else{
-            if(!orderCode.equals("unCode")){
+        } else {
+            if (!orderCode.equals("unCode")) {
                 ComFun.showLoading(MainActivity.this, "操作处理中，请稍后");
-            }else{
+            } else {
                 ComFun.hideLoading();
             }
         }
-        if(orderCode == null || (orderCode != null && !orderCode.equals("unCode"))){
+        if (orderCode == null || (orderCode != null && !orderCode.equals("unCode"))) {
             final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
             RequestParams params = new RequestParams();
             params.put("userId", userId);
             params.put("orderId", orderId);
-            if(orderCode != null && !orderCode.equals("unCode")){
+            if (orderCode != null && !orderCode.equals("unCode")) {
                 params.put("idenCode", orderCode);
             }
             ConnectorInventory.updateOrderState(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -689,16 +695,23 @@ public class MainActivity extends AppCompatActivity
                     try {
                         JSONObject resuleJson = new JSONObject(responseObj.toString());
                         String code = resuleJson.getString("code");
-                        if(code.equals("ajaxSuccess")){
+                        if (code.equals("ajaxSuccess")) {
                             ComFun.showToast(MainActivity.this, "操作成功", Toast.LENGTH_SHORT);
                             // 刷新订单列表
                             initDatas(false);
-                        }else if(code.equals("error")){
+                        } else if (code.equals("ajaxNone")) {
+                            ComFun.showToast(MainActivity.this, "接单失败，请稍后重试", Toast.LENGTH_SHORT);
+                        } else if (code.equals("ajaxfailure")) {
+                            ComFun.showToast(MainActivity.this, "对不起，该订单已被抢", Toast.LENGTH_SHORT);
+                            // 刷新订单列表
+                            initDatas(false);
+                        } else if (code.equals("error")) {
                             ComFun.showToast(MainActivity.this, "验证码错误，请重新输入验证码", Toast.LENGTH_SHORT);
-                        }else{
+                        } else {
                             ComFun.showToast(MainActivity.this, "操作处理异常，请稍后重试", Toast.LENGTH_SHORT);
                         }
-                    } catch (JSONException e) {}
+                    } catch (JSONException e) {
+                    }
                 }
 
                 @Override
