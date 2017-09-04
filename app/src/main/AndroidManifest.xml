@@ -62,6 +62,10 @@
             android:label="@string/title_activity_update_pwd"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PayDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyDialogStyle" />
     </application>
 
 </manifest>

@@ -26,8 +26,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center|top"
                 android:orientation="vertical"
-                android:padding="5dp"
-                android:paddingBottom="100dp"></LinearLayout>
+                android:padding="5dp"></LinearLayout>
         </com.fy.niu.fyreorder.customView.ElasticScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 

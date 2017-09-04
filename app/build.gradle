@@ -50,6 +50,7 @@ dependencies {
     compile 'com.tencent.xinge:xinge:3.1.8-alpha'
     compile 'com.tencent.wup:wup:1.0.0.E-alpha'
     compile 'com.tencent.mid:mid:3.72.4-alpha'
-    compile 'com.android.support.constraint:constraint-layout:+'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
+    compile 'com.bakerj:infinite-cards:1.0.0'
     testCompile 'junit:junit:4.12'
 }

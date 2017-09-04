@@ -16,6 +16,13 @@
             android:title="已接订单" />
     </group>
 
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_pay_img"
+            android:icon="@drawable/file"
+            android:title="扫码支付二维码" />
+    </group>
+
     <item android:title="操作选项">
         <menu>
             <item

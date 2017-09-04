@@ -12,12 +12,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.fy.niu.fyreorder.MainActivity;
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.TaskActivity;
 import com.fy.niu.fyreorder.model.Task;
 import com.fy.niu.fyreorder.util.DateFormatUtil;
-import com.fy.niu.fyreorder.util.SerializableObjectList;
 import com.fy.niu.fyreorder.util.SerializableTaskList;
 
 import java.io.Serializable;
@@ -53,7 +51,7 @@ public class HasTaskFragment extends Fragment {
                 // 发送刷新订单Handler
                 Message msg = new Message();
                 msg.what = TaskActivity.MSG_REF_TASK_LSIT;
-                MainActivity.mHandler.sendMessage(msg);
+                TaskActivity.mHandler.sendMessage(msg);
             }
         });
         noMainTaskDataLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -62,7 +60,7 @@ public class HasTaskFragment extends Fragment {
                 // 发送刷新订单Handler
                 Message msg = new Message();
                 msg.what = TaskActivity.MSG_REF_TASK_LSIT;
-                MainActivity.mHandler.sendMessage(msg);
+                TaskActivity.mHandler.sendMessage(msg);
             }
         });
         mainTaskSwipeRefresh.setTag("taskSwipeRefresh_" + hasTaskDataType);
@@ -94,12 +92,22 @@ public class HasTaskFragment extends Fragment {
             taskItemName.setText(taskData.getName());
             taskItemDate.setText("发布日期：" + DateFormatUtil.dateToStr(new Date(Long.parseLong(taskData.getDate())), DateFormatUtil.MMDDHHMM));
             taskItemContent.setText(taskData.getContent());
-            taskItemGetBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
+            if (pageType.equals("weiJie")) {
+                taskItemGetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 发送刷新订单Handler
+                        Message msg = new Message();
+                        Bundle data = new Bundle();
+                        msg.what = TaskActivity.MSG_GET_TASK;
+                        data.putString("taskId", taskData.getId());
+                        msg.setData(data);
+                        TaskActivity.mHandler.sendMessage(msg);
+                    }
+                });
+            } else {
+                taskItemGetBtn.setVisibility(View.GONE);
+            }
 
             mainTaskDataLayout.addView(taskItemView);
         }

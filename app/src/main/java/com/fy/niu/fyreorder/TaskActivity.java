@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.HasTaskFragment;
@@ -41,6 +42,7 @@ import java.util.Map;
 public class TaskActivity extends AppCompatActivity {
     public static Handler mHandler = null;
     public static final int MSG_REF_TASK_LSIT = 1;
+    public static final int MSG_GET_TASK = 2;
     private ViewPager taskViewPager;
     private ViewPagerIndicator taskIndicator;
 
@@ -152,6 +154,7 @@ public class TaskActivity extends AppCompatActivity {
             @Override
             public void onFailure(OkHttpException okHttpE) {
                 Log.d(" ==== 获取任务数据error === ", " ===> " + okHttpE);
+                ComFun.showToast(TaskActivity.this, "获取任务数据异常，请稍后重试", Toast.LENGTH_LONG);
             }
         }));
     }
@@ -260,6 +263,42 @@ public class TaskActivity extends AppCompatActivity {
             switch (msg.what) {
                 case MSG_REF_TASK_LSIT:
                     initDatas(true);
+                    break;
+                case MSG_GET_TASK:
+                    ComFun.showLoading(TaskActivity.this, "正在领取任务，请稍后");
+                    String userId = SharedPreferencesTool.getFromShared(TaskActivity.this, "fyLoginUserInfo", "userId");
+                    String taskId = b.getString("taskId");
+                    RequestParams params = new RequestParams();
+                    params.put("id", taskId);
+                    params.put("userId", userId);
+                    ConnectorInventory.updateTaskState(TaskActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                        @Override
+                        public void onFinish() {
+                            ComFun.hideLoading();
+                        }
+
+                        @Override
+                        public void onSuccess(Object responseObj) {
+                            try {
+                                JSONObject resuleJson = new JSONObject(responseObj.toString());
+                                String code = resuleJson.getString("code");
+                                if (code.equals("ajaxSuccess")) {
+                                    ComFun.showToast(TaskActivity.this, "任务领取成功", Toast.LENGTH_SHORT);
+                                    // 刷新订单列表
+                                    initDatas(false);
+                                } else {
+                                    ComFun.showToast(TaskActivity.this, "任务领取失败，请稍后重试", Toast.LENGTH_SHORT);
+                                }
+                            } catch (JSONException e) {
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(OkHttpException okHttpE) {
+                            Log.d(" ==== 领取任务error === ", " ===> " + okHttpE);
+                            ComFun.showToast(TaskActivity.this, "领取任务异常，请稍后重试", Toast.LENGTH_LONG);
+                        }
+                    }));
                     break;
             }
             super.handleMessage(msg);

@@ -219,9 +219,11 @@ public class MainActivity extends AppCompatActivity
 
         String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
         String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
+        MenuItem navMenuItemPayImg = navigationView.getMenu().findItem(R.id.nav_pay_img);
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         if (!ifGive.equals("0")) {
+            navMenuItemPayImg.setVisible(false);
             navMenuItemSelectSelfFloor.setVisible(false);
         } else {
             if (receiveSelfFloor.equals("self")) {
@@ -371,6 +373,7 @@ public class MainActivity extends AppCompatActivity
                 order.setFloorName(orderDataJson.getString("floorName"));
                 order.setOrderState(orderDataJson.getInt("orderState"));
                 order.setOrderType(orderDataJson.getInt("orderType"));
+                order.setPayType(orderDataJson.getInt("payType"));
                 order.setOrderDate(orderDataJson.getString("orderDate"));
                 order.setOrderNumber(orderDataJson.getString("orderNumber"));
                 order.setOrderPrice(orderDataJson.getString("orderPrice"));
@@ -449,11 +452,30 @@ public class MainActivity extends AppCompatActivity
         switch (id) {
             case R.id.nav_user_info:
                 drawer.closeDrawer(GravityCompat.START);
-                toUserData();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toUserData();
+                    }
+                }, 200);
                 break;
             case R.id.nav_has_order:
                 drawer.closeDrawer(GravityCompat.START);
-                toHasReceiveOrder();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toHasReceiveOrder();
+                    }
+                }, 200);
+                break;
+            case R.id.nav_pay_img:
+                drawer.closeDrawer(GravityCompat.START);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toPayDialogActivity();
+                    }
+                }, 200);
                 break;
             case R.id.nav_open_give:
                 toUserIfOpen();
@@ -490,6 +512,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return true;
+    }
+
+    /**
+     * 跳转到支付二维码弹框页面
+     */
+    public void toPayDialogActivity() {
+        Intent payDialogIntent = new Intent(MainActivity.this, PayDialogActivity.class);
+        startActivity(payDialogIntent);
     }
 
     /**
@@ -595,10 +625,12 @@ public class MainActivity extends AppCompatActivity
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
             navMenuItemFlooeChange.setTitleCondensed("self");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：" + floorName + " 』");
+            ComFun.showToast(MainActivity.this, "楼层已切换为：" + floorName, Toast.LENGTH_SHORT);
         } else {
             SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
             navMenuItemFlooeChange.setTitleCondensed("all");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
+            ComFun.showToast(MainActivity.this, "楼层已切换为：所有", Toast.LENGTH_SHORT);
         }
         // 刷新订单列表
         initDatas(false);

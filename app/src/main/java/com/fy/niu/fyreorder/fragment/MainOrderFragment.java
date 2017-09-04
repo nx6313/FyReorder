@@ -138,10 +138,15 @@ public class MainOrderFragment extends Fragment {
                 orderItemMainWrap.setBackgroundResource(R.drawable.order_card_bg_w);
             }
             userName.setText("客户名称：" + orderData.getUserName());
-            userAddress.setText("详细地址：" + orderData.getAddressDetail());
             if (orderData.getOrderType() == 1) {
-                userPayWay.setText("支付方式：微信支付");
+                userName.setText(userName.getText().toString() + "〔 零食订单 〕");
             } else if (orderData.getOrderType() == 2) {
+                userName.setText(userName.getText().toString() + "〔 外卖订单 〕");
+            }
+            userAddress.setText("详细地址：" + orderData.getAddressDetail());
+            if (orderData.getPayType() == 1) {
+                userPayWay.setText("支付方式：微信支付");
+            } else if (orderData.getPayType() == 2) {
                 userPayWay.setText("支付方式：货到付款");
             } else {
                 userPayWay.setText("支付方式：未知");

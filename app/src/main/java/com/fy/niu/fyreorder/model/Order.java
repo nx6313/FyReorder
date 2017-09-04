@@ -13,7 +13,8 @@ public class Order implements Serializable {
     private String floorId;
     private String floorName;
     private int orderState;
-    private int orderType; // 1 微信  2货到
+    private int orderType; // 1 零食订单  2 外卖订单
+    private int payType; // 1 微信  2 货到
     private String orderDate;
     private String orderNumber;
     private String orderPrice;
@@ -73,6 +74,14 @@ public class Order implements Serializable {
 
     public void setOrderType(int orderType) {
         this.orderType = orderType;
+    }
+
+    public int getPayType() {
+        return payType;
+    }
+
+    public void setPayType(int payType) {
+        this.payType = payType;
     }
 
     public String getOrderDate() {

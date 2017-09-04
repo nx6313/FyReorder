@@ -12,7 +12,7 @@
         android:background="@drawable/order_card_bg_w"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingBottom="4dp"
+        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"
