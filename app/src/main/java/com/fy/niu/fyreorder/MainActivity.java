@@ -497,20 +497,29 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK
-                && event.getAction() == KeyEvent.ACTION_DOWN) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                if (System.currentTimeMillis() - exitTime > 2000) {
-                    ComFun.showToast(this, "再按一次离开", 2000);
-                    exitTime = System.currentTimeMillis();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.ACTION_DOWN:
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
                 } else {
-                    System.exit(0);
+                    if (System.currentTimeMillis() - exitTime > 2000) {
+                        ComFun.showToast(this, "再按一次离开", 2000);
+                        exitTime = System.currentTimeMillis();
+                    } else {
+                        System.exit(0);
+                    }
                 }
-            }
+                break;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                break;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                break;
+            case KeyEvent.KEYCODE_VOLUME_MUTE:
+                break;
         }
+
         return true;
     }
 
@@ -560,6 +569,7 @@ public class MainActivity extends AppCompatActivity
      * 用户退出登录
      */
     public void toUserLoginOut() {
+        // 解除XPush绑定
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈
         ComFun.clearAllActiveActivity();

@@ -14,6 +14,7 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.ant.liao.GifView;
 import com.bakerj.infinitecards.AnimationTransformer;
 import com.bakerj.infinitecards.CardItem;
 import com.bakerj.infinitecards.InfiniteCardView;
@@ -25,7 +26,6 @@ import com.bakerj.infinitecards.transformer.DefaultZIndexTransformerCommon;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
-import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.DrawableManager;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -39,6 +39,8 @@ public class PayDialogActivity extends Activity {
     private InfiniteCardView payCardView;
     private BaseAdapter mAdapter;
 
+    private GifView payCardLoading;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +52,10 @@ public class PayDialogActivity extends Activity {
     }
 
     private void initView() {
+        payCardLoading = (GifView) findViewById(R.id.payCardLoading);
+        payCardLoading.setGifImage(R.drawable.loading_girl);
+        payCardLoading.setShowDimension(200, 190);
+        payCardLoading.setGifImageType(GifView.GifImageType.COVER);
         // 设置弹框Activity页面大小
         WindowManager.LayoutParams p = getWindow().getAttributes();
         //p.height = 1000;
