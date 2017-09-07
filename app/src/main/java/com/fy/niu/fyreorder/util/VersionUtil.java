@@ -72,7 +72,6 @@ public class VersionUtil {
                     if (newVersionJson.has("versionName") && newVersionJson.has("versionCode")) {
                         int versionCode = newVersionJson.getInt("versionCode");
                         int currentVersionCode = ComFun.getVersionCode(activity);
-                        versionCode = 2;
                         if (versionCode > currentVersionCode) {
                             // 需要更新
                             Version version = new Version();
