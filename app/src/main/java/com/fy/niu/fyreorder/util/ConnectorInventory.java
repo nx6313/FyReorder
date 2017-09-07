@@ -7,6 +7,8 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
 import com.fy.niu.fyreorder.okHttpUtil.request.CommonRequest;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 
+import okhttp3.Call;
+
 public class ConnectorInventory {
 
     /**
@@ -70,6 +72,13 @@ public class ConnectorInventory {
      */
     public static void updateUserPass(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "toUpdateUserPass", params), dataHandle);
+    }
+
+    /**
+     * 获取最后版本数据
+     */
+    public static Call getNewAppVersion(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        return CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "getNewVersion", params), dataHandle);
     }
 
 }

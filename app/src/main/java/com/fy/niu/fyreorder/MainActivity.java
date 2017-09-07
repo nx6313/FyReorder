@@ -23,15 +23,18 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fy.niu.fyreorder.customView.CircularImage;
+import com.fy.niu.fyreorder.customView.HorizontalProgressbarWithProgress;
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 import com.fy.niu.fyreorder.model.Order;
+import com.fy.niu.fyreorder.model.Version;
 import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
@@ -42,6 +45,7 @@ import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.VersionUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     public static final int MSG_UPDATE_ORDER_STATE = 1;
     public static final int MSG_REF_ORDER_LSIT = 2;
     public static final int MSG_CALL_USER_PHONE = 3;
+    public static final int MSG_START_DOWN_NEW_VERSION = 4;
     private long exitTime;
     private NavigationView navigationView;
     private CircularImage userHeadImg;
@@ -240,6 +245,12 @@ public class MainActivity extends AppCompatActivity
         if (ifOpen.equals("1")) {
             navMenuItemOpenGive.setTitleCondensed("true");
             navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
+        }
+
+        String currentVersionName = ComFun.getVersionName(MainActivity.this);
+        MenuItem navMenuItemUpdate = navigationView.getMenu().findItem(R.id.nav_update);
+        if(ComFun.strNull(currentVersionName)){
+            navMenuItemUpdate.setTitle("检查新版本『 当前版本：" + currentVersionName + " 』");
         }
 
         Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
@@ -486,9 +497,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);
-                ComFun.showToast(this, "正在开发中，敬请期待", 2000);
-                ComFun.AlertDialogWrap alertDialogWrap = ComFun.showLoading(MainActivity.this, null, true, true);
-                alertDialogWrap.setHttpCall(null);
+                VersionUtil.checkNewVersion(MainActivity.this);
                 break;
             case R.id.nav_exit:
                 toUserLoginOut();
@@ -704,6 +713,19 @@ public class MainActivity extends AppCompatActivity
                     } catch (SecurityException e) {
                         ComFun.showToast(MainActivity.this, "您可能没有提供拨打电话的权限，给小渔开放权限后再试试吧", Toast.LENGTH_LONG);
                     }
+                    break;
+                case MSG_START_DOWN_NEW_VERSION:
+                    String appUrl = b.getString("appUrl");
+                    // 弹框下载新版本
+                    VersionUtil.versionDialog = new AlertDialog.Builder(MainActivity.this, R.style.MyDialogStyle).setCancelable(false).create();
+                    VersionUtil.versionDialog.show();
+                    Window win = VersionUtil.versionDialog.getWindow();
+                    View downloadVersionView = MainActivity.this.getLayoutInflater().inflate(R.layout.download_version_dialog, null);
+                    win.setContentView(downloadVersionView);
+                    VersionUtil.downloadProgressBar = (HorizontalProgressbarWithProgress) downloadVersionView.findViewById(R.id.downloadProgressBar);
+                    VersionUtil.addDownLoadHandler(MainActivity.this);
+                    // 开启线程下载
+                    VersionUtil.beginDownload(MainActivity.this, appUrl);
                     break;
             }
             super.handleMessage(msg);

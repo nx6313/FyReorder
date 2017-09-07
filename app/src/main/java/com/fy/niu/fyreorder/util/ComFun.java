@@ -8,6 +8,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -248,28 +250,30 @@ public class ComFun {
      */
     public static AlertDialogWrap showLoading(Activity activity, String loadingTipValue, boolean cancelable, final boolean cancelCall) {
         final AlertDialogWrap alertDialogWrap = new AlertDialogWrap();
-        loadingDialog = new AlertDialog.Builder(activity).setCancelable(cancelable).create();
-        loadingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        loadingDialog = new AlertDialog.Builder(activity, R.style.MyDialogStyle).setCancelable(cancelable).create();
+        loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                Log.d("=--=23-424-234=2", "1231313>>>" + alertDialogWrap.getHttpCall());
+            public void onCancel(DialogInterface dialog) {
                 if (cancelCall && alertDialogWrap.getHttpCall() != null) {
-                    Log.d("=--=23-424-234=2", "dfdssfsf>>> " + alertDialogWrap.getHttpCall());
+                    Call getNewVersionCall = alertDialogWrap.getHttpCall();
+                    getNewVersionCall.cancel();
                 }
             }
         });
         loadingDialog.show();
         WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
         params.width = getScreenWidth() * 3 / 7;
+        params.alpha = 0.8f;
         //params.height = 200;
         loadingDialog.getWindow().setAttributes(params);
 
         Window win = loadingDialog.getWindow();
         View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        loadingView.setBackgroundResource(R.drawable.loading_bg);
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
-        loadingGif.setGifImage(R.drawable.loading_girl);
-        loadingGif.setShowDimension(200, 190);
+        loadingGif.setGifImage(R.drawable.loading);
+        loadingGif.setShowDimension(180, 180);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
         if (loadingTip != null) {
@@ -394,12 +398,16 @@ public class ComFun {
      * @return
      * @throws Exception
      */
-    public static int getVersionNo(Context mContext) throws Exception {
+    public static int getVersionCode(Context mContext) {
         //获取packagemanager的实例
         PackageManager packageManager = mContext.getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo packInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
-        return packInfo.versionCode;
+        try {
+            PackageInfo packInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
+            return packInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return -1;
     }
 
     /**
@@ -409,12 +417,16 @@ public class ComFun {
      * @return
      * @throws Exception
      */
-    public static String getVersionName(Context mContext) throws Exception {
+    public static String getVersionName(Context mContext) {
         //获取packagemanager的实例
         PackageManager packageManager = mContext.getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo packInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
-        return packInfo.versionName;
+        try {
+            PackageInfo packInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
+            return packInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return "";
     }
 
     /**
@@ -424,11 +436,15 @@ public class ComFun {
      * @param file
      */
     public static void installApk(Context mContext, File file) {
-        Intent intent = new Intent();
-        //执行动作
-        intent.setAction(Intent.ACTION_VIEW);
-        //执行的数据类型
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri data;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            data = FileProvider.getUriForFile(mContext, "com.fy.niu.fyreorder.fileprovider", file);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            data = Uri.fromFile(file);
+        }
+        intent.setDataAndType(data, "application/vnd.android.package-archive");
         mContext.startActivity(intent);
     }
 
