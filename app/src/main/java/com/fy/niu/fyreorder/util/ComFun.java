@@ -2,6 +2,7 @@ package com.fy.niu.fyreorder.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+
 /**
  * Created by 18230 on 2017/4/17.
  */
@@ -38,21 +42,29 @@ import java.util.Map;
 public class ComFun {
     private static Toast mToast = null;
     public static List<Activity> activityActiveList = new ArrayList<>();
-    public enum JSON_TYPE{
-        /**JSONObject*/
+
+    public enum JSON_TYPE {
+        /**
+         * JSONObject
+         */
         JSON_TYPE_OBJECT,
-        /**JSONArray*/
+        /**
+         * JSONArray
+         */
         JSON_TYPE_ARRAY,
-        /**不是JSON格式的字符串*/
+        /**
+         * 不是JSON格式的字符串
+         */
         JSON_TYPE_ERROR
     }
 
     /**
      * 向当前活动的ActivityList中添加项
+     *
      * @param activity
      */
-    public static void addToActiveActivityList(Activity activity){
-        if(!activityActiveList.contains(activity)){
+    public static void addToActiveActivityList(Activity activity) {
+        if (!activityActiveList.contains(activity)) {
             activityActiveList.add(activity);
         }
     }
@@ -60,9 +72,9 @@ public class ComFun {
     /**
      * 清空所有当前活动的Activity
      */
-    public static void clearAllActiveActivity(){
-        for(Activity activity : activityActiveList){
-            if(!activity.isFinishing()){
+    public static void clearAllActiveActivity() {
+        for (Activity activity : activityActiveList) {
+            if (!activity.isFinishing()) {
                 activity.finish();
             }
         }
@@ -70,6 +82,7 @@ public class ComFun {
 
     /**
      * 显示Toast提示信息
+     *
      * @param context
      * @param text
      * @param duration
@@ -86,6 +99,7 @@ public class ComFun {
 
     /**
      * 显示Toast提示信息(单例模式)
+     *
      * @param context
      * @param text
      * @param duration
@@ -99,9 +113,8 @@ public class ComFun {
      * 判断对象不为空
      *
      * @param str
-     * @param flags
-     *            为可选参数，如果需要进一步判断List/Map/Array中的数量是否为0，可传入true；否则可不传（参数一为List/
-     *            Map/Array类型时有效）
+     * @param flags 为可选参数，如果需要进一步判断List/Map/Array中的数量是否为0，可传入true；否则可不传（参数一为List/
+     *              Map/Array类型时有效）
      * @return
      */
     public static boolean strNull(Object str, boolean... flags) {
@@ -129,19 +142,21 @@ public class ComFun {
 
     /**
      * 打开输入法
+     *
      * @param context
      */
-    public static void openIME(Context context, EditText editText){
+    public static void openIME(Context context, EditText editText) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     /**
      * 关闭输入法
+     *
      * @param context
      */
-    public static void closeIME(Context context, View view){
-        if(view.getWindowToken() != null){
+    public static void closeIME(Context context, View view) {
+        if (view.getWindowToken() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager.isActive()) {
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),
@@ -152,6 +167,7 @@ public class ComFun {
 
     /**
      * 获得屏幕宽度
+     *
      * @return
      */
     public static int getScreenWidth() {
@@ -163,11 +179,13 @@ public class ComFun {
 
     /**
      * 显示加载框
+     *
      * @param activity
      * @param loadingTipValue
      */
     public static AlertDialog loadingDialog = null;
-    public static void showLoading(Activity activity, String loadingTipValue){
+
+    public static void showLoading(Activity activity, String loadingTipValue) {
         loadingDialog = new AlertDialog.Builder(activity).setCancelable(false).create();
         loadingDialog.show();
         WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
@@ -183,8 +201,8 @@ public class ComFun {
         loadingGif.setShowDimension(200, 190);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
-        if(loadingTip != null){
-            if(strNull(loadingTipValue)){
+        if (loadingTip != null) {
+            if (strNull(loadingTipValue)) {
                 loadingTip.setText(loadingTipValue);
             }
         }
@@ -192,10 +210,11 @@ public class ComFun {
 
     /**
      * 显示加载框
+     *
      * @param activity
      * @param loadingTipValue
      */
-    public static AlertDialog showLoading(Activity activity, String loadingTipValue, boolean cancelable){
+    public static AlertDialog showLoading(Activity activity, String loadingTipValue, boolean cancelable) {
         loadingDialog = new AlertDialog.Builder(activity).setCancelable(cancelable).create();
         loadingDialog.show();
         WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
@@ -211,27 +230,96 @@ public class ComFun {
         loadingGif.setShowDimension(200, 190);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
-        if(loadingTip != null){
-            if(strNull(loadingTipValue)){
+        if (loadingTip != null) {
+            if (strNull(loadingTipValue)) {
                 loadingTip.setText(loadingTipValue);
+            } else {
+                loadingTip.setVisibility(View.GONE);
             }
         }
         return loadingDialog;
     }
 
     /**
+     * 显示加载框
+     *
+     * @param activity
+     * @param loadingTipValue
+     */
+    public static AlertDialogWrap showLoading(Activity activity, String loadingTipValue, boolean cancelable, final boolean cancelCall) {
+        final AlertDialogWrap alertDialogWrap = new AlertDialogWrap();
+        loadingDialog = new AlertDialog.Builder(activity).setCancelable(cancelable).create();
+        loadingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Log.d("=--=23-424-234=2", "1231313>>>" + alertDialogWrap.getHttpCall());
+                if (cancelCall && alertDialogWrap.getHttpCall() != null) {
+                    Log.d("=--=23-424-234=2", "dfdssfsf>>> " + alertDialogWrap.getHttpCall());
+                }
+            }
+        });
+        loadingDialog.show();
+        WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
+        params.width = getScreenWidth() * 3 / 7;
+        //params.height = 200;
+        loadingDialog.getWindow().setAttributes(params);
+
+        Window win = loadingDialog.getWindow();
+        View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        win.setContentView(loadingView);
+        GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
+        loadingGif.setGifImage(R.drawable.loading_girl);
+        loadingGif.setShowDimension(200, 190);
+        loadingGif.setGifImageType(GifView.GifImageType.COVER);
+        TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
+        if (loadingTip != null) {
+            if (strNull(loadingTipValue)) {
+                loadingTip.setText(loadingTipValue);
+            } else {
+                loadingTip.setVisibility(View.GONE);
+            }
+        }
+        alertDialogWrap.setLoadingDialog(loadingDialog);
+        return alertDialogWrap;
+    }
+
+    public static class AlertDialogWrap {
+        private AlertDialog loadingDialog = null;
+        private Call httpCall = null;
+
+        public AlertDialogWrap() {
+        }
+
+        public AlertDialog getLoadingDialog() {
+            return loadingDialog;
+        }
+
+        public void setLoadingDialog(AlertDialog loadingDialog) {
+            this.loadingDialog = loadingDialog;
+        }
+
+        public Call getHttpCall() {
+            return httpCall;
+        }
+
+        public void setHttpCall(Call httpCall) {
+            this.httpCall = httpCall;
+        }
+    }
+
+    /**
      * 隐藏加载框
      */
-    public static void hideLoading(){
-        if(loadingDialog != null && loadingDialog.isShowing()){
+    public static void hideLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
     }
 
-    public static boolean strInArr(String[] strArr, String str){
-        if(strNull(strArr) && strArr.length > 0 && strNull(str)){
-            for(String s : strArr){
-                if(s.equals(str)){
+    public static boolean strInArr(String[] strArr, String str) {
+        if (strNull(strArr) && strArr.length > 0 && strNull(str)) {
+            for (String s : strArr) {
+                if (s.equals(str)) {
                     return true;
                 }
             }
@@ -244,24 +332,28 @@ public class ComFun {
         BigDecimal b1 = new BigDecimal(d1);
         return b1.add(d2).doubleValue();
     }
+
     public static double sub(double d1, double d2) {
         // 进行减法运算
         BigDecimal b1 = new BigDecimal(d1);
         BigDecimal b2 = new BigDecimal(d2);
         return b1.subtract(b2).doubleValue();
     }
+
     public static double mul(double d1, double d2) {
         // 进行乘法运算
         BigDecimal b1 = new BigDecimal(d1);
         BigDecimal b2 = new BigDecimal(d2);
         return b1.multiply(b2).doubleValue();
     }
-    public static double div(double d1, double d2,int len) {
+
+    public static double div(double d1, double d2, int len) {
         // 进行除法运算
         BigDecimal b1 = new BigDecimal(d1);
         BigDecimal b2 = new BigDecimal(d2);
-        return b1.divide(b2,len,BigDecimal. ROUND_HALF_UP).doubleValue();
+        return b1.divide(b2, len, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
+
     public static double round(double d, int len) {
         // 进行四舍五入操作
         BigDecimal b1 = new BigDecimal(d);
@@ -273,21 +365,22 @@ public class ComFun {
 
     /**
      * 并0操作
+     *
      * @return
      */
-    public static String addZero(String val){
-        if(ComFun.strNull(val)){
-            if(val.contains(".")){
+    public static String addZero(String val) {
+        if (ComFun.strNull(val)) {
+            if (val.contains(".")) {
                 int pointNum = new BigDecimal(val).scale();
-                if(pointNum <= 2){
-                    for(int i=0; i<2-pointNum; i++){
+                if (pointNum <= 2) {
+                    for (int i = 0; i < 2 - pointNum; i++) {
                         val += "0";
                     }
                     return val;
-                }else{
+                } else {
                     return addZero(round(Double.parseDouble(val), 2) + "");
                 }
-            }else{
+            } else {
                 return val + ".00";
             }
         }
@@ -296,11 +389,12 @@ public class ComFun {
 
     /**
      * 获取程序版本号
+     *
      * @param mContext
      * @return
      * @throws Exception
      */
-    public static int getVersionNo(Context mContext) throws Exception{
+    public static int getVersionNo(Context mContext) throws Exception {
         //获取packagemanager的实例
         PackageManager packageManager = mContext.getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
@@ -310,11 +404,12 @@ public class ComFun {
 
     /**
      * 获取程序版本号显示值
+     *
      * @param mContext
      * @return
      * @throws Exception
      */
-    public static String getVersionName(Context mContext) throws Exception{
+    public static String getVersionName(Context mContext) throws Exception {
         //获取packagemanager的实例
         PackageManager packageManager = mContext.getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
@@ -324,6 +419,7 @@ public class ComFun {
 
     /**
      * 安装apk
+     *
      * @param mContext
      * @param file
      */
@@ -338,12 +434,13 @@ public class ComFun {
 
     /**
      * 为View设置字体
+     *
      * @param context
      * @param view
      * @param fontName
      */
-    public static void setFont(Context context, TextView view, String fontName){
-        if(!strNull(fontName)){
+    public static void setFont(Context context, TextView view, String fontName) {
+        if (!strNull(fontName)) {
             fontName = "nsjmmt.ttf";
         }
         Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + fontName);
@@ -352,22 +449,23 @@ public class ComFun {
 
     /**
      * 获取JSON类型 (JSONObject 还是 JSONArray)
+     *
      * @param str
      * @return
      */
-    public static JSON_TYPE getJSONType(String str){
-        if(TextUtils.isEmpty(str)){
+    public static JSON_TYPE getJSONType(String str) {
+        if (TextUtils.isEmpty(str)) {
             return JSON_TYPE.JSON_TYPE_ERROR;
         }
 
         final char[] strChar = str.substring(0, 1).toCharArray();
         final char firstChar = strChar[0];
 
-        if(firstChar == '{'){
+        if (firstChar == '{') {
             return JSON_TYPE.JSON_TYPE_OBJECT;
-        }else if(firstChar == '['){
+        } else if (firstChar == '[') {
             return JSON_TYPE.JSON_TYPE_ARRAY;
-        }else{
+        } else {
             return JSON_TYPE.JSON_TYPE_ERROR;
         }
     }

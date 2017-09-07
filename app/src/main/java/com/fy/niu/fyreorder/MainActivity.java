@@ -487,6 +487,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);
                 ComFun.showToast(this, "正在开发中，敬请期待", 2000);
+                ComFun.AlertDialogWrap alertDialogWrap = ComFun.showLoading(MainActivity.this, null, true, true);
+                alertDialogWrap.setHttpCall(null);
                 break;
             case R.id.nav_exit:
                 toUserLoginOut();

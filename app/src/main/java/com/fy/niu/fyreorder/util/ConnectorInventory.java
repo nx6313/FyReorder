@@ -12,7 +12,7 @@ public class ConnectorInventory {
     /**
      * 用户登录
      */
-    public static void userLogin(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+    public static void  userLogin(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "toAppLogin", params), dataHandle);
     }
 
