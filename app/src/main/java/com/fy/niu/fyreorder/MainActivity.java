@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     private long exitTime;
     private NavigationView navigationView;
     private CircularImage userHeadImg;
+    private TextView leftMenuUserName;
 
     private ViewPager mainViewPager;
     private ViewPagerIndicator mainIndicator;
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity
         mHandler = new MainActivity.mHandler();
 
         mainUserHeadImg = (CircularImage) toolbar.findViewById(R.id.mainUserHeadImg);
-        mainUserHeadImg.setImageResource(R.drawable.default_user_head_1);
+        mainUserHeadImg.setImageResource(R.drawable.default_user_head);
         mainUserHeadImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,6 +146,8 @@ public class MainActivity extends AppCompatActivity
                         initDatas(false);
                     } else {
                         // 登录失败，提示用户，需要手动重新登录
+                        leftMenuUserName.setTag("needLogin");
+                        leftMenuUserName.setText("登录失效，点击登录");
                         ComFun.showToast(MainActivity.this, "登录失效，需重新登录", Toast.LENGTH_SHORT);
                     }
                 } catch (JSONException e) {
@@ -154,6 +157,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(OkHttpException okHttpE) {
                 // 登录失败，提示用户，需要手动重新登录
+                leftMenuUserName.setTag("needLogin");
+                leftMenuUserName.setText("登录失效，点击登录");
                 ComFun.showToast(MainActivity.this, "登录失效，请重新登录", Toast.LENGTH_SHORT);
             }
         }));
@@ -171,6 +176,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(Object responseObj) {
+                MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
+                navMenuItemLogginOut.setVisible(true);
                 try {
                     Log.d("用户信息成功", responseObj.toString());
                     DBUtil.deleteAll(new DBOpenHelper(MainActivity.this), "userInfo");
@@ -200,13 +207,18 @@ public class MainActivity extends AppCompatActivity
                     values.put("telephone", telephone);
                     DBUtil.save(new DBOpenHelper(MainActivity.this), "userInfo", values);
                     // 更新UI
-                    ((TextView) findViewById(R.id.leftMenuUserName)).setText(userName);
+                    leftMenuUserName.setTag("hasLogin");
+                    leftMenuUserName.setText(userName);
                 } catch (JSONException e) {
                 }
             }
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
+                MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
+                navMenuItemLogginOut.setVisible(false);
+                leftMenuUserName.setTag("needLogin");
+                leftMenuUserName.setText("登录失效，点击登录");
                 ComFun.showToast(MainActivity.this, "获取个人信息异常", Toast.LENGTH_SHORT);
             }
         }));
@@ -217,10 +229,28 @@ public class MainActivity extends AppCompatActivity
         navigationView.setItemIconTintList(null);
         navigationView.setNavigationItemSelectedListener(this);
         userHeadImg = (CircularImage) navigationView.getHeaderView(0).findViewById(R.id.userHeadImg);
-        userHeadImg.setImageResource(R.drawable.default_user_head_1);
+        userHeadImg.setImageResource(R.drawable.default_user_head);
+
+        leftMenuUserName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.leftMenuUserName);
+        userHeadImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (leftMenuUserName.getTag().toString().equals("initLoginUserInfo")) {
+                    // 正在初始化用户信息
+                } else if (leftMenuUserName.getTag().toString().equals("hasLogin")) {
+                    // 已经登录
+                } else if (leftMenuUserName.getTag().toString().equals("needLogin")) {
+                    // 需要登录
+                    toUserLoginOut();
+                }
+            }
+        });
 
         mainViewPager = (ViewPager) findViewById(R.id.mainViewPager);
         mainIndicator = (ViewPagerIndicator) findViewById(R.id.mainIndicator);
+
+        MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
+        navMenuItemLogginOut.setVisible(false);
 
         String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
         String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
@@ -249,7 +279,7 @@ public class MainActivity extends AppCompatActivity
 
         String currentVersionName = ComFun.getVersionName(MainActivity.this);
         MenuItem navMenuItemUpdate = navigationView.getMenu().findItem(R.id.nav_update);
-        if(ComFun.strNull(currentVersionName)){
+        if (ComFun.strNull(currentVersionName)) {
             navMenuItemUpdate.setTitle("检查新版本『 当前版本：" + currentVersionName + " 』");
         }
 

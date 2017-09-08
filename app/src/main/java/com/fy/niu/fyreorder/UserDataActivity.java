@@ -64,7 +64,7 @@ public class UserDataActivity extends AppCompatActivity {
 
     private void initView() {
         userDataHeadImg = (CircularImage) findViewById(R.id.userDataHeadImg);
-        userDataHeadImg.setImageResource(R.drawable.default_user_head_1);
+        userDataHeadImg.setImageResource(R.drawable.default_user_head);
 
         tvUserInfoName = (TextView) findViewById(R.id.tvUserInfoName);
         tvUserInfoSchool = (TextView) findViewById(R.id.tvUserInfoSchool);

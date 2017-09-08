@@ -13,15 +13,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/order_user_bg"
-        android:paddingTop="42dp"
+        android:orientation="vertical"
         android:paddingBottom="20dp"
-        android:orientation="vertical">
+        android:paddingTop="42dp">
 
         <com.fy.niu.fyreorder.customView.CircularImage
             android:id="@+id/userHeadImg"
             android:layout_width="74dp"
             android:layout_height="74dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:descendantFocusability="blocksDescendants" />
 
         <TextView
             android:id="@+id/leftMenuUserName"
@@ -29,8 +31,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
+            android:tag="initLoginUserInfo"
+            android:text="初始化用户信息中..."
             android:textColor="#292929"
-            android:textSize="18sp"
-            android:text="姓名"/>
+            android:textSize="18sp" />
     </LinearLayout>
 </RelativeLayout>
