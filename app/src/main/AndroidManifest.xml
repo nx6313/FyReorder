@@ -65,6 +65,13 @@
             android:label="@string/title_activity_update_pwd"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".CompleteOrderActivity"
+            android:label="@string/title_activity_complete_order"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".PayDialogActivity"
             android:screenOrientation="portrait"

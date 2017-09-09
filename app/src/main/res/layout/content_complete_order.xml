@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f1d8d8"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.fy.niu.fyreorder.CompleteOrderActivity"
+    tools:showIn="@layout/activity_complete_order">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/mainTaskSwipeRefresh"
+        android:id="@+id/completeOrderSwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
@@ -23,17 +26,17 @@
             app:overScrollType="bottom">
 
             <LinearLayout
-                android:id="@+id/mainTaskDataLayout"
+                android:id="@+id/completeOrderDataLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center|top"
                 android:orientation="vertical"
-                android:padding="6dp"></LinearLayout>
+                android:padding="5dp"></LinearLayout>
         </com.fy.niu.fyreorder.customView.ElasticScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/noMainTaskDataLayout"
+        android:id="@+id/noCompleteOrderDataLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -55,10 +58,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="14dp"
-                android:text="暂无任务数据"
+                android:text="暂无已完成订单"
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
-
 </LinearLayout>

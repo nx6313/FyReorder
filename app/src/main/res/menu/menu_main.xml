@@ -13,7 +13,14 @@
         <item
             android:id="@+id/nav_has_order"
             android:icon="@drawable/file"
-            android:title="已接订单" />
+            android:title="接单数据统计" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_complete_order"
+            android:icon="@drawable/complete_order"
+            android:title="已完成订单" />
     </group>
 
     <group android:checkableBehavior="single">

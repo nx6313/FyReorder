@@ -53,10 +53,13 @@ public class VersionUtil {
     private static int downloadTotal = 0;
     private static boolean downloading = false;
 
-    public static void checkNewVersion(final Activity activity) {
+    public static void checkNewVersion(final Activity activity, final boolean defaultCheckFlag) {
         threadList = new ArrayList<>();
 
-        ComFun.AlertDialogWrap alertDialogWrap = ComFun.showLoading(activity, null, true, true);
+        ComFun.AlertDialogWrap alertDialogWrap = null;
+        if (!defaultCheckFlag) {
+            alertDialogWrap = ComFun.showLoading(activity, null, true, true);
+        }
         // 创建网络请求，进行版本更新数据拿取
         Call call = ConnectorInventory.getNewAppVersion(activity, null, new DisposeDataHandle(new DisposeDataListener() {
             @Override
@@ -85,10 +88,14 @@ public class VersionUtil {
                             showNewVersionInfoDialog(activity, currentVersionName, version);
                         } else {
                             // 不需要更新
-                            ComFun.showToast(activity, "当前已经是最新版本啦", Toast.LENGTH_SHORT);
+                            if (!defaultCheckFlag) {
+                                ComFun.showToast(activity, "当前已经是最新版本啦", Toast.LENGTH_SHORT);
+                            }
                         }
                     } else {
-                        ComFun.showToast(activity, "检查更新异常，请稍后重试", Toast.LENGTH_LONG);
+                        if (!defaultCheckFlag) {
+                            ComFun.showToast(activity, "检查更新异常，请稍后重试", Toast.LENGTH_LONG);
+                        }
                     }
                 } catch (JSONException e) {
                 }
@@ -96,10 +103,14 @@ public class VersionUtil {
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                ComFun.showToast(activity, "检查更新失败，请稍后重试", Toast.LENGTH_LONG);
+                if (!defaultCheckFlag) {
+                    ComFun.showToast(activity, "检查更新失败，请稍后重试", Toast.LENGTH_LONG);
+                }
             }
         }));
-        alertDialogWrap.setHttpCall(call);
+        if (alertDialogWrap != null) {
+            alertDialogWrap.setHttpCall(call);
+        }
     }
 
     private static void showNewVersionInfoDialog(final Activity activity, String oldVersionName, final Version version) {

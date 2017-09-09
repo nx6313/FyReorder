@@ -1,0 +1,13 @@
+<resources>
+
+    <attr name="overScrollType" format="enum">
+        <enum name="all" value="1" />
+        <enum name="top" value="2" />
+        <enum name="bottom" value="3" />
+    </attr>
+
+    <declare-styleable name="ElasticScrollView">
+        <attr name="overScrollType" />
+    </declare-styleable>
+
+</resources>

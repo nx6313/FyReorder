@@ -7,8 +7,8 @@ android {
         applicationId "com.fy.niu.fyreorder"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "v1.0"
+        versionCode 3
+        versionName "v1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库
@@ -52,5 +52,6 @@ dependencies {
     compile 'com.tencent.mid:mid:3.72.4-alpha'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
     compile 'com.bakerj:infinite-cards:1.0.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }

@@ -24,9 +24,11 @@ public class Order implements Serializable {
     private String userName;
     private String userPhone;
     private String school;
+    private String personName;
+    private String personPhone;
     private List<BuyContent> orderDetail;
     private String remark; // 给商家的留言
-    private int state; // 已接1、未接2
+    private int state; // 已接1、未接2、已完成3
 
     public String getId() {
         return id;
@@ -154,6 +156,22 @@ public class Order implements Serializable {
 
     public void setSchool(String school) {
         this.school = school;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
+
+    public String getPersonPhone() {
+        return personPhone;
+    }
+
+    public void setPersonPhone(String personPhone) {
+        this.personPhone = personPhone;
     }
 
     public List<BuyContent> getOrderDetail() {

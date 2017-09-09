@@ -26,8 +26,8 @@ import com.bakerj.infinitecards.transformer.DefaultZIndexTransformerCommon;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
-import com.fy.niu.fyreorder.util.DrawableManager;
 import com.nineoldandroids.view.ViewHelper;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,11 +106,10 @@ public class PayDialogActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            DrawableManager drawableManager = new DrawableManager();
             ImageView payImgView = new ImageView(PayDialogActivity.this);
             payImgView.setFocusable(true);
             Log.d("加载支付二维码图片", "图片地址：" + payCardImgUris.get(position));
-            drawableManager.fetchDrawableOnThread(payCardImgUris.get(position), payImgView);
+            Picasso.with(PayDialogActivity.this).load(payCardImgUris.get(position)).into(payImgView);
             payImgView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {

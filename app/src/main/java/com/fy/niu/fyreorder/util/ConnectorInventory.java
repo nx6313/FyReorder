@@ -47,6 +47,13 @@ public class ConnectorInventory {
     }
 
     /**
+     * 获取已完成接单数据
+     */
+    public static void getCompleteOrderList(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "getOrderListFinish", params), dataHandle);
+    }
+
+    /**
      * 修改订单状态
      */
     public static void updateOrderState(Context context, RequestParams params, DisposeDataHandle dataHandle) {

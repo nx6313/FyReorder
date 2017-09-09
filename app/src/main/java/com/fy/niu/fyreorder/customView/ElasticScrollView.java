@@ -1,12 +1,15 @@
 package com.fy.niu.fyreorder.customView;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.ScrollView;
+
+import com.fy.niu.fyreorder.R;
 
 /**
  * Created by 18230 on 2017/4/17.
@@ -18,16 +21,30 @@ public class ElasticScrollView extends ScrollView {
     private Rect normal = new Rect();
     private boolean animationFinish = true;
 
+    private int overScrollType = 1; // 1：上下都可以弹性拉动、2：仅上方可以弹性拉动、3：仅下方可以弹性拉动
+
     public ElasticScrollView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public ElasticScrollView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, -1);
     }
 
     public ElasticScrollView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ElasticScrollView, defStyle, 0);
+        int n = a.getIndexCount();
+        for (int i = 0; i < n; i++) {
+            int attr = a.getIndex(i);
+            switch (attr) {
+                case R.styleable.ElasticScrollView_overScrollType:
+                    overScrollType = a.getInt(R.styleable.ElasticScrollView_overScrollType, 1);
+                    break;
+            }
+        }
+        a.recycle();
     }
 
     @Override
@@ -35,6 +52,7 @@ public class ElasticScrollView extends ScrollView {
         if (getChildCount() > 0) {
             inner = getChildAt(0);
         }
+        super.onFinishInflate();
     }
 
     @Override
@@ -50,7 +68,7 @@ public class ElasticScrollView extends ScrollView {
     public void commOnTouchEvent(MotionEvent event) {
         if (animationFinish) {
             int action = event.getAction();
-            switch(action) {
+            switch (action) {
                 case MotionEvent.ACTION_DOWN:
                     y = event.getY();
                     super.onTouchEvent(event);
@@ -102,6 +120,7 @@ public class ElasticScrollView extends ScrollView {
 
     /**
      * 是否需要开启动画
+     *
      * @return
      */
     public boolean isNeedAnimation() {
@@ -110,13 +129,24 @@ public class ElasticScrollView extends ScrollView {
 
     /**
      * 是否需要移动布局
+     *
      * @return
      */
     public boolean isNeedMove() {
         int offset = inner.getMeasuredHeight() - getHeight();
         int scrollY = getScrollY();
-        if (scrollY == 0 || scrollY == offset) {
-            return true;
+        if (overScrollType == 1) {
+            if (scrollY == 0 || scrollY == offset) {
+                return true;
+            }
+        } else if (overScrollType == 2) {
+            if (scrollY == 0) {
+                return true;
+            }
+        } else if (overScrollType == 3) {
+            if (scrollY == offset) {
+                return true;
+            }
         }
         return false;
     }
@@ -135,18 +165,20 @@ public class ElasticScrollView extends ScrollView {
 
     /**
      * 设置滑动开始结束监听器
+     *
      * @param listener
      */
-    public void setOnScrollListener(OnScrollListener listener){
+    public void setOnScrollListener(OnScrollListener listener) {
         this.listener = listener;
     }
 
     // 滑动距离监听器
-    public interface OnScrollListener{
+    public interface OnScrollListener {
         /**
          * 在滑动开始的时候调用
          */
         void onScrollStart();
+
         /**
          * 在滑动开始的时候调用
          */
@@ -155,8 +187,8 @@ public class ElasticScrollView extends ScrollView {
 
     @Override
     public void computeScroll() {
-        if(lastScrollUpdate == -1){
-            if(listener != null){
+        if (lastScrollUpdate == -1) {
+            if (listener != null) {
                 listener.onScrollStart();
             }
             postDelayed(scrollerTask, delayMillis);
@@ -173,7 +205,7 @@ public class ElasticScrollView extends ScrollView {
             long currentTime = System.currentTimeMillis();
             if ((currentTime - lastScrollUpdate) > 100) {
                 lastScrollUpdate = -1;
-                if(listener != null){
+                if (listener != null) {
                     listener.onScrollEnd();
                 }
             } else {

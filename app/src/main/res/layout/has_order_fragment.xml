@@ -32,7 +32,7 @@
                     android:id="@+id/orderNumLabelTv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="20"
+                    android:layout_weight="4"
                     android:textSize="32sp"
                     android:paddingLeft="30dp"
                     android:paddingRight="15dp"
@@ -40,17 +40,17 @@
                     android:paddingBottom="30dp"
                     android:gravity="center"
                     android:background="@drawable/has_order_card_bg_left"
-                    android:text="日接单数"/>
+                    android:text="~~~~"/>
 
                 <TextView
                     android:id="@+id/orderNumTv"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="11"
+                    android:layout_weight="3"
                     android:paddingRight="15dp"
                     android:textSize="35sp"
                     android:gravity="center"
-                    android:text="999"/>
+                    android:text="~"/>
             </LinearLayout>
 
             <LinearLayout
@@ -66,7 +66,7 @@
                     android:id="@+id/orderMoneyLabelTv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="20"
+                    android:layout_weight="4"
                     android:textSize="32sp"
                     android:paddingLeft="30dp"
                     android:paddingRight="15dp"
@@ -74,17 +74,17 @@
                     android:paddingBottom="30dp"
                     android:gravity="center"
                     android:background="@drawable/has_order_card_bg_left"
-                    android:text="日工资"/>
+                    android:text="~~~"/>
 
                 <TextView
                     android:id="@+id/orderMoneyTv"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="11"
+                    android:layout_weight="3"
                     android:paddingRight="15dp"
                     android:textSize="35sp"
                     android:gravity="center"
-                    android:text="￥12"/>
+                    android:text="~"/>
             </LinearLayout>
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>

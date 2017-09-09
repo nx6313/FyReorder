@@ -34,7 +34,6 @@ import com.fy.niu.fyreorder.customView.HorizontalProgressbarWithProgress;
 import com.fy.niu.fyreorder.customView.ViewPagerIndicator;
 import com.fy.niu.fyreorder.fragment.MainOrderFragment;
 import com.fy.niu.fyreorder.model.Order;
-import com.fy.niu.fyreorder.model.Version;
 import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
@@ -113,6 +112,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             initUserData();
             initDatas(false);
+            // 进行新版本检测
+            VersionUtil.checkNewVersion(MainActivity.this, true);
         }
 
         mainIndicator.setVisibleTabCount(mTitles.size());
@@ -144,6 +145,8 @@ public class MainActivity extends AppCompatActivity
                     if (data.get("result").equals("success")) {
                         initUserData();
                         initDatas(false);
+                        // 进行新版本检测
+                        VersionUtil.checkNewVersion(MainActivity.this, true);
                     } else {
                         // 登录失败，提示用户，需要手动重新登录
                         leftMenuUserName.setTag("needLogin");
@@ -318,13 +321,16 @@ public class MainActivity extends AppCompatActivity
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         RequestParams params = new RequestParams();
         params.put("userId", userId);
-        params.put("ifTake", "0");
         if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {
             params.put("floor", floor);
         }
         ConnectorInventory.getOrderList(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
+                if (isRefFlag) {
+                    hideRefLayout();
+                }
+                ComFun.hideLoading();
             }
 
             @Override
@@ -332,61 +338,20 @@ public class MainActivity extends AppCompatActivity
                 try {
                     JSONObject orderDataJson = new JSONObject(responseObj.toString());
                     JSONArray dataList = orderDataJson.getJSONArray("dataList");
-                    Log.d(" ==== 未接订单列表数据 === ", " ===> " + dataList);
+                    Log.d(" ==== 首页订单列表数据 === ", " ===> " + dataList);
                     if (dataList.length() > 0) {
-                        List<Order> weiJieOrderList = getOrderListFromJson(dataList);
-                        orderDataMap.put("weiJie", weiJieOrderList);
-                    } else {
-                        List<Order> weiJieOrderList = new ArrayList<>();
-                        orderDataMap.put("weiJie", weiJieOrderList);
-                    }
-                } catch (JSONException e) {
-                }
-                RequestParams params2 = new RequestParams();
-                params2.put("userId", userId);
-                params2.put("ifTake", "1");
-                ConnectorInventory.getOrderList(MainActivity.this, params2, new DisposeDataHandle(new DisposeDataListener() {
-                    @Override
-                    public void onFinish() {
-                        if (isRefFlag) {
-                            hideRefLayout();
-                        }
-                        ComFun.hideLoading();
-                    }
+                        getOrderListFromJson(dataList, orderDataMap);
 
-                    @Override
-                    public void onSuccess(Object responseObj) {
-                        try {
-                            JSONObject orderDataJson = new JSONObject(responseObj.toString());
-                            JSONArray dataList = orderDataJson.getJSONArray("dataList");
-                            Log.d(" ==== 已接订单列表数据 === ", " ===> " + dataList);
-                            if (dataList.length() > 0) {
-                                List<Order> yiJieOrderList = getOrderListFromJson(dataList);
-                                orderDataMap.put("yiJie", yiJieOrderList);
-                            } else {
-                                List<Order> yiJieOrderList = new ArrayList<>();
-                                orderDataMap.put("yiJie", yiJieOrderList);
-                            }
-                        } catch (JSONException e) {
-                        }
                         // 更新数据
                         updateOrderViewPager(orderDataMap);
                     }
-
-                    @Override
-                    public void onFailure(OkHttpException okHttpE) {
-                        ComFun.showToast(MainActivity.this, "获取已接订单数据异常", Toast.LENGTH_SHORT);
-                    }
-                }));
+                } catch (JSONException e) {
+                }
             }
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if (isRefFlag) {
-                    hideRefLayout();
-                }
-                ComFun.hideLoading();
-                ComFun.showToast(MainActivity.this, "获取未接订单数据异常", Toast.LENGTH_SHORT);
+                ComFun.showToast(MainActivity.this, "获取订单数据异常", Toast.LENGTH_SHORT);
             }
         }));
     }
@@ -402,56 +367,107 @@ public class MainActivity extends AppCompatActivity
         noMainOrderDataLayout_yiJie.setRefreshing(false);
     }
 
-    private List<Order> getOrderListFromJson(JSONArray dataList) {
-        List<Order> orderList = new ArrayList<>();
+    private void getOrderListFromJson(JSONArray dataList, Map<String, List<Order>> orderDataMap) {
+        List<Order> weiJieOrderList = new ArrayList<>();
+        List<Order> yiJieOrderList = new ArrayList<>();
         for (int i = 0; i < dataList.length(); i++) {
             try {
                 JSONObject orderDataJson = dataList.getJSONObject(i);
                 Order order = new Order();
-                order.setId(orderDataJson.getString("id"));
-                order.setIdenCode(orderDataJson.getString("idenCode"));
-                order.setFloorId(orderDataJson.getString("floorId"));
-                order.setFloorName(orderDataJson.getString("floorName"));
-                order.setOrderState(orderDataJson.getInt("orderState"));
-                order.setOrderType(orderDataJson.getInt("orderType"));
-                order.setPayType(orderDataJson.getInt("payType"));
-                order.setOrderDate(orderDataJson.getString("orderDate"));
-                order.setOrderNumber(orderDataJson.getString("orderNumber"));
-                order.setOrderPrice(orderDataJson.getString("orderPrice"));
-                order.setCouponPrice(orderDataJson.getString("newUser"));
-                order.setServicePrice(orderDataJson.getString("service"));
-                order.setAddressDetail(orderDataJson.getString("addressDetail"));
+                if(orderDataJson.has("id")){
+                    order.setId(orderDataJson.getString("id"));
+                    order.setIdenCode(orderDataJson.getString("idenCode"));
+                    order.setFloorId(orderDataJson.getString("floorId"));
+                    order.setFloorName(orderDataJson.getString("floorName"));
+                    order.setOrderState(orderDataJson.getInt("orderState"));
+                    order.setOrderType(orderDataJson.getInt("orderType"));
+                    order.setPayType(orderDataJson.getInt("payType"));
+                    order.setOrderDate(orderDataJson.getString("orderDate"));
+                    order.setOrderNumber(orderDataJson.getString("orderNumber"));
+                    order.setOrderPrice(orderDataJson.getString("orderPrice"));
+                    order.setCouponPrice(orderDataJson.getString("newUser"));
+                    order.setServicePrice(orderDataJson.getString("service"));
+                    order.setAddressDetail(orderDataJson.getString("addressDetail"));
+                    order.setPersonName(orderDataJson.getString("personName"));
+                    order.setPersonPhone(orderDataJson.getString("personPhone"));
 
-                if (orderDataJson.has("perName")) {
-                    order.setUserName(orderDataJson.getString("perName"));
-                }
-                if (orderDataJson.has("perTel")) {
-                    order.setUserPhone(orderDataJson.getString("perTel"));
-                }
-                if (orderDataJson.has("remark")) {
-                    order.setRemark(orderDataJson.getString("remark"));
-                }
-                order.setState(2);
+                    if (orderDataJson.has("perName")) {
+                        order.setUserName(orderDataJson.getString("perName"));
+                    }
+                    if (orderDataJson.has("perTel")) {
+                        order.setUserPhone(orderDataJson.getString("perTel"));
+                    }
+                    if (orderDataJson.has("remark")) {
+                        order.setRemark(orderDataJson.getString("remark"));
+                    }
+                    order.setState(2);
 
-                JSONArray buyContentJsonArr = orderDataJson.getJSONArray("children");
-                List<Order.BuyContent> buyContentList = new ArrayList<>();
-                for (int j = 0; j < buyContentJsonArr.length(); j++) {
-                    JSONObject buyContentJsonObj = buyContentJsonArr.getJSONObject(j);
-                    Order.BuyContent buyContent = new Order.BuyContent();
-                    buyContent.setProId(buyContentJsonObj.getString("proId"));
-                    buyContent.setNum(buyContentJsonObj.getInt("num"));
-                    buyContent.setPrice(buyContentJsonObj.getString("price"));
-                    buyContent.setName(buyContentJsonObj.getString("proName"));
-                    buyContent.setUrl(buyContentJsonObj.getString("url"));
+                    JSONArray buyContentJsonArr = orderDataJson.getJSONArray("children");
+                    List<Order.BuyContent> buyContentList = new ArrayList<>();
+                    for (int j = 0; j < buyContentJsonArr.length(); j++) {
+                        JSONObject buyContentJsonObj = buyContentJsonArr.getJSONObject(j);
+                        Order.BuyContent buyContent = new Order.BuyContent();
+                        buyContent.setProId(buyContentJsonObj.getString("proId"));
+                        buyContent.setNum(buyContentJsonObj.getInt("num"));
+                        buyContent.setPrice(buyContentJsonObj.getString("price"));
+                        buyContent.setName(buyContentJsonObj.getString("proName"));
+                        buyContent.setUrl(buyContentJsonObj.getString("url"));
 
-                    buyContentList.add(buyContent);
+                        buyContentList.add(buyContent);
+                    }
+                    order.setOrderDetail(buyContentList);
+
+                    weiJieOrderList.add(order);
+                }else if(orderDataJson.has("fnid")){
+                    order.setId(orderDataJson.getString("fnid"));
+                    order.setIdenCode(orderDataJson.getString("fnidenCode"));
+                    order.setFloorId(orderDataJson.getString("fnfloorId"));
+                    order.setFloorName(orderDataJson.getString("fnfloorName"));
+                    order.setOrderState(orderDataJson.getInt("fnorderState"));
+                    order.setOrderType(orderDataJson.getInt("fnorderType"));
+                    order.setPayType(orderDataJson.getInt("fnpayType"));
+                    order.setOrderDate(orderDataJson.getString("fnorderDate"));
+                    order.setOrderNumber(orderDataJson.getString("fnorderNumber"));
+                    order.setOrderPrice(orderDataJson.getString("fnorderPrice"));
+                    order.setCouponPrice(orderDataJson.getString("fnnewUser"));
+                    order.setServicePrice(orderDataJson.getString("fnservice"));
+                    order.setAddressDetail(orderDataJson.getString("fnaddressDetail"));
+                    order.setPersonName(orderDataJson.getString("fnpersonName"));
+                    order.setPersonPhone(orderDataJson.getString("fnpersonPhone"));
+
+                    if (orderDataJson.has("fnperName")) {
+                        order.setUserName(orderDataJson.getString("fnperName"));
+                    }
+                    if (orderDataJson.has("fnperTel")) {
+                        order.setUserPhone(orderDataJson.getString("fnperTel"));
+                    }
+                    if (orderDataJson.has("fnremark")) {
+                        order.setRemark(orderDataJson.getString("fnremark"));
+                    }
+                    order.setState(1);
+
+                    JSONArray buyContentJsonArr = orderDataJson.getJSONArray("fnchildren");
+                    List<Order.BuyContent> buyContentList = new ArrayList<>();
+                    for (int j = 0; j < buyContentJsonArr.length(); j++) {
+                        JSONObject buyContentJsonObj = buyContentJsonArr.getJSONObject(j);
+                        Order.BuyContent buyContent = new Order.BuyContent();
+                        buyContent.setProId(buyContentJsonObj.getString("fnproId"));
+                        buyContent.setNum(buyContentJsonObj.getInt("fnnum"));
+                        buyContent.setPrice(buyContentJsonObj.getString("fnprice"));
+                        buyContent.setName(buyContentJsonObj.getString("fnproName"));
+                        buyContent.setUrl(buyContentJsonObj.getString("fnurl"));
+
+                        buyContentList.add(buyContent);
+                    }
+                    order.setOrderDetail(buyContentList);
+
+                    yiJieOrderList.add(order);
                 }
-                order.setOrderDetail(buyContentList);
-                orderList.add(order);
             } catch (JSONException e) {
             }
         }
-        return orderList;
+        orderDataMap.put("weiJie", weiJieOrderList);
+        orderDataMap.put("yiJie", yiJieOrderList);
     }
 
     private void updateOrderViewPager(Map<String, List<Order>> orderDataMap) {
@@ -509,6 +525,15 @@ public class MainActivity extends AppCompatActivity
                     }
                 }, 200);
                 break;
+            case R.id.nav_complete_order:
+                drawer.closeDrawer(GravityCompat.START);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toCompleteOrder();
+                    }
+                }, 200);
+                break;
             case R.id.nav_pay_img:
                 drawer.closeDrawer(GravityCompat.START);
                 new Handler().postDelayed(new Runnable() {
@@ -527,7 +552,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);
-                VersionUtil.checkNewVersion(MainActivity.this);
+                VersionUtil.checkNewVersion(MainActivity.this, false);
                 break;
             case R.id.nav_exit:
                 toUserLoginOut();
@@ -604,6 +629,14 @@ public class MainActivity extends AppCompatActivity
     public void toHasReceiveOrder() {
         Intent hasReceiveOrderIntent = new Intent(MainActivity.this, OrderActivity.class);
         startActivity(hasReceiveOrderIntent);
+    }
+
+    /**
+     * 跳转到已完成订单列表
+     */
+    public void toCompleteOrder() {
+        Intent completeOrderIntent = new Intent(MainActivity.this, CompleteOrderActivity.class);
+        startActivity(completeOrderIntent);
     }
 
     /**

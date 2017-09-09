@@ -6,4 +6,5 @@
     <string name="title_activity_user_center">个人中心</string>
     <string name="title_activity_user_data">个人资料</string>
     <string name="title_activity_update_pwd">修改密码</string>
+    <string name="title_activity_complete_order">已完成订单</string>
 </resources>

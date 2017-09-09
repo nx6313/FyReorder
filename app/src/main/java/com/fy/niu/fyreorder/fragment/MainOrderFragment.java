@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.fy.niu.fyreorder.MainActivity;
@@ -18,9 +19,9 @@ import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.model.Order;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DateFormatUtil;
-import com.fy.niu.fyreorder.util.DrawableManager;
 import com.fy.niu.fyreorder.util.SerializableOrderList;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -92,7 +93,6 @@ public class MainOrderFragment extends Fragment {
         // 商家未接 !userType.equals("0") && orderData.getOrderState() == 2
         // 商家已接 !userType.equals("0") && orderData.getOrderState() == 3
         final String userType = SharedPreferencesTool.getFromShared(context, "fyLoginUserInfo", "ifGive");
-        DrawableManager drawableManager = new DrawableManager();
         for (final Order orderData : mOrderDataList) {
             LayoutInflater inflater = LayoutInflater.from(context);
             View orderItemView = inflater.inflate(R.layout.order_fragment_item, null);
@@ -101,9 +101,14 @@ public class MainOrderFragment extends Fragment {
             TextView userName = (TextView) orderItemView.findViewWithTag("order_item_user_name");
             TextView userAddress = (TextView) orderItemView.findViewWithTag("order_item_user_address");
             TextView userPayWay = (TextView) orderItemView.findViewWithTag("order_item_pay_way");
+            TextView userPhone = (TextView) orderItemView.findViewWithTag("order_item_user_phone");
             TextView orderNum = (TextView) orderItemView.findViewWithTag("order_item_order_num");
             TextView orderTime = (TextView) orderItemView.findViewWithTag("order_item_order_time");
             TextView orderRemark = (TextView) orderItemView.findViewWithTag("order_item_order_remark");
+            RelativeLayout orderReceiveUserInfoLayout = (RelativeLayout) orderItemView.findViewWithTag("order_item_receive_user_info_layout");
+            TextView receiveUserName = (TextView) orderItemView.findViewWithTag("order_item_receive_user_name");
+            TextView receiveUserPhone = (TextView) orderItemView.findViewWithTag("order_item_receive_user_phone");
+            ImageView receiveOrderCall = (ImageView) orderItemView.findViewWithTag("order_item_receive_order_call");
             final LinearLayout itemDetailLayout = (LinearLayout) orderItemView.findViewWithTag("order_item_detail");
             LinearLayout itemDetailMoneyWrapLayout = (LinearLayout) orderItemView.findViewWithTag("order_item_detail_money_wrap");
             LinearLayout itemDetailWrapLayout = (LinearLayout) orderItemView.findViewWithTag("order_item_detail_wrap");
@@ -113,6 +118,12 @@ public class MainOrderFragment extends Fragment {
             LinearLayout orderItemDoLayout = (LinearLayout) orderItemView.findViewWithTag("order_item_do");
             TextView orderItemDo1 = (TextView) orderItemView.findViewWithTag("order_item_do_1");
             ImageView orderCall = (ImageView) orderItemView.findViewWithTag("order_item_order_call");
+            if (pageType.equals("complete")) {
+                receiveOrderCall.setVisibility(View.GONE);
+                orderCall.setVisibility(View.GONE);
+                orderItemDoLayout.setVisibility(View.GONE);
+                userPhone.setVisibility(View.VISIBLE);
+            }
 
             orderItemView.setTag("close");
             itemDetailLayout.setVisibility(View.GONE);
@@ -151,12 +162,33 @@ public class MainOrderFragment extends Fragment {
             } else {
                 userPayWay.setText("支付方式：未知");
             }
+            userPhone.setText("客户电话：" + orderData.getUserPhone().substring(0, 3) + " **** " + orderData.getUserPhone().substring(orderData.getUserPhone().length() - 4, orderData.getUserPhone().length()));
             orderNum.setText("编号：" + orderData.getOrderNumber());
             orderTime.setText("时间：" + DateFormatUtil.dateToStr(new Date(Long.parseLong(orderData.getOrderDate())), DateFormatUtil.MDHHMM));
             if (ComFun.strNull(orderData.getRemark()) && !orderData.getRemark().equals("null")) {
                 orderRemark.setText("给商家的留言：" + orderData.getRemark());
             } else {
                 orderRemark.setVisibility(View.GONE);
+            }
+            if (pageType.equals("complete") || (!userType.equals("0") && orderData.getOrderState() == 4)) {
+                orderReceiveUserInfoLayout.setVisibility(View.VISIBLE);
+                if (ComFun.strNull(orderData.getPersonName())) {
+                    receiveUserName.setText("配送员名称：" + orderData.getPersonName());
+                } else {
+                    receiveUserName.setText("配送员名称：数据异常");
+                }
+                if (ComFun.strNull(orderData.getPersonPhone())) {
+                    receiveUserPhone.setText("电话：" + orderData.getPersonPhone().substring(0, 3) + " **** " + orderData.getPersonPhone().substring(orderData.getPersonPhone().length() - 4, orderData.getPersonPhone().length()));
+                    if (!pageType.equals("complete")) {
+                        receiveUserPhone.setText(receiveUserPhone.getText() + "（点击右侧图标拨打）");
+                        receiveOrderCall.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    receiveUserPhone.setText("电话：数据异常");
+                    receiveOrderCall.setVisibility(View.GONE);
+                }
+            } else {
+                orderReceiveUserInfoLayout.setVisibility(View.GONE);
             }
             if (orderData.getOrderDetail().size() > 0) {
                 for (Order.BuyContent buyContent : orderData.getOrderDetail()) {
@@ -165,7 +197,7 @@ public class MainOrderFragment extends Fragment {
                     TextView orderDetailItemName = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_name");
                     TextView orderDetailItemCountPrice = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_count_price");
 
-                    drawableManager.fetchDrawableOnThread(buyContent.getUrl(), orderDetailItemImg);
+                    Picasso.with(context).load(buyContent.getUrl()).into(orderDetailItemImg);
                     orderDetailItemName.setText("商品名称：" + buyContent.getName());
                     orderDetailItemCountPrice.setText("购买数量：" + buyContent.getNum() + "           价格：" + buyContent.getPrice() + " 元");
 
@@ -203,7 +235,7 @@ public class MainOrderFragment extends Fragment {
                 }
             });
             if (userType.equals("0") && orderData.getOrderState() == 4) {
-                orderItemDo1.setText("完 成 订 单");
+                orderItemDo1.setText("点 击 完 成 订 单");
             } else if (!userType.equals("0") && orderData.getOrderState() == 3) {
                 orderItemDo1.setText("等待配送员接单");
             } else if (!userType.equals("0") && orderData.getOrderState() == 4) {
@@ -218,6 +250,17 @@ public class MainOrderFragment extends Fragment {
             } else {
                 orderItemDo1.setText(userType + " -=- " + orderData.getOrderState());
             }
+            receiveOrderCall.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Message msg = new Message();
+                    Bundle data = new Bundle();
+                    msg.what = MainActivity.MSG_CALL_USER_PHONE;
+                    data.putString("userPhone", orderData.getPersonPhone());
+                    msg.setData(data);
+                    MainActivity.mHandler.sendMessage(msg);
+                }
+            });
             orderCall.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
