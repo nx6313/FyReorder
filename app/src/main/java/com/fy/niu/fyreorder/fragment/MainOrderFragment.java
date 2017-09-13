@@ -1,6 +1,7 @@
 package com.fy.niu.fyreorder.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -14,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.ant.liao.GifView;
+import com.fy.niu.fyreorder.CompleteOrderActivity;
 import com.fy.niu.fyreorder.MainActivity;
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.model.Order;
@@ -36,6 +39,7 @@ public class MainOrderFragment extends Fragment {
     private List<Order> mOrderDataList;
     public static final String BUNDLE_DATA_TYPE = "orderDataType";
     public static final String BUNDLE_DATA_LIST = "orderDataList";
+    private static int currentPageIndex = 1; // 当前页码数，初始化时，有页面单独设置
 
     @Nullable
     @Override
@@ -85,6 +89,10 @@ public class MainOrderFragment extends Fragment {
 
     public static void createMainOrderView(final Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> mOrderDataList) {
         mainOrderDataLayout.removeAllViews();
+        addOrderItemView(context, pageType, mainOrderDataLayout, mOrderDataList);
+    }
+
+    private static void addOrderItemView(final Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> mOrderDataList) {
         // 0学生  1商超   2外卖
         // 送货的  未接单 3 已接单 4
         // 商家    未接单 2 已接单 3
@@ -93,8 +101,8 @@ public class MainOrderFragment extends Fragment {
         // 商家未接 !userType.equals("0") && orderData.getOrderState() == 2
         // 商家已接 !userType.equals("0") && orderData.getOrderState() == 3
         final String userType = SharedPreferencesTool.getFromShared(context, "fyLoginUserInfo", "ifGive");
+        LayoutInflater inflater = LayoutInflater.from(context);
         for (final Order orderData : mOrderDataList) {
-            LayoutInflater inflater = LayoutInflater.from(context);
             View orderItemView = inflater.inflate(R.layout.order_fragment_item, null);
 
             LinearLayout orderItemMainWrap = (LinearLayout) orderItemView.findViewWithTag("order_item_main_wrap");
@@ -131,6 +139,7 @@ public class MainOrderFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if ((userType.equals("0") && orderData.getOrderState() == 4) ||
+                            (userType.equals("0") && orderData.getOrderState() == 5) ||
                             (!userType.equals("0") && orderData.getOrderState() == 3) ||
                             (!userType.equals("0") && orderData.getOrderState() == 4) ||
                             (!userType.equals("0") && orderData.getOrderState() == 5)) {
@@ -197,7 +206,7 @@ public class MainOrderFragment extends Fragment {
                     TextView orderDetailItemName = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_name");
                     TextView orderDetailItemCountPrice = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_count_price");
 
-                    Picasso.with(context).load(buyContent.getUrl()).into(orderDetailItemImg);
+                    Picasso.with(context).load(buyContent.getUrl()).resize(100, 100).centerCrop().placeholder(R.drawable.food_default).error(R.drawable.food_default).into(orderDetailItemImg);
                     orderDetailItemName.setText("商品名称：" + buyContent.getName());
                     orderDetailItemCountPrice.setText("购买数量：" + buyContent.getNum() + "           价格：" + buyContent.getPrice() + " 元");
 
@@ -275,6 +284,32 @@ public class MainOrderFragment extends Fragment {
 
             mainOrderDataLayout.addView(orderItemView);
         }
+        // 添加是否需要上拉刷新的布局
+        if (pageType.equals("complete") && mOrderDataList.size() > 0) {
+            final View topPullRefView = inflater.inflate(R.layout.pull_ref, null);
+            GifView topPullRefIngGif = (GifView) topPullRefView.findViewById(R.id.topPullRefIngGif);
+            topPullRefIngGif.setGifImage(R.drawable.refing);
+            topPullRefIngGif.setShowDimension(40, 40);
+            topPullRefIngGif.setGifImageType(GifView.GifImageType.COVER);
+            LinearLayout topPullRefLayout = (LinearLayout) topPullRefView.findViewById(R.id.topPullRefLayout);
+            topPullRefLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getTag().toString().equals("pullToRef")) {
+                        v.setTag("refIng");
+                        // 更新布局为正在刷新
+                        topPullRefView.findViewById(R.id.topPullRefTipTv).setVisibility(View.GONE);
+                        topPullRefView.findViewById(R.id.topPullRefIngLayout).setVisibility(View.VISIBLE);
+                        // 发送下一页数据请求广播
+                        Intent refPageDataIntent = new Intent();
+                        refPageDataIntent.setAction(CompleteOrderActivity.MSG_GET_NEW_PAGE_DATA);
+                        refPageDataIntent.putExtra("currentPageIndex", currentPageIndex + 1);
+                        context.sendBroadcast(refPageDataIntent);
+                    }
+                }
+            });
+            mainOrderDataLayout.addView(topPullRefView);
+        }
     }
 
     public static MainOrderFragment newInstance(String type, List<Order> orderData) {
@@ -289,4 +324,31 @@ public class MainOrderFragment extends Fragment {
 
         return fragment;
     }
+
+    public static void setCurrentPageIndex(int pageIndex) {
+        currentPageIndex = pageIndex;
+    }
+
+    public static void completeRef(Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> pageOrderList, boolean finished) {
+        if (mainOrderDataLayout != null) {
+            if (!finished && pageOrderList.size() > 0) {
+                mainOrderDataLayout.removeView(mainOrderDataLayout.findViewById(R.id.topPullRefLayout));
+                addOrderItemView(context, pageType, mainOrderDataLayout, pageOrderList);
+            }
+            LinearLayout topPullRefLayout = (LinearLayout) mainOrderDataLayout.findViewById(R.id.topPullRefLayout);
+            if (topPullRefLayout != null) {
+                if (!finished) {
+                    topPullRefLayout.setTag("pullToRef");
+                } else {
+                    topPullRefLayout.setTag("pullFinished");
+                    TextView topPullRefTipTv = (TextView) mainOrderDataLayout.findViewById(R.id.topPullRefTipTv);
+                    topPullRefTipTv.setText("没更多数据了");
+                }
+                // 更新布局为完成刷新
+                mainOrderDataLayout.findViewById(R.id.topPullRefTipTv).setVisibility(View.VISIBLE);
+                mainOrderDataLayout.findViewById(R.id.topPullRefIngLayout).setVisibility(View.GONE);
+            }
+        }
+    }
+
 }

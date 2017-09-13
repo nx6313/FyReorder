@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/loading_border"
     android:orientation="vertical"
-    android:paddingTop="30dp"
-    android:paddingBottom="30dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="15dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:gravity="center">

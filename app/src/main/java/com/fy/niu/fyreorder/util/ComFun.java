@@ -188,7 +188,7 @@ public class ComFun {
     public static AlertDialog loadingDialog = null;
 
     public static void showLoading(Activity activity, String loadingTipValue) {
-        loadingDialog = new AlertDialog.Builder(activity).setCancelable(false).create();
+        loadingDialog = new AlertDialog.Builder(activity, R.style.MyDialogStyle).setCancelable(false).create();
         loadingDialog.show();
         WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
         params.width = getScreenWidth() * 3 / 4;
@@ -197,6 +197,7 @@ public class ComFun {
 
         Window win = loadingDialog.getWindow();
         View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        loadingView.setBackgroundResource(R.drawable.loading_border);
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading_girl);
@@ -217,7 +218,7 @@ public class ComFun {
      * @param loadingTipValue
      */
     public static AlertDialog showLoading(Activity activity, String loadingTipValue, boolean cancelable) {
-        loadingDialog = new AlertDialog.Builder(activity).setCancelable(cancelable).create();
+        loadingDialog = new AlertDialog.Builder(activity, R.style.MyDialogStyle).setCancelable(cancelable).create();
         loadingDialog.show();
         WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
         params.width = getScreenWidth() * 3 / 4;
@@ -226,6 +227,7 @@ public class ComFun {
 
         Window win = loadingDialog.getWindow();
         View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        loadingView.setBackgroundResource(R.drawable.loading_border);
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading_girl);

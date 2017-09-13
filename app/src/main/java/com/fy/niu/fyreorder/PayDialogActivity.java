@@ -109,7 +109,7 @@ public class PayDialogActivity extends Activity {
             ImageView payImgView = new ImageView(PayDialogActivity.this);
             payImgView.setFocusable(true);
             Log.d("加载支付二维码图片", "图片地址：" + payCardImgUris.get(position));
-            Picasso.with(PayDialogActivity.this).load(payCardImgUris.get(position)).into(payImgView);
+            Picasso.with(PayDialogActivity.this).load(payCardImgUris.get(position)).placeholder(R.drawable.pay_default).error(R.drawable.pay_default).into(payImgView);
             payImgView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {

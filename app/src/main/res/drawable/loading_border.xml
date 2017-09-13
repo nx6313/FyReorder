@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:dither="true"
+    android:shape="rectangle">
 
-    <item
-        android:top="-10dp"
-        android:right="-10dp"
-        android:bottom="-10dp">
-
-        <shape
-            android:dither="true"
-            android:shape="rectangle">
-
-            <corners android:radius="0dp"/>
-            <stroke android:width="8dp" android:color="#3e8c65" />
-            <solid android:color="#a9cead" />
-        </shape>
-    </item>
-
-</layer-list>
+    <corners android:radius="20dp" />
+    <solid android:color="#eaeaea" />
+</shape>
