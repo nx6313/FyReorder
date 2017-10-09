@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     private FragmentPagerAdapter mAdapter;
 
     private CircularImage mainUserHeadImg;
+    private TextView toolbarTaskTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity
                 toggleLeftMenu();
             }
         });
+        toolbarTaskTv = (TextView) toolbar.findViewById(R.id.toolbarTaskTv);
 
         initView();
 
@@ -279,7 +281,9 @@ public class MainActivity extends AppCompatActivity
         if (!ifGive.equals("0")) {
             navMenuItemPayImg.setVisible(false);
             navMenuItemSelectSelfFloor.setVisible(false);
+            toolbarTaskTv.setVisibility(View.GONE);
         } else {
+            toolbarTaskTv.setVisibility(View.VISIBLE);
             if (receiveSelfFloor.equals("self")) {
                 navMenuItemSelectSelfFloor.setTitleCondensed("self");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：" + floorName + " 』");
