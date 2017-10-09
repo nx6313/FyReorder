@@ -24,18 +24,6 @@ public class MyApplication extends Application {
         instance = this;
 
         XGPushConfig.enableDebug(getApplicationContext(), true);
-        XGPushManager.registerPush(getApplicationContext(), new XGIOperateCallback() {
-            @Override
-            public void onSuccess(Object data, int i) {
-                SharedPreferencesTool.addOrUpdate(getApplicationContext(), "fyBaseData", "userToken", data.toString());
-                Log.d("TPush", "注册成功，设备token为：" + data);
-            }
-
-            @Override
-            public void onFail(Object data, int errCode, String msg) {
-                Log.d("TPush", "注册失败，错误码：" + errCode + ",错误信息：" + msg);
-            }
-        });
 //        XGCustomPushNotificationBuilder build = new XGCustomPushNotificationBuilder();
 //        build.setSound(RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_ALARM)) // 设置声音
 //                 setSound(

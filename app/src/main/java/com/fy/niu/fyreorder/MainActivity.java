@@ -45,6 +45,8 @@ import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 import com.fy.niu.fyreorder.util.VersionUtil;
+import com.tencent.android.tpush.XGIOperateCallback;
+import com.tencent.android.tpush.XGPushManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private CircularImage userHeadImg;
     private TextView leftMenuUserName;
+    private TextView leftMenuUserType;
 
     private ViewPager mainViewPager;
     private ViewPagerIndicator mainIndicator;
@@ -151,6 +154,7 @@ public class MainActivity extends AppCompatActivity
                         // 登录失败，提示用户，需要手动重新登录
                         leftMenuUserName.setTag("needLogin");
                         leftMenuUserName.setText("登录失效，点击登录");
+                        leftMenuUserType.setVisibility(View.GONE);
                         ComFun.showToast(MainActivity.this, "登录失效，需重新登录", Toast.LENGTH_SHORT);
                     }
                 } catch (JSONException e) {
@@ -162,6 +166,7 @@ public class MainActivity extends AppCompatActivity
                 // 登录失败，提示用户，需要手动重新登录
                 leftMenuUserName.setTag("needLogin");
                 leftMenuUserName.setText("登录失效，点击登录");
+                leftMenuUserType.setVisibility(View.GONE);
                 ComFun.showToast(MainActivity.this, "登录失效，请重新登录", Toast.LENGTH_SHORT);
             }
         }));
@@ -182,7 +187,7 @@ public class MainActivity extends AppCompatActivity
                 MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
                 navMenuItemLogginOut.setVisible(true);
                 try {
-                    Log.d("用户信息成功", responseObj.toString());
+                    Log.d("获取用户信息成功", responseObj.toString());
                     DBUtil.deleteAll(new DBOpenHelper(MainActivity.this), "userInfo");
                     JSONObject userInfoJson = new JSONObject(responseObj.toString());
                     String userId = userInfoJson.getString("userId");
@@ -212,6 +217,14 @@ public class MainActivity extends AppCompatActivity
                     // 更新UI
                     leftMenuUserName.setTag("hasLogin");
                     leftMenuUserName.setText(userName);
+                    leftMenuUserType.setVisibility(View.VISIBLE);
+                    if (type.trim().equals("0")) {
+                        leftMenuUserType.setText("[ 学生号登录 ]");
+                    } else if (type.trim().equals("1")) {
+                        leftMenuUserType.setText("[ 小卖铺商家登录 ]");
+                    } else if (type.trim().equals("2")) {
+                        leftMenuUserType.setText("[ 外卖登录 ]");
+                    }
                 } catch (JSONException e) {
                 }
             }
@@ -222,6 +235,7 @@ public class MainActivity extends AppCompatActivity
                 navMenuItemLogginOut.setVisible(false);
                 leftMenuUserName.setTag("needLogin");
                 leftMenuUserName.setText("登录失效，点击登录");
+                leftMenuUserType.setVisibility(View.GONE);
                 ComFun.showToast(MainActivity.this, "获取个人信息异常", Toast.LENGTH_SHORT);
             }
         }));
@@ -235,6 +249,7 @@ public class MainActivity extends AppCompatActivity
         userHeadImg.setImageResource(R.drawable.default_user_head);
 
         leftMenuUserName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.leftMenuUserName);
+        leftMenuUserType = (TextView) navigationView.getHeaderView(0).findViewById(R.id.leftMenuUserType);
         userHeadImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -259,6 +274,7 @@ public class MainActivity extends AppCompatActivity
         String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
         MenuItem navMenuItemPayImg = navigationView.getMenu().findItem(R.id.nav_pay_img);
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
+        MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         if (!ifGive.equals("0")) {
             navMenuItemPayImg.setVisible(false);
@@ -272,12 +288,22 @@ public class MainActivity extends AppCompatActivity
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：所有 』");
             }
         }
+        if (ifGive.equals("1")) {
+            navMenuItemOpenGive.setVisible(false);
+        }
 
-        MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         String ifOpen = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifOpen");
         if (ifOpen.equals("1")) {
             navMenuItemOpenGive.setTitleCondensed("true");
-            navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
+            if (ifGive.equals("0")) {
+                navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
+            }else if (ifGive.equals("2")) {
+                navMenuItemOpenGive.setTitle("正在营业中，点击暂停营业");
+            }
+        } else {
+            if (ifGive.equals("1")) {
+                ComFun.showToast(MainActivity.this, "您当前不能正常接单，请联系管理员", Toast.LENGTH_LONG);
+            }
         }
 
         String currentVersionName = ComFun.getVersionName(MainActivity.this);
@@ -644,6 +670,19 @@ public class MainActivity extends AppCompatActivity
      */
     public void toUserLoginOut() {
         // 解除XPush绑定
+        XGPushManager.unregisterPush(MainActivity.this, new XGIOperateCallback() {
+            @Override
+            public void onSuccess(Object data, int code) {
+                SharedPreferencesTool.deleteFromShared(MainActivity.this, "fyBaseData", "userToken");
+                Log.d("TPush", "反注册成功, [data] = " + data + ", [code] = " + code);
+            }
+
+            @Override
+            public void onFail(Object data, int errCode, String msg) {
+                Log.d("TPush", "反注册失败，错误码：" + errCode + ",错误信息：" + msg);
+            }
+        });
+        // 重置登录状态
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈
         ComFun.clearAllActiveActivity();
@@ -656,6 +695,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void toUserIfOpen() {
         final MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
+        final String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
         final String ifOpenFlag = navMenuItemOpenGive.getTitleCondensed().toString();
         ComFun.showLoading(MainActivity.this, "正在处理，请稍后");
         final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
@@ -677,13 +717,23 @@ public class MainActivity extends AppCompatActivity
                 if (ifOpenFlag.equals("true")) {
                     SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "0");
                     navMenuItemOpenGive.setTitleCondensed("false");
-                    navMenuItemOpenGive.setTitle("点击开始接单");
-                    ComFun.showToast(MainActivity.this, "成功停止接单啦", Toast.LENGTH_SHORT);
+                    if (ifGive.equals("0")) {
+                        navMenuItemOpenGive.setTitle("点击开始接单");
+                        ComFun.showToast(MainActivity.this, "成功停止接单啦", Toast.LENGTH_SHORT);
+                    } else if (ifGive.equals("2")) {
+                        navMenuItemOpenGive.setTitle("点击开始营业");
+                        ComFun.showToast(MainActivity.this, "成功暂停营业啦", Toast.LENGTH_SHORT);
+                    }
                 } else {
                     SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "1");
                     navMenuItemOpenGive.setTitleCondensed("true");
-                    navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
-                    ComFun.showToast(MainActivity.this, "成功开始接单啦", Toast.LENGTH_SHORT);
+                    if (ifGive.equals("0")) {
+                        navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
+                        ComFun.showToast(MainActivity.this, "成功开始接单啦", Toast.LENGTH_SHORT);
+                    } else if (ifGive.equals("2")) {
+                        navMenuItemOpenGive.setTitle("正在营业中，点击暂停营业");
+                        ComFun.showToast(MainActivity.this, "成功开始营业啦", Toast.LENGTH_SHORT);
+                    }
                 }
             }
 

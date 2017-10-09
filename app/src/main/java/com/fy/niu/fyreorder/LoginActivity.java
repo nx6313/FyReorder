@@ -31,6 +31,8 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.tencent.android.tpush.XGIOperateCallback;
+import com.tencent.android.tpush.XGPushManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,50 +83,63 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(ComFun.strNull(tvLoginName.getText().toString()) && ComFun.strNull(tvLoginPwd.getText().toString())){
                     btnLogin.requestFocus();
-                    ComFun.showLoading(LoginActivity.this, "登陆中，请稍后...", false);
-                    // 执行登录任务
-                    String devToken = SharedPreferencesTool.getFromShared(LoginActivity.this, "fyBaseData", "userToken");
-                    RequestParams params = new RequestParams();
-                    Log.d("登陆中 ====== ", "设备 Token：" + devToken);
-                    params.put("token", devToken);
-                    params.put("loginName", tvLoginName.getText().toString().trim());
-                    params.put("passWord", tvLoginPwd.getText().toString().trim());
-                    ConnectorInventory.userLogin(LoginActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                    XGPushManager.registerPush(LoginActivity.this, new XGIOperateCallback() {
                         @Override
-                        public void onFinish() {
-                            ComFun.hideLoading();
-                        }
-
-                        @Override
-                        public void onSuccess(Object responseObj) {
-                            try {
-                                Log.d("登录成功，用户信息", responseObj.toString());
-                                JSONObject data = new JSONObject(responseObj.toString());
-                                if(data.get("result").equals("success")){
-                                    // 保存登录用户信息
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.getString("userId"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginName", tvLoginName.getText().toString().trim());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginPass", tvLoginPwd.getText().toString().trim());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floor", data.getString("floor"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floorName", data.getString("floorName"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
-                                    ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
-                                    mLoginHandler = new Handler();
-                                    mLoginTesk = new LoginTask();
-                                    mLoginHandler.postDelayed(mLoginTesk, 1000);
-                                }else{
-                                    ComFun.showToast(LoginActivity.this, "账号或密码错误", Toast.LENGTH_LONG);
+                        public void onSuccess(Object data, int i) {
+                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyBaseData", "userToken", data.toString());
+                            Log.d("TPush", "登录时，注册成功，设备token为：" + data);
+                            ComFun.showLoading(LoginActivity.this, "登陆中，请稍后...", false);
+                            // 执行登录任务
+                            String devToken = SharedPreferencesTool.getFromShared(LoginActivity.this, "fyBaseData", "userToken");
+                            RequestParams params = new RequestParams();
+                            Log.d("登陆中 ====== ", "设备 Token：" + devToken);
+                            params.put("token", devToken);
+                            params.put("loginName", tvLoginName.getText().toString().trim());
+                            params.put("passWord", tvLoginPwd.getText().toString().trim());
+                            ConnectorInventory.userLogin(LoginActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                                @Override
+                                public void onFinish() {
+                                    ComFun.hideLoading();
                                 }
-                            } catch (JSONException e) {}
+
+                                @Override
+                                public void onSuccess(Object responseObj) {
+                                    try {
+                                        Log.d("登录成功，用户信息", responseObj.toString());
+                                        JSONObject data = new JSONObject(responseObj.toString());
+                                        if(data.get("result").equals("success")){
+                                            // 保存登录用户信息
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.getString("userId"));
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginName", tvLoginName.getText().toString().trim());
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginPass", tvLoginPwd.getText().toString().trim());
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floor", data.getString("floor"));
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floorName", data.getString("floorName"));
+                                            SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
+                                            ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
+                                            mLoginHandler = new Handler();
+                                            mLoginTesk = new LoginTask();
+                                            mLoginHandler.postDelayed(mLoginTesk, 1000);
+                                        }else{
+                                            ComFun.showToast(LoginActivity.this, "账号或密码错误", Toast.LENGTH_LONG);
+                                        }
+                                    } catch (JSONException e) {}
+                                }
+
+                                @Override
+                                public void onFailure(OkHttpException okHttpE) {
+                                    ComFun.showToast(LoginActivity.this, "登录异常，请稍后重试", Toast.LENGTH_LONG);
+                                }
+                            }));
                         }
 
                         @Override
-                        public void onFailure(OkHttpException okHttpE) {
-                            ComFun.showToast(LoginActivity.this, "登录异常，请稍后重试", Toast.LENGTH_LONG);
+                        public void onFail(Object data, int errCode, String msg) {
+                            Log.d("TPush", "登录时，注册失败，错误码：" + errCode + ",错误信息：" + msg);
+                            ComFun.showToast(LoginActivity.this, "登录推送注册异常，请稍后重试", Toast.LENGTH_LONG);
                         }
-                    }));
+                    });
                 }else{
                     if(!ComFun.strNull(tvLoginName.getText().toString())){
                         ComFun.showToast(LoginActivity.this, "请输入登录账号", Toast.LENGTH_SHORT);
