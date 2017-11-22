@@ -369,6 +369,7 @@ public class MainActivity extends AppCompatActivity
                     JSONObject orderDataJson = new JSONObject(responseObj.toString());
                     JSONArray dataList = orderDataJson.getJSONArray("dataList");
                     Log.d(" ==== 首页订单列表数据 === ", " ===> " + dataList);
+                    Log.d(" ==== 首页订单列表数据num === ", " ===> " + dataList.length());
                     if (dataList.length() > 0) {
                         getOrderListFromJson(dataList, orderDataMap);
 

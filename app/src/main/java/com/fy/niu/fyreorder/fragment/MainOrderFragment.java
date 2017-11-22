@@ -171,7 +171,11 @@ public class MainOrderFragment extends Fragment {
             } else {
                 userPayWay.setText("支付方式：未知");
             }
-            userPhone.setText("客户电话：" + orderData.getUserPhone().substring(0, 3) + " **** " + orderData.getUserPhone().substring(orderData.getUserPhone().length() - 4, orderData.getUserPhone().length()));
+            if(ComFun.strNull(orderData.getUserPhone())) {
+                userPhone.setText("客户电话：" + orderData.getUserPhone().substring(0, 3) + " **** " + orderData.getUserPhone().substring(orderData.getUserPhone().length() - 4, orderData.getUserPhone().length()));
+            } else {
+                userPhone.setText("客户电话：---");
+            }
             orderNum.setText("编号：" + orderData.getOrderNumber());
             orderTime.setText("时间：" + DateFormatUtil.dateToStr(new Date(Long.parseLong(orderData.getOrderDate())), DateFormatUtil.MDHHMM));
             if (ComFun.strNull(orderData.getRemark()) && !orderData.getRemark().equals("null")) {
@@ -193,7 +197,7 @@ public class MainOrderFragment extends Fragment {
                         receiveOrderCall.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    receiveUserPhone.setText("电话：数据异常");
+                    receiveUserPhone.setText("电话：---");
                     receiveOrderCall.setVisibility(View.GONE);
                 }
             } else {
