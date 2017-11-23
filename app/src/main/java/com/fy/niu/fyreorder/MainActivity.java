@@ -45,8 +45,6 @@ import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 import com.fy.niu.fyreorder.util.VersionUtil;
-import com.tencent.android.tpush.XGIOperateCallback;
-import com.tencent.android.tpush.XGPushManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +55,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.jpush.android.api.JPushInterface;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -130,10 +130,7 @@ public class MainActivity extends AppCompatActivity
 
     private void userSilentLogin(String userAccountNum, String userAccountPass) {
         ComFun.showLoading(MainActivity.this, "初始化数据中，请稍后");
-        String devToken = SharedPreferencesTool.getFromShared(MainActivity.this, "fyBaseData", "userToken");
         RequestParams params = new RequestParams();
-        Log.d("静默登陆中 ====== ", "设备 Token：" + devToken);
-        params.put("token", devToken);
         params.put("loginName", userAccountNum);
         params.put("passWord", userAccountPass);
         ConnectorInventory.userLogin(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -674,19 +671,8 @@ public class MainActivity extends AppCompatActivity
      * 用户退出登录
      */
     public void toUserLoginOut() {
-        // 解除XPush绑定
-        XGPushManager.unregisterPush(MainActivity.this, new XGIOperateCallback() {
-            @Override
-            public void onSuccess(Object data, int code) {
-                SharedPreferencesTool.deleteFromShared(MainActivity.this, "fyBaseData", "userToken");
-                Log.d("TPush", "反注册成功, [data] = " + data + ", [code] = " + code);
-            }
-
-            @Override
-            public void onFail(Object data, int errCode, String msg) {
-                Log.d("TPush", "反注册失败，错误码：" + errCode + ",错误信息：" + msg);
-            }
-        });
+        // 解除JPush绑定
+        JPushInterface.stopPush(MainActivity.this);
         // 重置登录状态
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈

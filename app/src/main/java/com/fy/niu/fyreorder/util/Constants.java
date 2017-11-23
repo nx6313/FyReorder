@@ -9,6 +9,8 @@ public class Constants {
     public static final int REQUEST_TIMEOUT = 10000;
     public static final String HTTP_URL_BASE = "https://www.suda60.com/fymall/";
 
+    public static final int JPUSH_SEQUENCE = 1;
+
     /**
      * 广播Action：获取网络数据成功
      */
