@@ -24,6 +24,7 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
+import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import org.json.JSONArray;
@@ -101,7 +102,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
     }
 
     private void initData(final boolean isRefFlag) {
-        MainOrderFragment.setCurrentPageIndex(1);
+        MainOrderFragment.setCurrentPageIndex(1, "complete");
         ComFun.showLoading(CompleteOrderActivity.this, "加载数据中，请稍后");
         final String userId = SharedPreferencesTool.getFromShared(CompleteOrderActivity.this, "fyLoginUserInfo", "userId");
         RequestParams params = new RequestParams();
@@ -138,7 +139,11 @@ public class CompleteOrderActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                ComFun.showToast(CompleteOrderActivity.this, "获取已完成订单数据异常", Toast.LENGTH_SHORT);
+                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                    ComFun.showToast(CompleteOrderActivity.this, "获取已完成订单数据超时", Toast.LENGTH_SHORT);
+                } else {
+                    ComFun.showToast(CompleteOrderActivity.this, "获取已完成订单数据异常", Toast.LENGTH_SHORT);
+                }
             }
         }));
     }
@@ -235,7 +240,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
                                 Log.d(" ==== 第" + currentPageIndex + "页已完成订单数据 === ", " ===> " + dataList);
                                 List<Order> pageOrderList = new ArrayList<>();
                                 if (dataList.length() > 0) {
-                                    MainOrderFragment.setCurrentPageIndex(currentPageIndex);
+                                    MainOrderFragment.setCurrentPageIndex(currentPageIndex, "complete");
                                     pageOrderList = getOrderListFromJson(dataList);
                                     MainOrderFragment.completeRef(CompleteOrderActivity.this, "complete", completeOrderDataLayout, pageOrderList, false);
                                 } else {
@@ -248,7 +253,11 @@ public class CompleteOrderActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(OkHttpException okHttpE) {
-                            ComFun.showToast(CompleteOrderActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);
+                            if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                ComFun.showToast(CompleteOrderActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
+                            } else {
+                                ComFun.showToast(CompleteOrderActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);
+                            }
                         }
                     }));
                     break;

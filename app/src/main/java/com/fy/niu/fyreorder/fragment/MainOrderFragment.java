@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,9 @@ public class MainOrderFragment extends Fragment {
     private List<Order> mOrderDataList;
     public static final String BUNDLE_DATA_TYPE = "orderDataType";
     public static final String BUNDLE_DATA_LIST = "orderDataList";
-    private static int currentPageIndex = 1; // 当前页码数，初始化时，有页面单独设置
+    private static int currentPageIndex_Complete = 1; // 已完成订单当前页码数，初始化时，有页面单独设置
+    private static int currentPageIndex_WeiJie = 1; // 未接订单当前页码数，初始化时，有页面单独设置
+    private static int currentPageIndex_YiJie = 1; // 已接订单当前页码数，初始化时，有页面单独设置
 
     @Nullable
     @Override
@@ -92,7 +95,7 @@ public class MainOrderFragment extends Fragment {
         addOrderItemView(context, pageType, mainOrderDataLayout, mOrderDataList);
     }
 
-    private static void addOrderItemView(final Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> mOrderDataList) {
+    private static void addOrderItemView(final Context context, final String pageType, LinearLayout mainOrderDataLayout, List<Order> mOrderDataList) {
         // 0学生  1商超   2外卖
         // 送货的  未接单 3 已接单 4
         // 商家    未接单 2 已接单 3
@@ -112,6 +115,7 @@ public class MainOrderFragment extends Fragment {
             TextView userPhone = (TextView) orderItemView.findViewWithTag("order_item_user_phone");
             TextView orderNum = (TextView) orderItemView.findViewWithTag("order_item_order_num");
             TextView orderTime = (TextView) orderItemView.findViewWithTag("order_item_order_time");
+            TextView orderIdenCode = (TextView) orderItemView.findViewWithTag("order_item_iden_code");
             TextView orderRemark = (TextView) orderItemView.findViewWithTag("order_item_order_remark");
             RelativeLayout orderReceiveUserInfoLayout = (RelativeLayout) orderItemView.findViewWithTag("order_item_receive_user_info_layout");
             TextView receiveUserName = (TextView) orderItemView.findViewWithTag("order_item_receive_user_name");
@@ -178,6 +182,10 @@ public class MainOrderFragment extends Fragment {
             }
             orderNum.setText("编号：" + orderData.getOrderNumber());
             orderTime.setText("时间：" + DateFormatUtil.dateToStr(new Date(Long.parseLong(orderData.getOrderDate())), DateFormatUtil.MDHHMM));
+            if(pageType.equals("yiJie")) {
+                orderIdenCode.setVisibility(View.VISIBLE);
+                orderIdenCode.setText("完成码：" + orderData.getIdenCode());
+            }
             if (ComFun.strNull(orderData.getRemark()) && !orderData.getRemark().equals("null")) {
                 orderRemark.setText("给商家的留言：" + orderData.getRemark());
             } else {
@@ -188,7 +196,7 @@ public class MainOrderFragment extends Fragment {
                 if (ComFun.strNull(orderData.getPersonName())) {
                     receiveUserName.setText("配送员名称：" + orderData.getPersonName());
                 } else {
-                    receiveUserName.setText("配送员名称：数据异常");
+                    receiveUserName.setText("配送员名称：名称为空");
                 }
                 if (ComFun.strNull(orderData.getPersonPhone())) {
                     receiveUserPhone.setText("电话：" + orderData.getPersonPhone().substring(0, 3) + " **** " + orderData.getPersonPhone().substring(orderData.getPersonPhone().length() - 4, orderData.getPersonPhone().length()));
@@ -289,7 +297,7 @@ public class MainOrderFragment extends Fragment {
             mainOrderDataLayout.addView(orderItemView);
         }
         // 添加是否需要上拉刷新的布局
-        if (pageType.equals("complete") && mOrderDataList.size() > 0) {
+        if ((pageType.equals("weiJie") || pageType.equals("yiJie") || pageType.equals("complete")) && mOrderDataList.size() > 0) {
             final View topPullRefView = inflater.inflate(R.layout.pull_ref, null);
             GifView topPullRefIngGif = (GifView) topPullRefView.findViewById(R.id.topPullRefIngGif);
             topPullRefIngGif.setGifImage(R.drawable.refing);
@@ -307,7 +315,14 @@ public class MainOrderFragment extends Fragment {
                         // 发送下一页数据请求广播
                         Intent refPageDataIntent = new Intent();
                         refPageDataIntent.setAction(CompleteOrderActivity.MSG_GET_NEW_PAGE_DATA);
-                        refPageDataIntent.putExtra("currentPageIndex", currentPageIndex + 1);
+                        refPageDataIntent.putExtra("pageType", pageType);
+                        if(pageType.equals("complete")){
+                            refPageDataIntent.putExtra("currentPageIndex", currentPageIndex_Complete + 1);
+                        } else if(pageType.equals("weiJie")){
+                            refPageDataIntent.putExtra("currentPageIndex", currentPageIndex_WeiJie + 1);
+                        } else if(pageType.equals("yiJie")){
+                            refPageDataIntent.putExtra("currentPageIndex", currentPageIndex_YiJie + 1);
+                        }
                         context.sendBroadcast(refPageDataIntent);
                     }
                 }
@@ -329,8 +344,14 @@ public class MainOrderFragment extends Fragment {
         return fragment;
     }
 
-    public static void setCurrentPageIndex(int pageIndex) {
-        currentPageIndex = pageIndex;
+    public static void setCurrentPageIndex(int pageIndex, String pageType) {
+        if(pageType.equals("complete")){
+            currentPageIndex_Complete = pageIndex;
+        } else if(pageType.equals("weiJie")){
+            currentPageIndex_WeiJie = pageIndex;
+        } else if(pageType.equals("yiJie")){
+            currentPageIndex_YiJie = pageIndex;
+        }
     }
 
     public static void completeRef(Context context, String pageType, LinearLayout mainOrderDataLayout, List<Order> pageOrderList, boolean finished) {

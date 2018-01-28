@@ -40,10 +40,17 @@ public class ConnectorInventory {
     }
 
     /**
-     * 获取接单数据
+     * 获取接单数据(已接)
      */
-    public static void getOrderList(Context context, RequestParams params, DisposeDataHandle dataHandle) {
-        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "getOrderList", params), dataHandle);
+    public static void getOrderListReceived(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "getOrderListReceived", params), dataHandle);
+    }
+
+    /**
+     * 获取接单数据(未接)
+     */
+    public static void getOrderListMissed(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE + "getOrderListMissed", params), dataHandle);
     }
 
     /**
