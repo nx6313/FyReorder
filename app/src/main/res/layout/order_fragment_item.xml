@@ -72,6 +72,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:tag="order_item_iden_code"
+            android:layout_marginTop="6dp"
+            android:visibility="gone"
+            android:text="完成码：~" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:tag="order_item_order_remark"
             android:text="给商家的留言：~"

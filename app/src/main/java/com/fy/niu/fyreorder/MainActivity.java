@@ -1,8 +1,11 @@
 package com.fy.niu.fyreorder;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,13 +43,12 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
+import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 import com.fy.niu.fyreorder.util.VersionUtil;
-import com.tencent.android.tpush.XGIOperateCallback;
-import com.tencent.android.tpush.XGPushManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,8 +60,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.jpush.android.api.JPushInterface;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private MainActivity.RefPageDataBroadcastReceiver refPageDataBroadcastReceiver;
+    public static final String MSG_GET_NEW_PAGE_DATA = "com.FyReorder.refPageData";
     public static Handler mHandler = null;
     public static final int MSG_UPDATE_ORDER_STATE = 1;
     public static final int MSG_REF_ORDER_LSIT = 2;
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private FragmentPagerAdapter mAdapter;
 
     private CircularImage mainUserHeadImg;
+    private TextView toolbarTaskTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +100,11 @@ public class MainActivity extends AppCompatActivity
         ((TextView) toolbar.findViewById(R.id.toolbarTitleTv)).setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        refPageDataBroadcastReceiver = new MainActivity.RefPageDataBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MSG_GET_NEW_PAGE_DATA);
+        registerReceiver(refPageDataBroadcastReceiver, intentFilter);
+
         mHandler = new MainActivity.mHandler();
 
         mainUserHeadImg = (CircularImage) toolbar.findViewById(R.id.mainUserHeadImg);
@@ -103,6 +115,7 @@ public class MainActivity extends AppCompatActivity
                 toggleLeftMenu();
             }
         });
+        toolbarTaskTv = (TextView) toolbar.findViewById(R.id.toolbarTaskTv);
 
         initView();
 
@@ -128,10 +141,7 @@ public class MainActivity extends AppCompatActivity
 
     private void userSilentLogin(String userAccountNum, String userAccountPass) {
         ComFun.showLoading(MainActivity.this, "初始化数据中，请稍后");
-        String devToken = SharedPreferencesTool.getFromShared(MainActivity.this, "fyBaseData", "userToken");
         RequestParams params = new RequestParams();
-        Log.d("静默登陆中 ====== ", "设备 Token：" + devToken);
-        params.put("token", devToken);
         params.put("loginName", userAccountNum);
         params.put("passWord", userAccountPass);
         ConnectorInventory.userLogin(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -279,7 +289,9 @@ public class MainActivity extends AppCompatActivity
         if (!ifGive.equals("0")) {
             navMenuItemPayImg.setVisible(false);
             navMenuItemSelectSelfFloor.setVisible(false);
+            toolbarTaskTv.setVisibility(View.GONE);
         } else {
+            toolbarTaskTv.setVisibility(View.VISIBLE);
             if (receiveSelfFloor.equals("self")) {
                 navMenuItemSelectSelfFloor.setTitleCondensed("self");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：" + floorName + " 』");
@@ -335,6 +347,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initDatas(final boolean isRefFlag) {
+        MainOrderFragment.setCurrentPageIndex(1, "weiJie");
+        MainOrderFragment.setCurrentPageIndex(1, "yiJie");
         final Map<String, List<Order>> orderDataMap = new LinkedHashMap<>();
         orderDataMap.put("weiJie", new ArrayList<Order>());
         orderDataMap.put("yiJie", new ArrayList<Order>());
@@ -350,7 +364,8 @@ public class MainActivity extends AppCompatActivity
         if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {
             params.put("floor", floor);
         }
-        ConnectorInventory.getOrderList(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+        params.put("pageIndex", "1");
+        ConnectorInventory.getOrderListReceived(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
                 if (isRefFlag) {
@@ -364,12 +379,13 @@ public class MainActivity extends AppCompatActivity
                 try {
                     JSONObject orderDataJson = new JSONObject(responseObj.toString());
                     JSONArray dataList = orderDataJson.getJSONArray("dataList");
-                    Log.d(" ==== 首页订单列表数据 === ", " ===> " + dataList);
+                    Log.d(" ==== 首页已接订单列表数据 === ", " ===> " + dataList);
+                    Log.d(" ==== 首页已接数据num === ", " ===> " + dataList.length());
                     if (dataList.length() > 0) {
-                        getOrderListFromJson(dataList, orderDataMap);
+                        getOrderListFromJson(dataList, orderDataMap, "yiJie");
 
                         // 更新数据
-                        updateOrderViewPager(orderDataMap);
+                        updateOrderViewPager(orderDataMap, "yiJie");
                     }
                 } catch (JSONException e) {
                 }
@@ -377,7 +393,46 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                ComFun.showToast(MainActivity.this, "获取订单数据异常", Toast.LENGTH_SHORT);
+                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                    ComFun.showToast(MainActivity.this, "获取已接订单数据超时", Toast.LENGTH_SHORT);
+                } else {
+                    ComFun.showToast(MainActivity.this, "获取已接订单数据异常", Toast.LENGTH_SHORT);
+                }
+            }
+        }));
+        ConnectorInventory.getOrderListMissed(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+            @Override
+            public void onFinish() {
+                if (isRefFlag) {
+                    hideRefLayout();
+                }
+                ComFun.hideLoading();
+            }
+
+            @Override
+            public void onSuccess(Object responseObj) {
+                try {
+                    JSONObject orderDataJson = new JSONObject(responseObj.toString());
+                    JSONArray dataList = orderDataJson.getJSONArray("dataList");
+                    Log.d(" ==== 首页未接订单列表数据 === ", " ===> " + dataList);
+                    Log.d(" ==== 首页未接数据num === ", " ===> " + dataList.length());
+                    if (dataList.length() > 0) {
+                        getOrderListFromJson(dataList, orderDataMap, "weiJie");
+
+                        // 更新数据
+                        updateOrderViewPager(orderDataMap, "weiJie");
+                    }
+                } catch (JSONException e) {
+                }
+            }
+
+            @Override
+            public void onFailure(OkHttpException okHttpE) {
+                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                    ComFun.showToast(MainActivity.this, "获取未接订单数据超时", Toast.LENGTH_SHORT);
+                } else {
+                    ComFun.showToast(MainActivity.this, "获取未接订单数据异常", Toast.LENGTH_SHORT);
+                }
             }
         }));
     }
@@ -393,7 +448,7 @@ public class MainActivity extends AppCompatActivity
         noMainOrderDataLayout_yiJie.setRefreshing(false);
     }
 
-    private void getOrderListFromJson(JSONArray dataList, Map<String, List<Order>> orderDataMap) {
+    private List<Order> getOrderListFromJson(JSONArray dataList, Map<String, List<Order>> orderDataMap, String type) {
         List<Order> weiJieOrderList = new ArrayList<>();
         List<Order> yiJieOrderList = new ArrayList<>();
         for (int i = 0; i < dataList.length(); i++) {
@@ -492,11 +547,25 @@ public class MainActivity extends AppCompatActivity
             } catch (JSONException e) {
             }
         }
-        orderDataMap.put("weiJie", weiJieOrderList);
-        orderDataMap.put("yiJie", yiJieOrderList);
+        if(orderDataMap != null) {
+            if(type.equals("weiJie")) {
+                orderDataMap.put("weiJie", weiJieOrderList);
+            }
+            if(type.equals("yiJie")) {
+                orderDataMap.put("yiJie", yiJieOrderList);
+            }
+        } else {
+            if(type.equals("weiJie")) {
+                return weiJieOrderList;
+            }
+            if(type.equals("yiJie")) {
+                return yiJieOrderList;
+            }
+        }
+        return null;
     }
 
-    private void updateOrderViewPager(Map<String, List<Order>> orderDataMap) {
+    private void updateOrderViewPager(Map<String, List<Order>> orderDataMap, String type) {
         SwipeRefreshLayout mainOrderSwipeRefresh_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_weiJie");
         SwipeRefreshLayout noMainOrderDataLayout_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("noDataLayout_weiJie");
         SwipeRefreshLayout mainOrderSwipeRefresh_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_yiJie");
@@ -505,25 +574,29 @@ public class MainActivity extends AppCompatActivity
                 mainOrderSwipeRefresh_yiJie != null && noMainOrderDataLayout_yiJie != null) {
             List<Order> weiJieOrderListNew = orderDataMap.get("weiJie");
             List<Order> yiJieOrderListNew = orderDataMap.get("yiJie");
-            if (ComFun.strNull(weiJieOrderListNew, true)) {
-                noMainOrderDataLayout_weiJie.setVisibility(View.GONE);
-                mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
-                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
-                mainOrderDataLayout.removeAllViews();
-                MainOrderFragment.createMainOrderView(MainActivity.this, "weiJie", mainOrderDataLayout, weiJieOrderListNew);
-            } else {
-                mainOrderSwipeRefresh_weiJie.setVisibility(View.GONE);
-                noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
+            if(type.equals("weiJie")) {
+                if (ComFun.strNull(weiJieOrderListNew, true)) {
+                    noMainOrderDataLayout_weiJie.setVisibility(View.GONE);
+                    mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
+                    LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
+                    mainOrderDataLayout.removeAllViews();
+                    MainOrderFragment.createMainOrderView(MainActivity.this, "weiJie", mainOrderDataLayout, weiJieOrderListNew);
+                } else {
+                    mainOrderSwipeRefresh_weiJie.setVisibility(View.GONE);
+                    noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
+                }
             }
-            if (ComFun.strNull(yiJieOrderListNew, true)) {
-                noMainOrderDataLayout_yiJie.setVisibility(View.GONE);
-                mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
-                LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
-                mainOrderDataLayout.removeAllViews();
-                MainOrderFragment.createMainOrderView(MainActivity.this, "yiJie", mainOrderDataLayout, yiJieOrderListNew);
-            } else {
-                mainOrderSwipeRefresh_yiJie.setVisibility(View.GONE);
-                noMainOrderDataLayout_yiJie.setVisibility(View.VISIBLE);
+            if(type.equals("yiJie")) {
+                if (ComFun.strNull(yiJieOrderListNew, true)) {
+                    noMainOrderDataLayout_yiJie.setVisibility(View.GONE);
+                    mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
+                    LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
+                    mainOrderDataLayout.removeAllViews();
+                    MainOrderFragment.createMainOrderView(MainActivity.this, "yiJie", mainOrderDataLayout, yiJieOrderListNew);
+                } else {
+                    mainOrderSwipeRefresh_yiJie.setVisibility(View.GONE);
+                    noMainOrderDataLayout_yiJie.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -669,19 +742,8 @@ public class MainActivity extends AppCompatActivity
      * 用户退出登录
      */
     public void toUserLoginOut() {
-        // 解除XPush绑定
-        XGPushManager.unregisterPush(MainActivity.this, new XGIOperateCallback() {
-            @Override
-            public void onSuccess(Object data, int code) {
-                SharedPreferencesTool.deleteFromShared(MainActivity.this, "fyBaseData", "userToken");
-                Log.d("TPush", "反注册成功, [data] = " + data + ", [code] = " + code);
-            }
-
-            @Override
-            public void onFail(Object data, int errCode, String msg) {
-                Log.d("TPush", "反注册失败，错误码：" + errCode + ",错误信息：" + msg);
-            }
-        });
+        // 解除JPush绑定
+        JPushInterface.stopPush(MainActivity.this);
         // 重置登录状态
         SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
         // 清空后退栈
@@ -898,6 +960,110 @@ public class MainActivity extends AppCompatActivity
                     ComFun.showToast(MainActivity.this, "操作处理失败，请稍后重试", Toast.LENGTH_SHORT);
                 }
             }));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(refPageDataBroadcastReceiver);
+    }
+
+    class RefPageDataBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case MSG_GET_NEW_PAGE_DATA:
+                    final int currentPageIndex = intent.getIntExtra("currentPageIndex", 1);
+                    ComFun.showLoading(MainActivity.this, "加载数据中，请稍后");
+                    final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+                    String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
+                    String floor = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floor");
+                    String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+                    RequestParams params = new RequestParams();
+                    params.put("userId", userId);
+                    if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {
+                        params.put("floor", floor);
+                    }
+                    params.put("pageIndex", String.valueOf(currentPageIndex));
+                    if(intent.getStringExtra("pageType").equals("weiJie")) {
+                        ConnectorInventory.getOrderListMissed(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                            @Override
+                            public void onFinish() {
+                                ComFun.hideLoading();
+                            }
+
+                            @Override
+                            public void onSuccess(Object responseObj) {
+                                try {
+                                    JSONObject orderDataJson = new JSONObject(responseObj.toString());
+                                    JSONArray dataList = orderDataJson.getJSONArray("dataList");
+                                    Log.d(" ==== 第" + currentPageIndex + "页未接订单数据 === ", " ===> " + dataList);
+                                    List<Order> pageOrderList = new ArrayList<>();
+                                    SwipeRefreshLayout mainOrderSwipeRefresh_weiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_weiJie");
+                                    LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_weiJie.findViewById(R.id.mainOrderDataLayout);
+                                    if (dataList.length() > 0) {
+                                        MainOrderFragment.setCurrentPageIndex(currentPageIndex, "weiJie");
+                                        pageOrderList = getOrderListFromJson(dataList, null, "weiJie");
+                                        MainOrderFragment.completeRef(MainActivity.this, "weiJie", mainOrderDataLayout, pageOrderList, false);
+                                    } else {
+                                        ComFun.showToast(MainActivity.this, "已经没有更多数据了", Toast.LENGTH_SHORT);
+                                        MainOrderFragment.completeRef(MainActivity.this, "weiJie", mainOrderDataLayout, pageOrderList, true);
+                                    }
+                                } catch (JSONException e) {
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(OkHttpException okHttpE) {
+                                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                    ComFun.showToast(MainActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
+                                } else {
+                                    ComFun.showToast(MainActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);
+                                }
+                            }
+                        }));
+                    } else if(intent.getStringExtra("pageType").equals("yiJie")) {
+                        ConnectorInventory.getOrderListReceived(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+                            @Override
+                            public void onFinish() {
+                                ComFun.hideLoading();
+                            }
+
+                            @Override
+                            public void onSuccess(Object responseObj) {
+                                try {
+                                    JSONObject orderDataJson = new JSONObject(responseObj.toString());
+                                    JSONArray dataList = orderDataJson.getJSONArray("dataList");
+                                    Log.d(" ==== 第" + currentPageIndex + "页已接订单数据 === ", " ===> " + dataList);
+                                    List<Order> pageOrderList = new ArrayList<>();
+                                    SwipeRefreshLayout mainOrderSwipeRefresh_yiJie = (SwipeRefreshLayout) mainViewPager.findViewWithTag("orderSwipeRefresh_yiJie");
+                                    LinearLayout mainOrderDataLayout = (LinearLayout) mainOrderSwipeRefresh_yiJie.findViewById(R.id.mainOrderDataLayout);
+                                    if (dataList.length() > 0) {
+                                        MainOrderFragment.setCurrentPageIndex(currentPageIndex, "yiJie");
+                                        pageOrderList = getOrderListFromJson(dataList, null, "yiJie");
+                                        MainOrderFragment.completeRef(MainActivity.this, "yiJie", mainOrderDataLayout, pageOrderList, false);
+                                    } else {
+                                        ComFun.showToast(MainActivity.this, "已经没有更多数据了", Toast.LENGTH_SHORT);
+                                        MainOrderFragment.completeRef(MainActivity.this, "yiJie", mainOrderDataLayout, pageOrderList, true);
+                                    }
+                                } catch (JSONException e) {
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(OkHttpException okHttpE) {
+                                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                    ComFun.showToast(MainActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
+                                } else {
+                                    ComFun.showToast(MainActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);
+                                }
+                            }
+                        }));
+                    }
+                    break;
+            }
         }
     }
 }

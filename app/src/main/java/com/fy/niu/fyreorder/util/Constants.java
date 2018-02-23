@@ -10,6 +10,8 @@ public class Constants {
     public static final String HTTP_URL_BASE = "https://www.suda60.com/fymall/";
     public static final String HTTP_URL_BASE_NEW = "https://www.suda60.com/newPro/";
 
+    public static final int JPUSH_SEQUENCE = 1;
+
     /**
      * 广播Action：获取网络数据成功
      */
