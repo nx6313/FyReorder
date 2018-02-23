@@ -82,6 +82,13 @@ public class ConnectorInventory {
     }
 
     /**
+     * 获取院校信息
+     */
+    public static void getSchoolData(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "getAppUniversity", params), dataHandle);
+    }
+
+    /**
      * 获取最后版本数据
      */
     public static Call getNewAppVersion(Context context, RequestParams params, DisposeDataHandle dataHandle) {

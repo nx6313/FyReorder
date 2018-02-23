@@ -288,7 +288,7 @@ public class MainOrderFragment extends Fragment {
         if (pageType.equals("complete") && mOrderDataList.size() > 0) {
             final View topPullRefView = inflater.inflate(R.layout.pull_ref, null);
             GifView topPullRefIngGif = (GifView) topPullRefView.findViewById(R.id.topPullRefIngGif);
-            topPullRefIngGif.setGifImage(R.drawable.refing);
+            //topPullRefIngGif.setGifImage(R.drawable.refing);
             topPullRefIngGif.setShowDimension(40, 40);
             topPullRefIngGif.setGifImageType(GifView.GifImageType.COVER);
             LinearLayout topPullRefLayout = (LinearLayout) topPullRefView.findViewById(R.id.topPullRefLayout);

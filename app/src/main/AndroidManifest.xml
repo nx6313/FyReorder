@@ -2,16 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fy.niu.fyreorder">
 
-    <receiver android:name=".broadcastReceiver.MessageReceiver">
-        <intent-filter>
-
-            <!-- 接收消息透传 -->
-            <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
-            <!-- 监听注册、反注册、设置/删除标签、通知被点击等处理结果 -->
-            <action android:name="com.tencent.android.tpush.action.FEEDBACK" />
-        </intent-filter>
-    </receiver>
-
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -65,13 +55,11 @@
             android:label="@string/title_activity_update_pwd"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".CompleteOrderActivity"
             android:label="@string/title_activity_complete_order"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".PayDialogActivity"
             android:screenOrientation="portrait"
@@ -86,6 +74,18 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity android:name=".RegisterActivity"></activity>
+
+        <receiver android:name=".broadcastReceiver.MessageReceiver">
+            <intent-filter>
+
+                <!-- 接收消息透传 -->
+                <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
+                <!-- 监听注册、反注册、设置/删除标签、通知被点击等处理结果 -->
+                <action android:name="com.tencent.android.tpush.action.FEEDBACK" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

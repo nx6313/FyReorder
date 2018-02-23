@@ -7,6 +7,8 @@
     <color name="itemFocusColor">#77a19c</color>
     <color name="colorScroll">#a6d79fb2</color>
     <color name="navItem">#BCC58C</color>
+    <color name="colorRegisterBg">#954e25</color>
+    <color name="colorRegister">#2d2d2d</color>
 
     <color name="editTableSaveBtnPressed">#ac6969</color>
     <color name="editTableSaveBtnFocus">#832f2f</color>

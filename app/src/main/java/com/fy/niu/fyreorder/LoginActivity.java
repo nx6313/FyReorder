@@ -65,8 +65,8 @@ public class LoginActivity extends AppCompatActivity {
         login_layout = (RelativeLayout) findViewById(R.id.login_layout);
         //login_layout.setVisibility(View.GONE);
 
-        login_logo = (CircularImage) findViewById(R.id.login_logo);
-        login_logo.setImageResource(R.drawable.jiang_pai);
+        //login_logo = (CircularImage) findViewById(R.id.login_logo);
+        //login_logo.setImageResource(R.drawable.jiang_pai);
 
         tvLoginName = (ClearEditText) findViewById(R.id.tvLoginName);
         tvLoginPwd = (ClearEditText) findViewById(R.id.tvLoginPwd);
@@ -153,6 +153,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // 用户注册事件触发
+    public void userRegister(View view) {
+        Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(registerIntent);
+        LoginActivity.this.finish();
     }
 
     /**

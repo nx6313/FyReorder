@@ -11,76 +11,97 @@
         android:id="@+id/login_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp"
         android:background="@drawable/login_bg_round_rect"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="80dp"
-        android:paddingTop="25dp"
+        android:orientation="vertical"
         android:paddingBottom="40dp"
-        android:orientation="vertical">
+        android:paddingTop="25dp">
 
-        <com.fy.niu.fyreorder.customView.CircularImage
+        <ImageView
             android:id="@+id/login_logo"
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-            android:layout_centerHorizontal="true"/>
+            android:layout_width="80dp"
+            android:layout_height="90dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/login_logo" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/login_logo"
+            android:layout_marginTop="50dp"
             android:gravity="center"
-            android:layout_marginTop="15dp"
+            android:orientation="vertical"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:orientation="vertical">
+            android:paddingRight="20dp">
 
             <com.fy.niu.fyreorder.customView.ClearEditText
                 android:id="@+id/tvLoginName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
+                android:background="@drawable/bg_edittext_selector"
+                android:drawableLeft="@drawable/icon_login_name"
+                android:drawablePadding="10dp"
+                android:hint="输入登录账号"
                 android:paddingBottom="10dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:textSize="16sp"
+                android:paddingTop="10dp"
                 android:singleLine="true"
                 android:textColor="#2d2d2d"
                 android:textColorHint="#6e6e6e"
-                android:drawableLeft="@drawable/icon_login_name"
-                android:drawablePadding="10dp"
-                android:background="@drawable/bg_edittext_selector"
-                android:hint="输入登录账号" />
+                android:textSize="16sp" />
 
             <com.fy.niu.fyreorder.customView.ClearEditText
                 android:id="@+id/tvLoginPwd"
-                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_edittext_selector"
+                android:drawableLeft="@drawable/icon_pwd"
+                android:drawablePadding="10dp"
+                android:hint="输入登录密码"
+                android:inputType="textPassword"
                 android:paddingBottom="10dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:layout_marginTop="8dp"
-                android:textSize="16sp"
+                android:paddingTop="10dp"
                 android:singleLine="true"
                 android:textColor="#2d2d2d"
                 android:textColorHint="#6e6e6e"
-                android:drawableLeft="@drawable/icon_pwd"
-                android:drawablePadding="10dp"
-                android:background="@drawable/bg_edittext_selector"
-                android:hint="输入登录密码"/>
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginTop="35dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#f2f2f2"
                 android:background="@drawable/edit_table_btn_style"
-                android:text="登   录"/>
+                android:text="登   录"
+                android:textColor="#f2f2f2"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:onClick="userRegister"
+                android:padding="8dp"
+                android:text="没有账号？立即注册"
+                android:textColor="@color/colorRegister" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:gravity="center"
+                android:text="注：当前仅支持接单员注册"
+                android:textColor="#8e6518"
+                android:textSize="12sp" />
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>
