@@ -27,6 +27,7 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
+import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import org.json.JSONArray;
@@ -47,6 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etUserDormNo;
 
     private Map<String, School> schoolMap = new HashMap<>();
+
+    private SchoolListAdapter schoolListAdapter = null;
+    private List<School> schoolAdapterList = new ArrayList<>();
 
     private String userSchoolId = null;
     private String userSchool = null;
@@ -77,9 +81,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        ComFun.showLoading(RegisterActivity.this, "正在获取学院信息，请稍后");
         ConnectorInventory.getSchoolData(RegisterActivity.this, null, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
+                ComFun.hideLoading();
             }
 
             @Override
@@ -115,6 +121,8 @@ public class RegisterActivity extends AppCompatActivity {
                                             listPopupWindow = new ListPopupWindow(RegisterActivity.this);
                                             listPopupWindow.setAnchorView(etUserSchool);
                                             listPopupWindow.setHeight(400);
+                                            schoolListAdapter = new SchoolListAdapter();
+                                            listPopupWindow.setAdapter(schoolListAdapter);
                                             listPopupWindow.show();
                                             listPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                                                 @Override
@@ -133,7 +141,8 @@ public class RegisterActivity extends AppCompatActivity {
                                                 }
                                             });
                                         }
-                                        listPopupWindow.setAdapter(new SchoolListAdapter(schools));
+                                        schoolAdapterList = schools;
+                                        schoolListAdapter.notifyDataSetChanged();
                                     }
                                 } else {
                                     if (listPopupWindow != null && listPopupWindow.isShowing()) {
@@ -161,11 +170,13 @@ public class RegisterActivity extends AppCompatActivity {
                                         etUserDorm.setText("");
                                     } else {
                                         // 获取近似项
+                                        ComFun.showLoading(RegisterActivity.this, "正在获取宿舍楼信息，请稍后");
                                         RequestParams params = new RequestParams();
                                         params.put("orgroleId", userSchoolId);
                                         ConnectorInventory.getDromDataBySchool(RegisterActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
                                             @Override
                                             public void onFinish() {
+                                                ComFun.hideLoading();
                                             }
 
                                             @Override
@@ -197,7 +208,11 @@ public class RegisterActivity extends AppCompatActivity {
 
                                             @Override
                                             public void onFailure(OkHttpException okHttpE) {
-                                                ComFun.showToast(RegisterActivity.this, "获取楼号信息失败，请稍后重试", Toast.LENGTH_LONG);
+                                                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                                    ComFun.showToast(RegisterActivity.this, "获取宿舍楼信息超时，请稍后重试", Toast.LENGTH_LONG);
+                                                } else {
+                                                    ComFun.showToast(RegisterActivity.this, "获取宿舍楼信息失败，请稍后重试", Toast.LENGTH_LONG);
+                                                }
                                             }
                                         }));
                                     }
@@ -220,14 +235,21 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                ComFun.showToast(RegisterActivity.this, "获取院校信息失败，请稍后重试", Toast.LENGTH_LONG);
+                etUserSchool.setFocusable(false);
+                etUserSchool.setEnabled(false);
+                etUserDorm.setFocusable(false);
+                etUserDorm.setEnabled(false);
+                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                    ComFun.showToast(RegisterActivity.this, "获取院校信息超时，请稍后重试", Toast.LENGTH_LONG);
+                } else {
+                    ComFun.showToast(RegisterActivity.this, "获取院校信息失败，请稍后重试", Toast.LENGTH_LONG);
+                }
             }
         }));
     }
 
     private List<School> getNearSchoolList(String searchStr) {
         List<School> searchSchools = new ArrayList<>();
-        searchStr = "山西";
         for (Map.Entry<String, School> m : schoolMap.entrySet()) {
             if (m.getKey().contains(searchStr)) {
                 searchSchools.add(m.getValue());
@@ -249,20 +271,15 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     class SchoolListAdapter extends BaseAdapter {
-        List<School> schools = new ArrayList<>();
-
-        public SchoolListAdapter(List<School> schoolList) {
-            schools = schoolList;
-        }
 
         @Override
         public int getCount() {
-            return schools.size();
+            return schoolAdapterList.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return schools.get(position);
+            return schoolAdapterList.get(position);
         }
 
         @Override
@@ -275,8 +292,8 @@ public class RegisterActivity extends AppCompatActivity {
             LayoutInflater inflater = LayoutInflater.from(RegisterActivity.this);
             View view = inflater.inflate(R.layout.school_info_item, null);
             TextView schollTv = (TextView) view.findViewById(R.id.schoolInfoItem);
-            schollTv.setTag(schools.get(position).getOrgroleId());
-            schollTv.setText(schools.get(position).getOrgName());
+            schollTv.setTag(schoolAdapterList.get(position).getOrgroleId());
+            schollTv.setText(schoolAdapterList.get(position).getOrgName());
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
