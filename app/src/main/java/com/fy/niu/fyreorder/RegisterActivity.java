@@ -162,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     } else {
                                         // 获取近似项
                                         RequestParams params = new RequestParams();
-                                        params.put("", "");
+                                        params.put("orgroleId", userSchoolId);
                                         ConnectorInventory.getDromDataBySchool(RegisterActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
                                             @Override
                                             public void onFinish() {
@@ -170,7 +170,29 @@ public class RegisterActivity extends AppCompatActivity {
 
                                             @Override
                                             public void onSuccess(Object responseObj) {
-
+                                                if (listPopupWindow == null || (listPopupWindow != null && !listPopupWindow.isShowing())) {
+                                                    listPopupWindow = new ListPopupWindow(RegisterActivity.this);
+                                                    listPopupWindow.setAnchorView(etUserDorm);
+                                                    listPopupWindow.setHeight(400);
+                                                    listPopupWindow.show();
+                                                    listPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                                                        @Override
+                                                        public void onDismiss() {
+                                                            String curStr = etUserDorm.getText().toString().trim();
+                                                            if (userDormId == null) {
+                                                                etUserDorm.setText("");
+                                                            } else {
+                                                                if (!curStr.equals("") && !curStr.equals(userDorm)) {
+                                                                    etUserDorm.setText(userDorm);
+                                                                    listPopupWindow.dismiss();
+                                                                } else if (curStr.equals("")) {
+                                                                    userDormId = null;
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                //listPopupWindow.setAdapter(new ListAdapter());
                                             }
 
                                             @Override
@@ -178,30 +200,6 @@ public class RegisterActivity extends AppCompatActivity {
                                                 ComFun.showToast(RegisterActivity.this, "获取楼号信息失败，请稍后重试", Toast.LENGTH_LONG);
                                             }
                                         }));
-
-                                        if (listPopupWindow == null || (listPopupWindow != null && !listPopupWindow.isShowing())) {
-                                            listPopupWindow = new ListPopupWindow(RegisterActivity.this);
-                                            listPopupWindow.setAnchorView(etUserDorm);
-                                            listPopupWindow.setHeight(400);
-                                            listPopupWindow.show();
-                                            listPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                                                @Override
-                                                public void onDismiss() {
-                                                    String curStr = etUserDorm.getText().toString().trim();
-                                                    if (userDormId == null) {
-                                                        etUserDorm.setText("");
-                                                    } else {
-                                                        if (!curStr.equals("") && !curStr.equals(userDorm)) {
-                                                            etUserDorm.setText(userDorm);
-                                                            listPopupWindow.dismiss();
-                                                        } else if (curStr.equals("")) {
-                                                            userDormId = null;
-                                                        }
-                                                    }
-                                                }
-                                            });
-                                        }
-                                        //listPopupWindow.setAdapter(new ListAdapter());
                                     }
                                 } else {
                                     if (listPopupWindow != null && listPopupWindow.isShowing()) {
