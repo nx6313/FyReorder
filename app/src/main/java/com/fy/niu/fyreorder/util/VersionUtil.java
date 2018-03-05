@@ -3,25 +3,20 @@ package com.fy.niu.fyreorder.util;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.fy.niu.fyreorder.MainActivity;
-import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.customView.HorizontalProgressbarWithProgress;
 import com.fy.niu.fyreorder.model.Version;
 import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataHandle;
 import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
+import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +56,10 @@ public class VersionUtil {
             alertDialogWrap = ComFun.showLoading(activity, null, true, true);
         }
         // 创建网络请求，进行版本更新数据拿取
-        Call call = ConnectorInventory.getNewAppVersion(activity, null, new DisposeDataHandle(new DisposeDataListener() {
+        final String userId = SharedPreferencesTool.getFromShared(activity, "fyLoginUserInfo", "userId");
+        RequestParams params = new RequestParams();
+        params.put("userId", userId);
+        Call call = ConnectorInventory.getNewAppVersion(activity, params, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
                 ComFun.hideLoading();

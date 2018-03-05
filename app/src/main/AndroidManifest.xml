@@ -55,23 +55,25 @@
             android:label="@string/title_activity_update_pwd"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".CompleteOrderActivity"
             android:label="@string/title_activity_complete_order"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".PayDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyDialogStyle" />
+        <activity
+            android:name=".DbsyActivity"
+            android:label="@string/title_activity_dbsy"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

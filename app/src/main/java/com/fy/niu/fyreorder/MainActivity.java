@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity
 
     private CircularImage mainUserHeadImg;
     private TextView toolbarTaskTv;
+    private TextView toolbarDbsyTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         toolbarTaskTv = (TextView) toolbar.findViewById(R.id.toolbarTaskTv);
+        toolbarDbsyTv = (TextView) toolbar.findViewById(R.id.toolbarDbsyTv);
 
         initView();
 
@@ -286,12 +288,17 @@ public class MainActivity extends AppCompatActivity
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+        if (ifGive.equals("3")) {
+            toolbarDbsyTv.setVisibility(View.VISIBLE);
+        } else {
+            toolbarDbsyTv.setVisibility(View.GONE);
+        }
         if (!ifGive.equals("0")) {
             navMenuItemPayImg.setVisible(false);
             navMenuItemSelectSelfFloor.setVisible(false);
-            toolbarTaskTv.setVisibility(View.GONE);
+            //toolbarTaskTv.setVisibility(View.GONE);
         } else {
-            toolbarTaskTv.setVisibility(View.VISIBLE);
+            //toolbarTaskTv.setVisibility(View.VISIBLE);
             if (receiveSelfFloor.equals("self")) {
                 navMenuItemSelectSelfFloor.setTitleCondensed("self");
                 navMenuItemSelectSelfFloor.setTitle("楼层切换『 当前为：" + floorName + " 』");
@@ -309,7 +316,7 @@ public class MainActivity extends AppCompatActivity
             navMenuItemOpenGive.setTitleCondensed("true");
             if (ifGive.equals("0")) {
                 navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
-            }else if (ifGive.equals("2")) {
+            } else if (ifGive.equals("2")) {
                 navMenuItemOpenGive.setTitle("正在营业中，点击暂停营业");
             }
         } else {
@@ -393,7 +400,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                     ComFun.showToast(MainActivity.this, "获取已接订单数据超时", Toast.LENGTH_SHORT);
                 } else {
                     ComFun.showToast(MainActivity.this, "获取已接订单数据异常", Toast.LENGTH_SHORT);
@@ -428,7 +435,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                     ComFun.showToast(MainActivity.this, "获取未接订单数据超时", Toast.LENGTH_SHORT);
                 } else {
                     ComFun.showToast(MainActivity.this, "获取未接订单数据异常", Toast.LENGTH_SHORT);
@@ -455,7 +462,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 JSONObject orderDataJson = dataList.getJSONObject(i);
                 Order order = new Order();
-                if(orderDataJson.has("id")){
+                if (orderDataJson.has("id")) {
                     order.setId(orderDataJson.getString("id"));
                     order.setIdenCode(orderDataJson.getString("idenCode"));
                     order.setFloorId(orderDataJson.getString("floorId"));
@@ -499,7 +506,7 @@ public class MainActivity extends AppCompatActivity
                     order.setOrderDetail(buyContentList);
 
                     weiJieOrderList.add(order);
-                }else if(orderDataJson.has("fnid")){
+                } else if (orderDataJson.has("fnid")) {
                     order.setId(orderDataJson.getString("fnid"));
                     order.setIdenCode(orderDataJson.getString("fnidenCode"));
                     order.setFloorId(orderDataJson.getString("fnfloorId"));
@@ -547,18 +554,18 @@ public class MainActivity extends AppCompatActivity
             } catch (JSONException e) {
             }
         }
-        if(orderDataMap != null) {
-            if(type.equals("weiJie")) {
+        if (orderDataMap != null) {
+            if (type.equals("weiJie")) {
                 orderDataMap.put("weiJie", weiJieOrderList);
             }
-            if(type.equals("yiJie")) {
+            if (type.equals("yiJie")) {
                 orderDataMap.put("yiJie", yiJieOrderList);
             }
         } else {
-            if(type.equals("weiJie")) {
+            if (type.equals("weiJie")) {
                 return weiJieOrderList;
             }
-            if(type.equals("yiJie")) {
+            if (type.equals("yiJie")) {
                 return yiJieOrderList;
             }
         }
@@ -574,7 +581,7 @@ public class MainActivity extends AppCompatActivity
                 mainOrderSwipeRefresh_yiJie != null && noMainOrderDataLayout_yiJie != null) {
             List<Order> weiJieOrderListNew = orderDataMap.get("weiJie");
             List<Order> yiJieOrderListNew = orderDataMap.get("yiJie");
-            if(type.equals("weiJie")) {
+            if (type.equals("weiJie")) {
                 if (ComFun.strNull(weiJieOrderListNew, true)) {
                     noMainOrderDataLayout_weiJie.setVisibility(View.GONE);
                     mainOrderSwipeRefresh_weiJie.setVisibility(View.VISIBLE);
@@ -586,7 +593,7 @@ public class MainActivity extends AppCompatActivity
                     noMainOrderDataLayout_weiJie.setVisibility(View.VISIBLE);
                 }
             }
-            if(type.equals("yiJie")) {
+            if (type.equals("yiJie")) {
                 if (ComFun.strNull(yiJieOrderListNew, true)) {
                     noMainOrderDataLayout_yiJie.setVisibility(View.GONE);
                     mainOrderSwipeRefresh_yiJie.setVisibility(View.VISIBLE);
@@ -712,6 +719,16 @@ public class MainActivity extends AppCompatActivity
     public void toTaskListActivity(View view) {
         Intent taskIntent = new Intent(MainActivity.this, TaskActivity.class);
         MainActivity.this.startActivity(taskIntent);
+    }
+
+    /**
+     * 跳转到代办事宜列表页面
+     *
+     * @param view
+     */
+    public void toDbsyListActivity(View view) {
+        Intent dbsyIntent = new Intent(MainActivity.this, DbsyActivity.class);
+        MainActivity.this.startActivity(dbsyIntent);
     }
 
     /**
@@ -987,7 +1004,7 @@ public class MainActivity extends AppCompatActivity
                         params.put("floor", floor);
                     }
                     params.put("pageIndex", String.valueOf(currentPageIndex));
-                    if(intent.getStringExtra("pageType").equals("weiJie")) {
+                    if (intent.getStringExtra("pageType").equals("weiJie")) {
                         ConnectorInventory.getOrderListMissed(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
                             @Override
                             public void onFinish() {
@@ -1017,14 +1034,14 @@ public class MainActivity extends AppCompatActivity
 
                             @Override
                             public void onFailure(OkHttpException okHttpE) {
-                                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                                     ComFun.showToast(MainActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
                                 } else {
                                     ComFun.showToast(MainActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);
                                 }
                             }
                         }));
-                    } else if(intent.getStringExtra("pageType").equals("yiJie")) {
+                    } else if (intent.getStringExtra("pageType").equals("yiJie")) {
                         ConnectorInventory.getOrderListReceived(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
                             @Override
                             public void onFinish() {
@@ -1054,7 +1071,7 @@ public class MainActivity extends AppCompatActivity
 
                             @Override
                             public void onFailure(OkHttpException okHttpE) {
-                                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                                     ComFun.showToast(MainActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
                                 } else {
                                     ComFun.showToast(MainActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);

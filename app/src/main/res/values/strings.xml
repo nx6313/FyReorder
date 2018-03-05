@@ -8,4 +8,5 @@
     <string name="title_activity_update_pwd">修改密码</string>
     <string name="title_activity_complete_order">已完成订单</string>
     <string name="title_activity_register">新用户注册</string>
+    <string name="title_activity_dbsy">代办事宜</string>
 </resources>

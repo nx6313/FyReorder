@@ -19,10 +19,24 @@ public class ConnectorInventory {
     }
 
     /**
+     * 用户注册
+     */
+    public static void  userRegister(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "appRegister", params), dataHandle);
+    }
+
+    /**
      * 获取用户基本信息数据
      */
     public static void getUserInfo(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "getUserDetailMsg", params), dataHandle);
+    }
+
+    /**
+     * 校区负责人获取代办事宜
+     */
+    public static void getAgreeList(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "toAgreeList", params), dataHandle);
     }
 
     /**
