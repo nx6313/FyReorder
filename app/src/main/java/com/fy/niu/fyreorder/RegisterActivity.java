@@ -15,12 +15,17 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fy.niu.fyreorder.customView.ElasticScrollView;
 import com.fy.niu.fyreorder.model.Dorm;
 import com.fy.niu.fyreorder.model.School;
 import com.fy.niu.fyreorder.okHttpUtil.exception.OkHttpException;
@@ -30,6 +35,7 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
+import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import org.json.JSONArray;
@@ -42,6 +48,14 @@ import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
+    private RelativeLayout registerPageInputLayout;
+    private RelativeLayout registerPagePayLayout;
+    private LinearLayout registerPayBfLayout;
+    private ElasticScrollView registerDoc;
+    private RelativeLayout registerPayLayout;
+    private Button btnRegisterCloseDoc;
+    private CheckBox cbRegisterReadDoc;
+
     private EditText etUserName;
     private EditText etUserPhone;
     private EditText etUserSchool;
@@ -76,6 +90,16 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        registerPageInputLayout = (RelativeLayout) findViewById(R.id.registerPageInputLayout);
+        registerPagePayLayout = (RelativeLayout) findViewById(R.id.registerPagePayLayout);
+        registerPageInputLayout.setVisibility(View.VISIBLE);
+        registerPagePayLayout.setVisibility(View.GONE);
+        registerPayBfLayout = (LinearLayout) findViewById(R.id.registerPayBfLayout);
+        registerDoc = (ElasticScrollView) findViewById(R.id.registerDoc);
+        registerPayLayout = (RelativeLayout) findViewById(R.id.registerPayLayout);
+        btnRegisterCloseDoc = (Button) findViewById(R.id.btnRegisterCloseDoc);
+        cbRegisterReadDoc = (CheckBox) findViewById(R.id.cbRegisterReadDoc);
+
         etUserName = (EditText) findViewById(R.id.etUserName);
         etUserPhone = (EditText) findViewById(R.id.etUserPhone);
         etUserSchool = (EditText) findViewById(R.id.etUserSchool);
@@ -94,6 +118,10 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(Object responseObj) {
+                etUserSchool.setFocusable(true);
+                //etUserSchool.setEnabled(true);
+                etUserSchool.setHint("请输入所在学院");
+                etUserSchool.setOnClickListener(null);
                 try {
                     JSONObject resultJson = new JSONObject(responseObj.toString());
                     Boolean success = resultJson.getBoolean("success");
@@ -205,7 +233,14 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onFailure(OkHttpException okHttpE) {
                 etUserSchool.setFocusable(false);
-                etUserSchool.setEnabled(false);
+                //etUserSchool.setEnabled(false);
+                etUserSchool.setHint("点这里重新获取院校信息");
+                etUserSchool.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        initData();
+                    }
+                });
                 etUserDorm.setFocusable(false);
                 etUserDorm.setEnabled(false);
                 if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
@@ -227,8 +262,8 @@ public class RegisterActivity extends AppCompatActivity {
         return searchSchools;
     }
 
-    // 进行注册
-    public void doRegister(View view) {
+    // 跳转到下一步
+    public void toRegisterNext(View view) {
         if (!ComFun.strNull(etUserName.getText().toString())) {
             ComFun.showToast(RegisterActivity.this, "用户名不能为空", Toast.LENGTH_LONG);
             return;
@@ -249,45 +284,72 @@ public class RegisterActivity extends AppCompatActivity {
             ComFun.showToast(RegisterActivity.this, "楼号不能为空", Toast.LENGTH_LONG);
             return;
         }
-        ComFun.showLoading(RegisterActivity.this, "正在注册，请稍后");
-        RequestParams params = new RequestParams();
-        params.put("name", etUserName.getText().toString().trim());
-        params.put("telephone", etUserPhone.getText().toString().trim());
-        params.put("orgId", userSchoolId);
-        params.put("floorId", userDormId);
-        params.put("major", etUserPerl.getText().toString().trim());
-        params.put("sex", rgUserSex.findViewById(rgUserSex.getCheckedRadioButtonId()).getTag().toString().trim());
-        ConnectorInventory.userRegister(RegisterActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
-            @Override
-            public void onFinish() {
-                ComFun.hideLoading();
-            }
+        registerPageInputLayout.setVisibility(View.GONE);
+        registerPagePayLayout.setVisibility(View.VISIBLE);
+    }
 
-            @Override
-            public void onSuccess(Object responseObj) {
-                try {
-                    JSONObject resultJson = new JSONObject(responseObj.toString());
-                    Boolean success = resultJson.getBoolean("success");
-                    ComFun.showToast(RegisterActivity.this, resultJson.getString("msg"), Toast.LENGTH_LONG);
-                    if (success) {
-                        Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(loginIntent);
-                        RegisterActivity.this.finish();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+    // 显示用户协议
+    public void showRegisterDoc(View view) {
+        registerDoc.setVisibility(View.VISIBLE);
+        registerPayLayout.setVisibility(View.GONE);
+        btnRegisterCloseDoc.setVisibility(View.VISIBLE);
+        registerPayBfLayout.setVisibility(View.GONE);
+    }
 
-            @Override
-            public void onFailure(OkHttpException okHttpE) {
-                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
-                    ComFun.showToast(RegisterActivity.this, "注册超时，请稍后重试", Toast.LENGTH_LONG);
-                } else {
-                    ComFun.showToast(RegisterActivity.this, "注册失败，请稍后重试", Toast.LENGTH_LONG);
-                }
-            }
-        }));
+    // 关闭用户协议
+    public void closeRegisterDoc(View view) {
+        registerDoc.setVisibility(View.GONE);
+        registerPayLayout.setVisibility(View.VISIBLE);
+        btnRegisterCloseDoc.setVisibility(View.GONE);
+        registerPayBfLayout.setVisibility(View.VISIBLE);
+    }
+
+    // 进行注册
+    public void doRegister(View view) {
+        if (cbRegisterReadDoc.isChecked()) {
+            ComFun.showToast(RegisterActivity.this, "微信支付正在审核中，敬请期待", Toast.LENGTH_LONG);
+//            ComFun.showLoading(RegisterActivity.this, "正在注册，请稍后");
+//            RequestParams params = new RequestParams();
+//            params.put("name", etUserName.getText().toString().trim());
+//            params.put("telephone", etUserPhone.getText().toString().trim());
+//            params.put("orgId", userSchoolId);
+//            params.put("floorId", userDormId);
+//            params.put("major", etUserPerl.getText().toString().trim());
+//            params.put("sex", rgUserSex.findViewById(rgUserSex.getCheckedRadioButtonId()).getTag().toString().trim());
+//            ConnectorInventory.userRegister(RegisterActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
+//                @Override
+//                public void onFinish() {
+//                    ComFun.hideLoading();
+//                }
+//
+//                @Override
+//                public void onSuccess(Object responseObj) {
+//                    try {
+//                        JSONObject resultJson = new JSONObject(responseObj.toString());
+//                        Boolean success = resultJson.getBoolean("success");
+//                        ComFun.showToast(RegisterActivity.this, resultJson.getString("msg"), Toast.LENGTH_LONG);
+//                        if (success) {
+//                            Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+//                            startActivity(loginIntent);
+//                            RegisterActivity.this.finish();
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(OkHttpException okHttpE) {
+//                    if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+//                        ComFun.showToast(RegisterActivity.this, "注册超时，请稍后重试", Toast.LENGTH_LONG);
+//                    } else {
+//                        ComFun.showToast(RegisterActivity.this, "注册失败，请稍后重试", Toast.LENGTH_LONG);
+//                    }
+//                }
+//            }));
+        } else {
+            ComFun.showToast(RegisterActivity.this, "请您先阅读《速达接单用户协议》", Toast.LENGTH_LONG);
+        }
     }
 
     // 返回登录

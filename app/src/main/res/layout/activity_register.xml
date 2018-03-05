@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_bg"
     tools:context="com.fy.niu.fyreorder.RegisterActivity">
 
-    <com.fy.niu.fyreorder.customView.ElasticScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center|top"
-        android:overScrollMode="never"
-        android:scrollbarSize="2dp"
-        android:scrollbarThumbVertical="@color/colorScroll"
-        android:scrollbars="none">
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/registerPageInputLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/register_logo"
@@ -189,14 +188,14 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btnRegister"
+                android:id="@+id/btnRegisterNext"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_below="@+id/register_6"
                 android:layout_marginTop="35dp"
                 android:background="@drawable/edit_table_btn_style"
-                android:onClick="doRegister"
-                android:text="立即注册"
+                android:onClick="toRegisterNext"
+                android:text="下一步"
                 android:textColor="#f2f2f2"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -204,7 +203,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/btnRegister"
+                android:layout_below="@+id/btnRegisterNext"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:onClick="backToLogin"
@@ -212,6 +211,110 @@
                 android:text="已有账号？返回登录"
                 android:textColor="@color/colorRegister" />
         </RelativeLayout>
-    </com.fy.niu.fyreorder.customView.ElasticScrollView>
 
-</android.support.constraint.ConstraintLayout>
+        <RelativeLayout
+            android:id="@+id/registerPagePayLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true">
+
+            <LinearLayout
+                android:id="@+id/registerPayBfLayout"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:background="@drawable/register_baoz"
+                android:orientation="vertical" />
+
+            <com.fy.niu.fyreorder.customView.ElasticScrollView
+                android:id="@+id/registerDoc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="45dp"
+                android:gravity="center|top"
+                android:overScrollMode="never"
+                android:scrollbarSize="2dp"
+                android:scrollbarThumbVertical="@color/colorScroll"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/register_doc" />
+            </com.fy.niu.fyreorder.customView.ElasticScrollView>
+
+            <RelativeLayout
+                android:id="@+id/registerPayLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/registerPayTip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="支付20元保证金开启接单之旅！！！"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/registerPayDoc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/registerPayTip"
+                    android:padding="10dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:onClick="showRegisterDoc"
+                        android:text="请您阅读《速达接单用户协议》" />
+
+                    <CheckBox
+                        android:id="@+id/cbRegisterReadDoc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="我已阅读该协议" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/btnRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_below="@+id/registerPayDoc"
+                    android:background="@drawable/edit_table_btn_style"
+                    android:onClick="doRegister"
+                    android:text="确认开通并注册"
+                    android:textColor="#f2f2f2"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btnRegisterCloseDoc"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/edit_table_btn_style"
+                android:onClick="closeRegisterDoc"
+                android:text="关闭协议"
+                android:textColor="#f2f2f2"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>
