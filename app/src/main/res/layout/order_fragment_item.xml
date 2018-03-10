@@ -20,6 +20,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:tag="order_item_type"
+            android:text="订单类型：~"
+            android:layout_marginBottom="10dp"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:tag="order_item_user_name"
             android:text="客户名称：~"
             android:textSize="16sp"

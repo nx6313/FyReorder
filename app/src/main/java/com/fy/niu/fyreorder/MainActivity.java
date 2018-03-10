@@ -22,6 +22,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -47,6 +48,7 @@ import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
+import com.fy.niu.fyreorder.util.MyTagHandler;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 import com.fy.niu.fyreorder.util.VersionUtil;
 
@@ -390,10 +392,9 @@ public class MainActivity extends AppCompatActivity
                     Log.d(" ==== 首页已接数据num === ", " ===> " + dataList.length());
                     if (dataList.length() > 0) {
                         getOrderListFromJson(dataList, orderDataMap, "yiJie");
-
-                        // 更新数据
-                        updateOrderViewPager(orderDataMap, "yiJie");
                     }
+                    // 更新数据
+                    updateOrderViewPager(orderDataMap, "yiJie");
                 } catch (JSONException e) {
                 }
             }
@@ -425,10 +426,9 @@ public class MainActivity extends AppCompatActivity
                     Log.d(" ==== 首页未接数据num === ", " ===> " + dataList.length());
                     if (dataList.length() > 0) {
                         getOrderListFromJson(dataList, orderDataMap, "weiJie");
-
-                        // 更新数据
-                        updateOrderViewPager(orderDataMap, "weiJie");
                     }
+                    // 更新数据
+                    updateOrderViewPager(orderDataMap, "weiJie");
                 } catch (JSONException e) {
                 }
             }
@@ -479,6 +479,9 @@ public class MainActivity extends AppCompatActivity
                     order.setPersonName(orderDataJson.getString("personName"));
                     order.setPersonPhone(orderDataJson.getString("personPhone"));
 
+                    if(orderDataJson.has("shopName")) {
+                        order.setShopName(orderDataJson.getString("shopName"));
+                    }
                     if (orderDataJson.has("perName")) {
                         order.setUserName(orderDataJson.getString("perName"));
                     }
@@ -499,7 +502,11 @@ public class MainActivity extends AppCompatActivity
                         buyContent.setNum(buyContentJsonObj.getInt("num"));
                         buyContent.setPrice(buyContentJsonObj.getString("price"));
                         buyContent.setName(buyContentJsonObj.getString("proName"));
-                        buyContent.setUrl(buyContentJsonObj.getString("url"));
+                        if (buyContentJsonObj.has("url")) {
+                            buyContent.setUrl(buyContentJsonObj.getString("url"));
+                        } else {
+                            buyContent.setUrl("-");
+                        }
 
                         buyContentList.add(buyContent);
                     }
@@ -523,6 +530,9 @@ public class MainActivity extends AppCompatActivity
                     order.setPersonName(orderDataJson.getString("fnpersonName"));
                     order.setPersonPhone(orderDataJson.getString("fnpersonPhone"));
 
+                    if(orderDataJson.has("fnshopName")) {
+                        order.setShopName(orderDataJson.getString("fnshopName"));
+                    }
                     if (orderDataJson.has("fnperName")) {
                         order.setUserName(orderDataJson.getString("fnperName"));
                     }
@@ -543,7 +553,11 @@ public class MainActivity extends AppCompatActivity
                         buyContent.setNum(buyContentJsonObj.getInt("fnnum"));
                         buyContent.setPrice(buyContentJsonObj.getString("fnprice"));
                         buyContent.setName(buyContentJsonObj.getString("fnproName"));
-                        buyContent.setUrl(buyContentJsonObj.getString("fnurl"));
+                        if (buyContentJsonObj.has("fnurl")) {
+                            buyContent.setUrl(buyContentJsonObj.getString("fnurl"));
+                        } else {
+                            buyContent.setUrl("-");
+                        }
 
                         buyContentList.add(buyContent);
                     }
@@ -552,6 +566,7 @@ public class MainActivity extends AppCompatActivity
                     yiJieOrderList.add(order);
                 }
             } catch (JSONException e) {
+                Log.d("解析订单数据异常 ==> ", "" + e);
             }
         }
         if (orderDataMap != null) {
@@ -864,31 +879,41 @@ public class MainActivity extends AppCompatActivity
                 case MSG_UPDATE_ORDER_STATE:
                     final String orderId = b.getString("orderId");
                     int orderState = b.getInt("orderState");
+                    final Order orderData = (Order) b.getSerializable("orderData");
                     // 送货的  未接单 3 已接单 4
                     // 商家    未接单 2 已接单 3
                     if (orderState == 4) {
+                        new android.support.v7.app.AlertDialog.Builder(MainActivity.this).setTitle("确定要完成该订单吗？").setMessage(
+                                "订单类型：" + (orderData.getOrderType() == 1 ? "零食订单" : "外卖订单") + "\n订单商家：" + orderData.getShopName() + "\n付款方式：" + (orderData.getPayType() == 1 ? "微信支付" : (orderData.getPayType() == 2 ? "货到付款" : "未知")))
+                                .setPositiveButton("确定完成订单", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        updateOrderState(orderId, orderData.getIdenCode().trim());
+                                    }
+                                })
+                                .setNegativeButton("取消", null).show();
                         // 需要完成订单验证码
-                        final EditText etCompCode = new EditText(MainActivity.this);
-                        etCompCode.setPadding(DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16), DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16));
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("请输入订单验收码").setIcon(R.drawable.edit).setView(etCompCode).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ComFun.hideLoading();
-                            }
-                        });
-                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String compCode = etCompCode.getText().toString();
-                                if (ComFun.strNull(compCode.trim())) {
-                                    updateOrderState(orderId, compCode.trim());
-                                } else {
-                                    updateOrderState(orderId, "unCode");
-                                }
-                            }
-                        });
-                        builder.show();
+//                        final EditText etCompCode = new EditText(MainActivity.this);
+//                        etCompCode.setPadding(DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16), DisplayUtil.dip2px(MainActivity.this, 30), DisplayUtil.dip2px(MainActivity.this, 16));
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                        builder.setTitle("请输入订单验收码").setIcon(R.drawable.edit).setView(etCompCode).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                ComFun.hideLoading();
+//                            }
+//                        });
+//                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                String compCode = etCompCode.getText().toString();
+//                                if (ComFun.strNull(compCode.trim())) {
+//                                    updateOrderState(orderId, compCode.trim());
+//                                } else {
+//                                    updateOrderState(orderId, "unCode");
+//                                }
+//                            }
+//                        });
+//                        builder.show();
                     } else {
                         updateOrderState(orderId, null);
                     }

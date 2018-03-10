@@ -22,6 +22,7 @@ import com.fy.niu.fyreorder.MainActivity;
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.model.Order;
 import com.fy.niu.fyreorder.util.ComFun;
+import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DateFormatUtil;
 import com.fy.niu.fyreorder.util.SerializableOrderList;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
@@ -109,6 +110,7 @@ public class MainOrderFragment extends Fragment {
             View orderItemView = inflater.inflate(R.layout.order_fragment_item, null);
 
             LinearLayout orderItemMainWrap = (LinearLayout) orderItemView.findViewWithTag("order_item_main_wrap");
+            TextView orderType = (TextView) orderItemView.findViewWithTag("order_item_type");
             TextView userName = (TextView) orderItemView.findViewWithTag("order_item_user_name");
             TextView userAddress = (TextView) orderItemView.findViewWithTag("order_item_user_address");
             TextView userPayWay = (TextView) orderItemView.findViewWithTag("order_item_pay_way");
@@ -161,15 +163,20 @@ public class MainOrderFragment extends Fragment {
             if (pageType.equals("weiJie")) {
                 orderItemMainWrap.setBackgroundResource(R.drawable.order_card_bg_w);
             }
-            userName.setText("客户名称：" + orderData.getUserName());
+            userName.setText("客户名称：" + orderData.getUserName() + "〔 "+ orderData.getShopName() +" 〕");
             if (orderData.getOrderType() == 1) {
-                userName.setText(userName.getText().toString() + "〔 零食订单 〕");
+                orderType.setText("订单类型：零食订单");
             } else if (orderData.getOrderType() == 2) {
-                userName.setText(userName.getText().toString() + "〔 外卖订单 〕");
+                orderType.setText("订单类型：外卖订单");
             }
             userAddress.setText("详细地址：" + orderData.getAddressDetail());
             if (orderData.getPayType() == 1) {
                 userPayWay.setText("支付方式：微信支付");
+                if (pageType.equals("weiJie")) {
+                    orderItemMainWrap.setBackgroundResource(R.drawable.order_card_bg_w_wx);
+                } else {
+                    orderItemMainWrap.setBackgroundResource(R.drawable.order_card_bg_wx);
+                }
             } else if (orderData.getPayType() == 2) {
                 userPayWay.setText("支付方式：货到付款");
             } else {
@@ -183,7 +190,7 @@ public class MainOrderFragment extends Fragment {
             orderNum.setText("编号：" + orderData.getOrderNumber());
             orderTime.setText("时间：" + DateFormatUtil.dateToStr(new Date(Long.parseLong(orderData.getOrderDate())), DateFormatUtil.MDHHMM));
             if(pageType.equals("yiJie")) {
-                orderIdenCode.setVisibility(View.VISIBLE);
+                orderIdenCode.setVisibility(View.GONE);
                 orderIdenCode.setText("完成码：" + orderData.getIdenCode());
             }
             if (ComFun.strNull(orderData.getRemark()) && !orderData.getRemark().equals("null")) {
@@ -218,7 +225,7 @@ public class MainOrderFragment extends Fragment {
                     TextView orderDetailItemName = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_name");
                     TextView orderDetailItemCountPrice = (TextView) orderDetailItemView.findViewWithTag("order_detail_item_count_price");
 
-                    Picasso.with(context).load(buyContent.getUrl()).resize(100, 100).centerCrop().placeholder(R.drawable.food_default).error(R.drawable.food_default).into(orderDetailItemImg);
+                    Picasso.with(context).load(Constants.HTTP_URL_BASE_NEW + buyContent.getUrl()).resize(100, 100).centerCrop().placeholder(R.drawable.food_default).error(R.drawable.food_default).into(orderDetailItemImg);
                     orderDetailItemName.setText("商品名称：" + buyContent.getName());
                     orderDetailItemCountPrice.setText("购买数量：" + buyContent.getNum() + "           价格：" + buyContent.getPrice() + " 元");
 
@@ -250,6 +257,7 @@ public class MainOrderFragment extends Fragment {
                         msg.what = MainActivity.MSG_UPDATE_ORDER_STATE;
                         data.putString("orderId", orderData.getId());
                         data.putInt("orderState", orderData.getOrderState());
+                        data.putSerializable("orderData", orderData);
                         msg.setData(data);
                         MainActivity.mHandler.sendMessage(msg);
                     }

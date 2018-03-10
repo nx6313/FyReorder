@@ -26,6 +26,7 @@ public class Order implements Serializable {
     private String school;
     private String personName;
     private String personPhone;
+    private String shopName;
     private List<BuyContent> orderDetail;
     private String remark; // 给商家的留言
     private int state; // 已接1、未接2、已完成3
@@ -172,6 +173,14 @@ public class Order implements Serializable {
 
     public void setPersonPhone(String personPhone) {
         this.personPhone = personPhone;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 
     public List<BuyContent> getOrderDetail() {

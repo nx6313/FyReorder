@@ -58,11 +58,11 @@ public class CommonJsonCallback implements Callback {
             @Override
             public void run() {
                 mListener.onFinish();
-                if(ioexception instanceof SocketTimeoutException){
+                if (ioexception instanceof SocketTimeoutException) {
                     L.d("请求超时");
                     // 返回数据超时
                     mListener.onFailure(new OkHttpException(Constants.HTTP_OUT_TIME_ERROR, "返回数据超时"));
-                }else{
+                } else {
                     L.d("请求异常：" + ioexception.getMessage());
                     mListener.onFailure(new OkHttpException(Constants.HTTP_NETWORK_ERROR, ioexception));
                 }
@@ -75,13 +75,16 @@ public class CommonJsonCallback implements Callback {
     }
 
     @Override
-    public void onResponse(Call call, final Response response) throws IOException {
+    public void onResponse(Call call, Response response) throws IOException {
         final String result = response.body().string();
         final ArrayList<String> cookieLists = handleCookie(response.headers());
+        final String encodedPath = response.request().url().encodedPath();
+        response.body().close();
+        response.close();
         mDeliveryHandler.post(new Runnable() {
             @Override
             public void run() {
-                handleResponse(result, response.request().url().encodedPath());
+                handleResponse(result, encodedPath);
                 /**
                  * handle the cookie
                  */
@@ -117,13 +120,13 @@ public class CommonJsonCallback implements Callback {
 
         try {
             JSONObject result = null;
-            if(ComFun.getJSONType(responseObj.toString()).equals(ComFun.JSON_TYPE.JSON_TYPE_OBJECT)){
+            if (ComFun.getJSONType(responseObj.toString()).equals(ComFun.JSON_TYPE.JSON_TYPE_OBJECT)) {
                 result = new JSONObject(responseObj.toString());
-            }else if(ComFun.getJSONType(responseObj.toString()).equals(ComFun.JSON_TYPE.JSON_TYPE_ARRAY)){
+            } else if (ComFun.getJSONType(responseObj.toString()).equals(ComFun.JSON_TYPE.JSON_TYPE_ARRAY)) {
                 result = new JSONObject();
                 JSONArray dataJsonArr = new JSONArray(responseObj.toString());
                 result.put("dataList", dataJsonArr);
-            }else{
+            } else {
                 new Exception("返回JSON数据格式错误，访问地址：" + url + "，返回值为：" + responseObj.toString()).printStackTrace();
             }
             if (!result.has(RESULT_CODE)) {
