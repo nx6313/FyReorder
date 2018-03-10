@@ -161,7 +161,7 @@ public class VersionUtil {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(Constants.HTTP_URL_BASE + apkUrl);
+                    URL url = new URL(Constants.HTTP_URL_BASE_NEW + apkUrl);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setConnectTimeout(5000);
