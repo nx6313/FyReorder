@@ -73,7 +73,11 @@
             android:name=".DbsyActivity"
             android:label="@string/title_activity_dbsy"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PrintDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyDialogStyle" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

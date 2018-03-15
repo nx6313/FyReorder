@@ -289,11 +289,17 @@ public class MainActivity extends AppCompatActivity
         MenuItem navMenuItemPayImg = navigationView.getMenu().findItem(R.id.nav_pay_img);
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
+        MenuItem navMenuItemPrintOrder = navigationView.getMenu().findItem(R.id.nav_print_order);
         String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
         if (ifGive.equals("3")) {
             toolbarDbsyTv.setVisibility(View.VISIBLE);
         } else {
             toolbarDbsyTv.setVisibility(View.GONE);
+        }
+        if (ifGive.equals("1") || ifGive.equals("2")) { // 1:商超   2:外卖
+            navMenuItemPrintOrder.setVisible(true);
+        } else {
+            navMenuItemPrintOrder.setVisible(false);
         }
         if (!ifGive.equals("0")) {
             navMenuItemPayImg.setVisible(false);
@@ -671,6 +677,15 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
                 toFloorChange();
                 break;
+            case R.id.nav_print_order:
+                drawer.closeDrawer(GravityCompat.START);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toPrintDialogActivity();
+                    }
+                }, 200);
+                break;
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);
                 VersionUtil.checkNewVersion(MainActivity.this, false);
@@ -716,6 +731,15 @@ public class MainActivity extends AppCompatActivity
     public void toPayDialogActivity() {
         Intent payDialogIntent = new Intent(MainActivity.this, PayDialogActivity.class);
         startActivity(payDialogIntent);
+    }
+
+
+    /**
+     * 跳转到打印小票弹框页面
+     */
+    public void toPrintDialogActivity() {
+        Intent printDialogIntent = new Intent(MainActivity.this, PrintDialogActivity.class);
+        startActivity(printDialogIntent);
     }
 
     /**

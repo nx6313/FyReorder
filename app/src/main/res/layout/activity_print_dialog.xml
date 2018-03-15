@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.fy.niu.fyreorder.PrintDialogActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:background="@drawable/loading_bg"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="当前连接的打票机："
+            android:textColor="#e2f7ff" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:text="无打票机连接"
+            android:textColor="#e2f7ff" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/edit_table_btn_style"
+            android:text="连接打票机"
+            android:textColor="#ffecc0"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="正在听单并打印小票中..."
+            android:textColor="#fffbd7"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <com.fy.niu.fyreorder.customView.ElasticScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:background="#414141"
+            android:gravity="center|top"
+            android:overScrollMode="never"
+            android:scrollbarSize="2dp"
+            android:scrollbarThumbVertical="@color/colorScroll"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/printingOrderDataLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:orientation="vertical"
+                android:paddingBottom="3dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingTop="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="『 新订单 』20:30 10s"
+                        android:textColor="#72fa2d"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        android:textColor="#faab2d"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="『 新订单 』20:30 10s"
+                        android:textColor="#72fa2d"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="xxxxxxxxxxxxxxxxxxxxxxxxxsdfsdfsdfsdfsdfsdfsdfdsfsdfsdfsdfsdfsdfxx"
+                        android:textColor="#faab2d"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.fy.niu.fyreorder.customView.ElasticScrollView>
+    </LinearLayout>
+</RelativeLayout>
