@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffe7e3"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/pbSearchTip"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp" />
+
+        <TextView
+            android:id="@+id/tvSearchTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在搜索可用的蓝牙设备" />
+
+        <Button
+            android:id="@+id/btnReSearch"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:background="@drawable/edit_table_btn_style"
+            android:onClick="connectionPrintDevice"
+            android:text="重新搜索蓝牙设备"
+            android:textColor="#ffecc0"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <com.fy.niu.fyreorder.customView.ElasticScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="6dp"
+        android:gravity="center|top"
+        android:overScrollMode="never"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/colorScroll"
+        android:scrollbars="none">
+
+        <RadioGroup
+            android:id="@+id/blueDevItemWrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="3dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="3dp"></RadioGroup>
+    </com.fy.niu.fyreorder.customView.ElasticScrollView>
+</LinearLayout>

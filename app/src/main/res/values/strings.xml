@@ -10,6 +10,8 @@
     <string name="title_activity_register">新用户注册</string>
     <string name="title_activity_dbsy">代办事宜</string>
 
+    <item name="tag_bluetooth_device_address" type="id"></item>
+
     <string name="register_doc">
         本服务协议是您与宿达平台（以下简称“服务平台”）之间就服务平台提供的信息服务等相关事宜所订立的协议。请您仔细阅读本协议，您勾选"同意并接受《宿达服务协议》"并点击使用服务后，本服务协议对您产生约束力。您应当在使用服务平台的服务之前认真阅读、充分理解全部条款的内容，如您对条款有任何疑问的，应向平台客服咨询。\n\n\n
 

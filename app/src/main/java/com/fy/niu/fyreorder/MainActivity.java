@@ -1,5 +1,7 @@
 package com.fy.niu.fyreorder;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,6 +50,7 @@ import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
 import com.fy.niu.fyreorder.util.DisplayUtil;
+import com.fy.niu.fyreorder.util.MyApplication;
 import com.fy.niu.fyreorder.util.MyTagHandler;
 import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 import com.fy.niu.fyreorder.util.VersionUtil;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     public static final int MSG_REF_ORDER_LSIT = 2;
     public static final int MSG_CALL_USER_PHONE = 3;
     public static final int MSG_START_DOWN_NEW_VERSION = 4;
+    public static final int MSG_UPDATE_PRINT_MENU_STATE = 5;
     private long exitTime;
     private NavigationView navigationView;
     private CircularImage userHeadImg;
@@ -164,6 +168,8 @@ public class MainActivity extends AppCompatActivity
                         initDatas(false);
                         // 进行新版本检测
                         VersionUtil.checkNewVersion(MainActivity.this, true);
+                        // 初始化打票机设置
+                        initPrintSet();
                     } else {
                         // 登录失败，提示用户，需要手动重新登录
                         leftMenuUserName.setTag("needLogin");
@@ -253,6 +259,39 @@ public class MainActivity extends AppCompatActivity
                 ComFun.showToast(MainActivity.this, "获取个人信息异常", Toast.LENGTH_SHORT);
             }
         }));
+    }
+
+    private void initPrintSet() {
+        Boolean printIsOpenInSave = SharedPreferencesTool.getBooleanFromShared(this.getApplicationContext(), "systemSet", "printIsOpen");
+        if (printIsOpenInSave) {
+            MyApplication.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (MyApplication.mBluetoothAdapter != null) {
+                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(this.getApplicationContext(), "systemSet", "connectionDeviceCode", "");
+                if (ComFun.strNull(connectionDeviceCode)) {
+                    if (MyApplication.mBluetoothAdapter.isEnabled()) {
+                        BluetoothSocket curBluetoothSocket = MyApplication.mBluetoothSocketMap.get(connectionDeviceCode);
+                        if (ComFun.strNull(curBluetoothSocket)) {
+                            if (curBluetoothSocket.isConnected()) {
+                                return;
+                            }
+                        }
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode);
+                                new Thread(connectRunnable).start();
+                            }
+                        }, 200);
+                    } else {
+                        ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启，请开启后", Toast.LENGTH_LONG);
+                    }
+                } else {
+                    ComFun.showToast(this.getApplicationContext(), "您的打票机功能已开启但并未进行设置，请到 操作选项 中设置", Toast.LENGTH_LONG);
+                }
+            } else {
+                ComFun.showToast(this.getApplicationContext(), "对不起，您的设备不支持蓝牙", Toast.LENGTH_SHORT);
+            }
+        }
     }
 
     private void initView() {
@@ -485,7 +524,7 @@ public class MainActivity extends AppCompatActivity
                     order.setPersonName(orderDataJson.getString("personName"));
                     order.setPersonPhone(orderDataJson.getString("personPhone"));
 
-                    if(orderDataJson.has("shopName")) {
+                    if (orderDataJson.has("shopName")) {
                         order.setShopName(orderDataJson.getString("shopName"));
                     }
                     if (orderDataJson.has("perName")) {
@@ -536,7 +575,7 @@ public class MainActivity extends AppCompatActivity
                     order.setPersonName(orderDataJson.getString("fnpersonName"));
                     order.setPersonPhone(orderDataJson.getString("fnpersonPhone"));
 
-                    if(orderDataJson.has("fnshopName")) {
+                    if (orderDataJson.has("fnshopName")) {
                         order.setShopName(orderDataJson.getString("fnshopName"));
                     }
                     if (orderDataJson.has("fnperName")) {
@@ -684,7 +723,7 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         toPrintDialogActivity();
                     }
-                }, 200);
+                }, 400);
                 break;
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);
@@ -967,6 +1006,11 @@ public class MainActivity extends AppCompatActivity
                     VersionUtil.addDownLoadHandler(MainActivity.this);
                     // 开启线程下载
                     VersionUtil.beginDownload(MainActivity.this, appUrl);
+                    break;
+                case MSG_UPDATE_PRINT_MENU_STATE:
+                    MenuItem navMenuItemPrintOrder = navigationView.getMenu().findItem(R.id.nav_print_order);
+                    String statusStr = b.getString("status");
+                    navMenuItemPrintOrder.setTitle("打印订单小票『 " + statusStr + " 』");
                     break;
             }
             super.handleMessage(msg);

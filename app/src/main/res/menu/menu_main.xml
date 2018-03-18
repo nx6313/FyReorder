@@ -42,7 +42,7 @@
                 android:title="楼层切换『 当前为：所有 』" />
             <item
                 android:id="@+id/nav_print_order"
-                android:title="打印订单小票" />
+                android:title="打印订单小票『 未开启 』" />
         </menu>
     </item>
 

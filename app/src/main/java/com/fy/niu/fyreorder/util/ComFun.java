@@ -1,6 +1,7 @@
 package com.fy.niu.fyreorder.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,10 +11,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,8 +23,6 @@ import android.widget.Toast;
 
 import com.ant.liao.GifView;
 import com.fy.niu.fyreorder.R;
-
-import org.json.JSONException;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -242,6 +239,49 @@ public class ComFun {
             }
         }
         return loadingDialog;
+    }
+
+    /**
+     * 显示加载框
+     *
+     * @param activity
+     * @param loadingTipValue
+     */
+    public static AlertDialog showLoading(Activity activity, String loadingTipValue, final LoadingCallback callback) {
+        loadingDialog = new AlertDialog.Builder(activity, R.style.MyDialogStyle).setCancelable(true).create();
+        loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                callback.cancel();
+            }
+        });
+        loadingDialog.show();
+        WindowManager.LayoutParams params = loadingDialog.getWindow().getAttributes();
+        params.width = getScreenWidth() * 3 / 4;
+        //params.height = 200;
+        loadingDialog.getWindow().setAttributes(params);
+
+        Window win = loadingDialog.getWindow();
+        View loadingView = activity.getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        loadingView.setBackgroundResource(R.drawable.loading_border);
+        win.setContentView(loadingView);
+        GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
+        loadingGif.setGifImage(R.drawable.loading_girl);
+        loadingGif.setShowDimension(200, 190);
+        loadingGif.setGifImageType(GifView.GifImageType.COVER);
+        TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
+        if (loadingTip != null) {
+            if (strNull(loadingTipValue)) {
+                loadingTip.setText(loadingTipValue);
+            } else {
+                loadingTip.setVisibility(View.GONE);
+            }
+        }
+        return loadingDialog;
+    }
+
+    public interface LoadingCallback {
+        void cancel();
     }
 
     /**
