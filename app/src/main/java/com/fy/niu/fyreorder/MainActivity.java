@@ -286,11 +286,11 @@ public class MainActivity extends AppCompatActivity
                         }, 200);
                     } else {
                         navMenuItemPrintOrder.setTitle("打印订单小票『 蓝牙未启用 』");
-                        ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启，请开启后到 操作选项 中设置", Toast.LENGTH_LONG);
+                        ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启", Toast.LENGTH_LONG);
                     }
                 } else {
                     navMenuItemPrintOrder.setTitle("打印订单小票『 未设置 』");
-                    ComFun.showToast(this.getApplicationContext(), "您的打票机功能已开启但并未进行设置，请到 操作选项 中设置", Toast.LENGTH_LONG);
+                    ComFun.showToast(this.getApplicationContext(), "打票机功能已开启但未进行设置", Toast.LENGTH_LONG);
                 }
             } else {
                 navMenuItemPrintOrder.setTitle("打印订单小票『 不支持蓝牙 』");

@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ant.liao.GifView;
 import com.fy.niu.fyreorder.broadcastReceiver.FyBroadcastReceiver;
 import com.fy.niu.fyreorder.customView.ElasticScrollView;
 import com.fy.niu.fyreorder.util.ComFun;
@@ -46,6 +48,7 @@ public class PrintDialogActivity extends Activity {
     public static Handler mHandler = null;
     private CheckBox cbPrint;
     private TextView tvPrintTip;
+    private Button btnOpenBluetooth;
     private Button btnAgainConnectPrint;
     private Button btnReConnectPrint;
     private TextView tvPrintCode;
@@ -104,6 +107,7 @@ public class PrintDialogActivity extends Activity {
 
         cbPrint = (CheckBox) findViewById(R.id.cbPrint);
         tvPrintTip = (TextView) findViewById(R.id.tvPrintTip);
+        btnOpenBluetooth = (Button) findViewById(R.id.btnOpenBluetooth);
         btnAgainConnectPrint = (Button) findViewById(R.id.btnAgainConnectPrint);
         btnReConnectPrint = (Button) findViewById(R.id.btnReConnectPrint);
         tvPrintCode = (TextView) findViewById(R.id.tvPrintCode);
@@ -113,6 +117,7 @@ public class PrintDialogActivity extends Activity {
         printingOrderDataLayout = (LinearLayout) findViewById(R.id.printingOrderDataLayout);
         cbPrint.setChecked(false);
         tvPrintTip.setVisibility(View.GONE);
+        btnOpenBluetooth.setVisibility(View.GONE);
         btnAgainConnectPrint.setVisibility(View.GONE);
         btnReConnectPrint.setVisibility(View.GONE);
         tvPrintCode.setVisibility(View.GONE);
@@ -138,6 +143,7 @@ public class PrintDialogActivity extends Activity {
                                 if (ComFun.strNull(curBluetoothSocket)) {
                                     if (curBluetoothSocket.isConnected()) {
                                         tvPrintCode.setText(connectionDeviceCode);
+                                        btnOpenBluetooth.setVisibility(View.GONE);
                                         btnAgainConnectPrint.setVisibility(View.GONE);
                                         btnReConnectPrint.setVisibility(View.VISIBLE);
                                         btnConnectPrint.setVisibility(View.GONE);
@@ -164,9 +170,10 @@ public class PrintDialogActivity extends Activity {
                                     }
                                 }, 200);
                             } else {
+                                btnOpenBluetooth.setVisibility(View.VISIBLE);
                                 tvPrintCode.setText("蓝牙未启用，打票机无连接");
-                                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                                startActivityForResult(intent, OPEN_BLUETOOTH);
+//                                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                                startActivityForResult(intent, OPEN_BLUETOOTH);
 
                                 Message mainPageUpdateMenuMsg = new Message();
                                 Bundle mainPageUpdateMenuData = new Bundle();
@@ -200,6 +207,7 @@ public class PrintDialogActivity extends Activity {
                     }
                 } else {
                     tvPrintTip.setVisibility(View.GONE);
+                    btnOpenBluetooth.setVisibility(View.GONE);
                     btnAgainConnectPrint.setVisibility(View.GONE);
                     btnReConnectPrint.setVisibility(View.GONE);
                     tvPrintCode.setVisibility(View.GONE);
@@ -284,30 +292,14 @@ public class PrintDialogActivity extends Activity {
                     // 判断是否配对过
                     final RadioGroup blueDevItemWrap = (RadioGroup) mPopupWindow.getContentView().findViewById(R.id.blueDevItemWrap);
                     View blueDevItemView = LayoutInflater.from(PrintDialogActivity.this).inflate(R.layout.blue_dev_item, null);
+                    RadioGroup.LayoutParams lp = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+                    blueDevItemView.setLayoutParams(lp);
                     RadioButton rbBlueDev = (RadioButton) blueDevItemView.findViewWithTag("rbBlueDev");
                     rbBlueDev.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            btnConnectPrint.setVisibility(View.GONE);
                             final String curSelectedBlueDeviceAddress = buttonView.getTag(R.id.tag_bluetooth_device_address).toString();
                             SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", curSelectedBlueDeviceAddress);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mPopupWindow.dismiss();
-                                    // 断开当前已连接的蓝牙设备
-                                    for (Map.Entry<String, BluetoothSocket> m : MyApplication.mBluetoothSocketMap.entrySet()) {
-                                        if (m.getValue().isConnected()) {
-                                            try {
-                                                m.getValue().close();
-                                            } catch (IOException e) {
-                                            }
-                                        }
-                                    }
-                                    ConnectRunnable connectRunnable = new ConnectRunnable(curSelectedBlueDeviceAddress);
-                                    new Thread(connectRunnable).start();
-                                }
-                            }, 100);
                         }
                     });
                     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
@@ -318,9 +310,10 @@ public class PrintDialogActivity extends Activity {
                         }
                         String rbTextVal = "";
                         if (ComFun.strNull(device.getName())) {
-                            rbTextVal = "名称：" + device.getName() + "\t\t";
+                            rbTextVal = "设备蓝牙名称：" + device.getName() + "\n";
                         }
-                        rbTextVal += "地址：" + device.getAddress();
+                        rbTextVal += "设备蓝牙地址：" + device.getAddress() + "\n";
+                        rbTextVal += "状态：未配对";
                         rbBlueDev.setText(rbTextVal);
                         rbBlueDev.setTag(R.id.tag_bluetooth_device_address, device.getAddress());
                         blueDevItemWrap.addView(blueDevItemView);
@@ -330,12 +323,14 @@ public class PrintDialogActivity extends Activity {
                         } else {
                             return;
                         }
+                        ((RadioButton) blueDevItemView).setTextColor(Color.parseColor("#FBF481"));
                         // 已配对的设备
                         String rbTextVal = "";
                         if (ComFun.strNull(device.getName())) {
-                            rbTextVal = "名称：" + device.getName() + "\t\t";
+                            rbTextVal = "设备蓝牙名称：" + device.getName() + "\n";
                         }
-                        rbTextVal += "地址：" + device.getAddress();
+                        rbTextVal += "设备蓝牙地址：" + device.getAddress() + "\n";
+                        rbTextVal += "状态：已配对";
                         rbBlueDev.setText(rbTextVal);
                         rbBlueDev.setTag(R.id.tag_bluetooth_device_address, device.getAddress());
                         blueDevItemWrap.addView(blueDevItemView);
@@ -344,17 +339,38 @@ public class PrintDialogActivity extends Activity {
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     // 搜索完成
                     if (mPopupWindow != null) {
-                        ProgressBar pbSearchTip = (ProgressBar) mPopupWindow.getContentView().findViewById(R.id.pbSearchTip);
-                        TextView tvSearchTip = (TextView) mPopupWindow.getContentView().findViewById(R.id.tvSearchTip);
+                        LinearLayout searchTipLayout = (LinearLayout) mPopupWindow.getContentView().findViewById(R.id.searchTipLayout);
+                        LinearLayout noBluetoothLayout = (LinearLayout) mPopupWindow.getContentView().findViewById(R.id.noBluetoothLayout);
+                        ElasticScrollView esvBlueSearchItem = (ElasticScrollView) mPopupWindow.getContentView().findViewById(R.id.esvBlueSearchItem);
+                        Button btnSureThisPrint = (Button) mPopupWindow.getContentView().findViewById(R.id.btnSureThisPrint);
                         Button btnReSearch = (Button) mPopupWindow.getContentView().findViewById(R.id.btnReSearch);
-                        pbSearchTip.setVisibility(View.GONE);
-                        tvSearchTip.setVisibility(View.GONE);
+                        searchTipLayout.setVisibility(View.GONE);
+                        btnSureThisPrint.setVisibility(View.VISIBLE);
+                        if (searchGetBluetoothAddressList.size() == 0) {
+                            esvBlueSearchItem.setVisibility(View.GONE);
+                            noBluetoothLayout.setVisibility(View.VISIBLE);
+                            btnSureThisPrint.setEnabled(false);
+                            btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
+                            btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+                        } else {
+                            esvBlueSearchItem.setVisibility(View.VISIBLE);
+                            noBluetoothLayout.setVisibility(View.GONE);
+                            btnSureThisPrint.setEnabled(true);
+                            btnSureThisPrint.setBackgroundResource(R.drawable.edit_table_btn_style);
+                            btnSureThisPrint.setTextColor(Color.parseColor("#ffecc0"));
+                        }
                         btnReSearch.setVisibility(View.VISIBLE);
                     }
                     break;
             }
         }
     };
+
+    // 打开蓝牙
+    public void openBluetooth(View view) {
+        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(intent, OPEN_BLUETOOTH);
+    }
 
     // 连接新的打票机
     public void reConnectionPrintDevice(View view) {
@@ -368,27 +384,43 @@ public class PrintDialogActivity extends Activity {
 
     // 重试连接
     public void againConnectionPrintDevice(View view) {
-        final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
-        if (ComFun.strNull(connectionDeviceCode)) {
-            tvPrintCode.setText("正在连接中...");
+        if (MyApplication.mBluetoothAdapter != null) {
+            if (MyApplication.mBluetoothAdapter.isEnabled()) {
+                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
+                if (ComFun.strNull(connectionDeviceCode)) {
+                    tvPrintCode.setText("正在连接中...");
 
-            Message mainPageUpdateMenuMsg = new Message();
-            Bundle mainPageUpdateMenuData = new Bundle();
-            mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
-            mainPageUpdateMenuData.putString("status", "正在连接中...");
-            mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
-            MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ConnectRunnable connectRunnable = new ConnectRunnable(connectionDeviceCode);
-                    new Thread(connectRunnable).start();
+                    Message mainPageUpdateMenuMsg = new Message();
+                    Bundle mainPageUpdateMenuData = new Bundle();
+                    mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
+                    mainPageUpdateMenuData.putString("status", "正在连接中...");
+                    mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
+                    MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ConnectRunnable connectRunnable = new ConnectRunnable(connectionDeviceCode);
+                            new Thread(connectRunnable).start();
+                        }
+                    }, 100);
                 }
-            }, 100);
+            } else {
+                btnOpenBluetooth.setVisibility(View.VISIBLE);
+                tvPrintCode.setText("蓝牙未启用，打票机无连接");
+//                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                startActivityForResult(intent, OPEN_BLUETOOTH);
+
+                Message mainPageUpdateMenuMsg = new Message();
+                Bundle mainPageUpdateMenuData = new Bundle();
+                mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
+                mainPageUpdateMenuData.putString("status", "蓝牙未启用");
+                mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
+                MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
+            }
         }
     }
 
-    // 所有蓝牙设备列表并提示用户选择连接打票机
+    // 显示蓝牙设备列表弹层并提示用户选择连接打票机
     private void connectionPrintDev() {
         if (MyApplication.mBluetoothAdapter.isEnabled()) {
             // 开始搜索蓝牙设备
@@ -398,18 +430,69 @@ public class PrintDialogActivity extends Activity {
             MyApplication.mBluetoothAdapter.startDiscovery();
             // 显示蓝牙设备列表popWindow弹层
             final View blueDevListPopView = LayoutInflater.from(PrintDialogActivity.this).inflate(R.layout.blue_dev_list_view, null);
-            RadioGroup blueDevItemWrap = (RadioGroup) blueDevListPopView.findViewById(R.id.blueDevItemWrap);
+            final RadioGroup blueDevItemWrap = (RadioGroup) blueDevListPopView.findViewById(R.id.blueDevItemWrap);
             blueDevItemWrap.removeAllViews();
             searchGetBluetoothAddressList.clear();
-            Button btnReSearch = (Button) blueDevListPopView.findViewById(R.id.btnReSearch);
+            final LinearLayout searchTipLayout = (LinearLayout) blueDevListPopView.findViewById(R.id.searchTipLayout);
+            final LinearLayout noBluetoothLayout = (LinearLayout) blueDevListPopView.findViewById(R.id.noBluetoothLayout);
+            final GifView noBluetoothGif_1 = (GifView) blueDevListPopView.findViewById(R.id.noBluetoothGif_1);
+            noBluetoothGif_1.setGifImage(R.drawable.photo_1);
+            noBluetoothGif_1.setShowDimension(240, 340);
+            noBluetoothGif_1.setGifImageType(GifView.GifImageType.COVER);
+            final GifView noBluetoothGif_2 = (GifView) blueDevListPopView.findViewById(R.id.noBluetoothGif_2);
+            noBluetoothGif_2.setGifImage(R.drawable.photo_2);
+            noBluetoothGif_2.setShowDimension(240, 340);
+            noBluetoothGif_2.setGifImageType(GifView.GifImageType.COVER);
+            final GifView noBluetoothGif_3 = (GifView) blueDevListPopView.findViewById(R.id.noBluetoothGif_3);
+            noBluetoothGif_3.setGifImage(R.drawable.photo_3);
+            noBluetoothGif_3.setShowDimension(240, 340);
+            noBluetoothGif_3.setGifImageType(GifView.GifImageType.COVER);
+            final ElasticScrollView esvBlueSearchItem = (ElasticScrollView) blueDevListPopView.findViewById(R.id.esvBlueSearchItem);
+            final Button btnSureThisPrint = (Button) blueDevListPopView.findViewById(R.id.btnSureThisPrint);
+            final Button btnReSearch = (Button) blueDevListPopView.findViewById(R.id.btnReSearch);
+            searchTipLayout.setVisibility(View.VISIBLE);
+            noBluetoothLayout.setVisibility(View.GONE);
+            esvBlueSearchItem.setVisibility(View.GONE);
+            btnSureThisPrint.setVisibility(View.VISIBLE);
+            btnSureThisPrint.setEnabled(false);
+            btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
+            btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+            btnReSearch.setVisibility(View.GONE);
+            btnSureThisPrint.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int selectedId = blueDevItemWrap.getCheckedRadioButtonId();
+                    if (selectedId != -1) {
+                        String curSelectedBlueDeviceAddress = blueDevItemWrap.findViewById(blueDevItemWrap.getCheckedRadioButtonId()).getTag(R.id.tag_bluetooth_device_address).toString();
+                        btnConnectPrint.setVisibility(View.GONE);
+                        mPopupWindow.dismiss();
+                        // 断开当前已连接的蓝牙设备
+                        for (Map.Entry<String, BluetoothSocket> m : MyApplication.mBluetoothSocketMap.entrySet()) {
+                            if (m.getValue().isConnected()) {
+                                try {
+                                    m.getValue().close();
+                                } catch (IOException e) {
+                                }
+                            }
+                        }
+                        ConnectRunnable connectRunnable = new ConnectRunnable(curSelectedBlueDeviceAddress);
+                        new Thread(connectRunnable).start();
+                    } else {
+                        ComFun.showToast(PrintDialogActivity.this, "请选择连接设备", Toast.LENGTH_SHORT);
+                    }
+                }
+            });
             btnReSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    v.setVisibility(View.GONE);
-                    ProgressBar pbSearchTip = (ProgressBar) blueDevListPopView.findViewById(R.id.pbSearchTip);
-                    TextView tvSearchTip = (TextView) blueDevListPopView.findViewById(R.id.tvSearchTip);
-                    pbSearchTip.setVisibility(View.VISIBLE);
-                    tvSearchTip.setVisibility(View.VISIBLE);
+                    searchTipLayout.setVisibility(View.VISIBLE);
+                    noBluetoothLayout.setVisibility(View.GONE);
+                    esvBlueSearchItem.setVisibility(View.GONE);
+                    btnSureThisPrint.setVisibility(View.VISIBLE);
+                    btnSureThisPrint.setEnabled(false);
+                    btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
+                    btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+                    btnReSearch.setVisibility(View.GONE);
                     RadioGroup blueDevItemWrap = (RadioGroup) blueDevListPopView.findViewById(R.id.blueDevItemWrap);
                     blueDevItemWrap.removeAllViews();
                     searchGetBluetoothAddressList.clear();
@@ -424,7 +507,7 @@ public class PrintDialogActivity extends Activity {
             if (mPopupWindow != null && mPopupWindow.isShowing()) {
                 return;
             }
-            mPopupWindow = new PopupWindow(blueDevListPopView, LinearLayout.LayoutParams.MATCH_PARENT, DisplayUtil.dip2px(PrintDialogActivity.this, 400));
+            mPopupWindow = new PopupWindow(blueDevListPopView, LinearLayout.LayoutParams.MATCH_PARENT, DisplayUtil.dip2px(PrintDialogActivity.this, 320));
             mPopupWindow.setFocusable(true);
             mPopupWindow.setOutsideTouchable(true);
             mPopupWindow.setBackgroundDrawable(new ColorDrawable());
@@ -440,8 +523,17 @@ public class PrintDialogActivity extends Activity {
             mPopupWindow.setAnimationStyle(R.style.popWindow_animation);
             mPopupWindow.showAtLocation(findViewById(R.id.printDialogLayout), Gravity.BOTTOM, 0, 0);
         } else {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(intent, OPEN_BLUETOOTH);
+            btnOpenBluetooth.setVisibility(View.VISIBLE);
+            tvPrintCode.setText("蓝牙未启用，打票机无连接");
+//            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(intent, OPEN_BLUETOOTH);
+
+            Message mainPageUpdateMenuMsg = new Message();
+            Bundle mainPageUpdateMenuData = new Bundle();
+            mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
+            mainPageUpdateMenuData.putString("status", "蓝牙未启用");
+            mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
+            MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
         }
     }
 
@@ -598,7 +690,7 @@ public class PrintDialogActivity extends Activity {
                         }
                     }, 300);
                 } else {
-                    ComFun.showToast(PrintDialogActivity.this, "蓝牙已打开，2秒后将自动开始搜索蓝牙设备列表", Toast.LENGTH_SHORT);
+                    ComFun.showToast(PrintDialogActivity.this, "蓝牙已打开，将自动搜索蓝牙设备", Toast.LENGTH_SHORT);
                     tvPrintCode.setText("未设置相关打票机");
 
                     Message mainPageUpdateMenuMsg = new Message();
@@ -615,7 +707,8 @@ public class PrintDialogActivity extends Activity {
                     }, 2400);
                 }
             } else {
-                ComFun.showToast(PrintDialogActivity.this, "蓝牙未打开，请前往系统设置打开蓝牙功能", Toast.LENGTH_SHORT);
+                btnOpenBluetooth.setVisibility(View.VISIBLE);
+                ComFun.showToast(PrintDialogActivity.this, "蓝牙未打开，无法使用打票机功能", Toast.LENGTH_SHORT);
             }
         }
     }
@@ -636,8 +729,9 @@ public class PrintDialogActivity extends Activity {
                     String loadingTip = b.getString("loadingTip");
                     ComFun.showLoading(PrintDialogActivity.this, loadingTip);
                     tvPrintCode.setText("正在连接中...");
+                    btnOpenBluetooth.setVisibility(View.GONE);
                     btnAgainConnectPrint.setVisibility(View.GONE);
-                    btnReConnectPrint.setVisibility(View.VISIBLE);
+                    btnReConnectPrint.setVisibility(View.GONE);
                     btnConnectPrint.setVisibility(View.GONE);
 //                    tvPrintListening.setVisibility(View.GONE);
 //                    esvOrderWaiter.setVisibility(View.GONE);
@@ -647,10 +741,11 @@ public class PrintDialogActivity extends Activity {
                     String toastTip = b.getString("toastTip");
                     String deviceAddress = b.getString("deviceAddress");
                     boolean connectionFlag = b.getBoolean("connectionFlag");
-                    ComFun.showToast(PrintDialogActivity.this, toastTip, Toast.LENGTH_LONG);
+                    ComFun.showToast(PrintDialogActivity.this, toastTip, Toast.LENGTH_SHORT);
                     ComFun.hideLoading();
                     if (connectionFlag) {
                         tvPrintCode.setText(deviceAddress);
+                        btnOpenBluetooth.setVisibility(View.GONE);
                         btnAgainConnectPrint.setVisibility(View.GONE);
                         btnReConnectPrint.setVisibility(View.VISIBLE);
                         btnConnectPrint.setVisibility(View.GONE);
@@ -660,7 +755,8 @@ public class PrintDialogActivity extends Activity {
                         printingOrderDataLayout.removeAllViews();
                     } else {
                         // 之前保存到蓝牙地址失效，连接失败
-                        tvPrintCode.setText("设备连接失败\n\n\t可能的失败原因：\n\t\t1、正在连接的设备并未开启蓝牙。\n\t\t2、正在连接的设备不在附近。\n\t\t3、正在连接的设备并没有完成配对。\n\n\n您可以：\n选择 再次重试连接 或者 连接新的打票机");
+                        tvPrintCode.setText("设备连接失败\n\n\t可能的失败原因：\n\t\t1、正在连接的设备并未开启蓝牙。\n\t\t2、正在连接的设备不在附近。\n\t\t3、正在连接的设备并没有完成配对。\n\n\n您可以：\n\t\t确保所选设备正确后，尝试 再次重试连接 或者 连接新的打票机");
+                        btnOpenBluetooth.setVisibility(View.GONE);
                         btnAgainConnectPrint.setVisibility(View.VISIBLE);
                         btnReConnectPrint.setVisibility(View.VISIBLE);
                         btnConnectPrint.setVisibility(View.GONE);
@@ -671,7 +767,8 @@ public class PrintDialogActivity extends Activity {
                     break;
                 case MSG_CONNECTION_DIS:
                     ComFun.showToast(PrintDialogActivity.this, "打票机连接已断开", Toast.LENGTH_SHORT);
-                    tvPrintCode.setText("连接已断开\n\n\t可能的断开原因：\n\t\t1、正在连接的设备关闭了蓝牙。\n\t\t2、正在连接的设备不在附近。\n\t\t3、正在连接的设备并没有完成配对。\n\n\n您可以：\n选择 再次重试连接 或者 连接新的打票机");
+                    tvPrintCode.setText("连接已断开\n\n\t可能的断开原因：\n\t\t1、正在连接的设备关闭了蓝牙。\n\t\t2、正在连接的设备不在附近。\n\t\t3、正在连接的设备并没有完成配对。\n\n\n您可以：\n\t\t确保所选设备正确后，尝试 再次重试连接 或者 连接新的打票机");
+                    btnOpenBluetooth.setVisibility(View.GONE);
                     btnAgainConnectPrint.setVisibility(View.VISIBLE);
                     btnReConnectPrint.setVisibility(View.VISIBLE);
                     btnConnectPrint.setVisibility(View.GONE);
