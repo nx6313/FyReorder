@@ -53,16 +53,20 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                     } catch (IOException e) {
                     }
                 } else {
-                    Message printMsg = new Message();
-                    printMsg.what = PrintDialogActivity.MSG_CONNECTION_DIS;
-                    PrintDialogActivity.mHandler.sendMessage(printMsg);
+                    if (PrintDialogActivity.mHandler != null) {
+                        Message printMsg = new Message();
+                        printMsg.what = PrintDialogActivity.MSG_CONNECTION_DIS;
+                        PrintDialogActivity.mHandler.sendMessage(printMsg);
+                    }
 
-                    Message mainPageUpdateMenuMsg = new Message();
-                    Bundle mainPageUpdateMenuData = new Bundle();
-                    mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
-                    mainPageUpdateMenuData.putString("status", "连接断开");
-                    mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
-                    MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
+                    if (MainActivity.mHandler != null) {
+                        Message mainPageUpdateMenuMsg = new Message();
+                        Bundle mainPageUpdateMenuData = new Bundle();
+                        mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
+                        mainPageUpdateMenuData.putString("status", "连接断开");
+                        mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
+                        MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
+                    }
                 }
                 break;
         }
