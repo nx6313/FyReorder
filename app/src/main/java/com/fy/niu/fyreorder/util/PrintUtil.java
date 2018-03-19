@@ -146,7 +146,7 @@ public class PrintUtil {
      * @return
      */
     public static List<String> removeDuplicateWithOrder(List<String> li) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (int i = 0; i < li.size(); i++) {
             String str = li.get(i);  //获取传入集合对象的每一个元素
             if (!list.contains(str)) {   //查看新集合中是否有指定的元素，如果没有则加入
