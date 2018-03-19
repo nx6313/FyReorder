@@ -527,4 +527,25 @@ public class ComFun {
             return JSON_TYPE.JSON_TYPE_ERROR;
         }
     }
+
+    /**
+     * 处理字符串，每隔i个字符，加一个换行符
+     *
+     * @param proName
+     * @param i
+     * @return
+     */
+    public static String autoWordLine(String proName, int i) {
+        String returnStr = "";
+        if (strNull(proName)) {
+            for (int s = 0; s < proName.length(); s++) {
+                if ((s + 1) % i == 0) {
+                    returnStr += proName.charAt(s) + "\n";
+                } else {
+                    returnStr += proName.charAt(s);
+                }
+            }
+        }
+        return returnStr;
+    }
 }

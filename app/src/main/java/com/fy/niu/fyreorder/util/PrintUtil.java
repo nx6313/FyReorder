@@ -19,53 +19,60 @@ public class PrintUtil {
     /**
      * 居左对齐
      */
-    public static final Byte[] toLeft = new Byte[]{0x1B, 0x61, 0x00};
+    public static final byte[] toLeft = new byte[]{0x1B, 0x61, 0x00};
     /**
      * 居中对齐
      */
-    public static final Byte[] toCenter = new Byte[]{0x1B, 0x61, 0x01};
+    public static final byte[] toCenter = new byte[]{0x1B, 0x61, 0x01};
+    /**
+     * 居右对齐
+     */
+    public static final byte[] toRight = new byte[]{0x1B, 0x61, 0x02};
     /**
      * 加大2倍
      */
-    public static final Byte[] toLarge = new Byte[]{0x1D, 0x21, 0x11};
+    public static final byte[] toLarge = new byte[]{0x1D, 0x21, 0x11};
     /**
      * 取消加大
      */
-    public static final Byte[] cancleLarge = new Byte[]{0x1D, 0x21, 0x00};
+    public static final byte[] cancleLarge = new byte[]{0x1D, 0x21, 0x00};
     /**
      * 加粗
      */
-    public static final Byte[] toLarge2 = new Byte[]{0x1B, 0x45, 0x01};
+    public static final byte[] toLarge2 = new byte[]{0x1B, 0x45, 0x01};
     /**
      * 取消加粗
      */
-    public static final Byte[] cancleLarge2 = new Byte[]{0x1B, 0x45, 0x00};
+    public static final byte[] cancleLarge2 = new byte[]{0x1B, 0x45, 0x00};
     /**
      * 加载走纸命令
      */
-    public static final Byte[] cut = new Byte[]{0x1D, 0x56, 0x42, 0x00};// 切纸并且走纸
-
+    public static final byte[] cut = new byte[]{0x1B, 0x64, 0x03};
+    /**
+     * 加载走纸命令
+     */
+    public static final byte[] cut2 = new byte[]{0x1B, 0x64, 0x01};
 
     /**
      * 设置模型
      */
-    public static final Byte[] setCodeModel = new Byte[]{0x1D, 0x28, 0x6B, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00};
+    public static final byte[] setCodeModel = new byte[]{0x1D, 0x28, 0x6B, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00};
     /**
      * 设置单元格大小
      */
-    public static final Byte[] setCodeSize = new Byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x43, 0x09};
+    public static final byte[] setCodeSize = new byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x43, 0x09};
     /**
      * 设置纠错正等级
      */
-    public static final Byte[] setCodeLevel = new Byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x45, 0x30};
+    public static final byte[] setCodeLevel = new byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x45, 0x30};
     /**
      * 加载二维码
      */
-    public static Byte[] setCode = new Byte[8];
+    public static byte[] setCode = new byte[8];
     /**
      * 打印二维码
      */
-    public static final Byte[] printCode = new Byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x51, 0x30};
+    public static final byte[] printCode = new byte[]{0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x51, 0x30};
 
     /**
      * 设置加载二维码指令

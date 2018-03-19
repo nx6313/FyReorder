@@ -295,13 +295,6 @@ public class PrintDialogActivity extends Activity {
                     RadioGroup.LayoutParams lp = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
                     blueDevItemView.setLayoutParams(lp);
                     RadioButton rbBlueDev = (RadioButton) blueDevItemView.findViewWithTag("rbBlueDev");
-                    rbBlueDev.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            final String curSelectedBlueDeviceAddress = buttonView.getTag(R.id.tag_bluetooth_device_address).toString();
-                            SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", curSelectedBlueDeviceAddress);
-                        }
-                    });
                     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
                         if (!searchGetBluetoothAddressList.contains(device.getAddress())) {
                             searchGetBluetoothAddressList.add(device.getAddress());
@@ -464,6 +457,7 @@ public class PrintDialogActivity extends Activity {
                     int selectedId = blueDevItemWrap.getCheckedRadioButtonId();
                     if (selectedId != -1) {
                         String curSelectedBlueDeviceAddress = blueDevItemWrap.findViewById(blueDevItemWrap.getCheckedRadioButtonId()).getTag(R.id.tag_bluetooth_device_address).toString();
+                        SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", curSelectedBlueDeviceAddress);
                         btnConnectPrint.setVisibility(View.GONE);
                         mPopupWindow.dismiss();
                         // 断开当前已连接的蓝牙设备
