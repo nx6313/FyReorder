@@ -262,6 +262,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initPrintSet() {
+        MenuItem navMenuItemPrintOrder = navigationView.getMenu().findItem(R.id.nav_print_order);
         Boolean printIsOpenInSave = SharedPreferencesTool.getBooleanFromShared(this.getApplicationContext(), "systemSet", "printIsOpen");
         if (printIsOpenInSave) {
             MyApplication.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -275,22 +276,28 @@ public class MainActivity extends AppCompatActivity
                                 return;
                             }
                         }
+                        navMenuItemPrintOrder.setTitle("打印订单小票『 正在连接中... 』");
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode);
+                                PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode, false);
                                 new Thread(connectRunnable).start();
                             }
                         }, 200);
                     } else {
-                        ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启，请开启后", Toast.LENGTH_LONG);
+                        navMenuItemPrintOrder.setTitle("打印订单小票『 蓝牙未启用 』");
+                        ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启，请开启后到 操作选项 中设置", Toast.LENGTH_LONG);
                     }
                 } else {
+                    navMenuItemPrintOrder.setTitle("打印订单小票『 未设置 』");
                     ComFun.showToast(this.getApplicationContext(), "您的打票机功能已开启但并未进行设置，请到 操作选项 中设置", Toast.LENGTH_LONG);
                 }
             } else {
+                navMenuItemPrintOrder.setTitle("打印订单小票『 不支持蓝牙 』");
                 ComFun.showToast(this.getApplicationContext(), "对不起，您的设备不支持蓝牙", Toast.LENGTH_SHORT);
             }
+        } else {
+            navMenuItemPrintOrder.setTitle("打印订单小票『 未开启 』");
         }
     }
 
@@ -723,7 +730,7 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         toPrintDialogActivity();
                     }
-                }, 400);
+                }, 300);
                 break;
             case R.id.nav_update:
                 drawer.closeDrawer(GravityCompat.START);

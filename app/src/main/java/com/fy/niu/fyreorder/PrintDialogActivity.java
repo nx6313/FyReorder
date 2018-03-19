@@ -229,65 +229,6 @@ public class PrintDialogActivity extends Activity {
         if (printIsOpenInSave) {
             if (MyApplication.mBluetoothAdapter != null) {
                 cbPrint.setChecked(true);
-                // 注册蓝牙监听
-                PrintDialogActivity.this.registerReceiver(mReceiver, makeFilter());
-                tvPrintTip.setVisibility(View.VISIBLE);
-                tvPrintCode.setVisibility(View.VISIBLE);
-                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
-                if (ComFun.strNull(connectionDeviceCode)) {
-                    if (MyApplication.mBluetoothAdapter.isEnabled()) {
-                        BluetoothSocket curBluetoothSocket = MyApplication.mBluetoothSocketMap.get(connectionDeviceCode);
-                        if (ComFun.strNull(curBluetoothSocket)) {
-                            if (curBluetoothSocket.isConnected()) {
-                                tvPrintCode.setText(connectionDeviceCode);
-                                btnAgainConnectPrint.setVisibility(View.GONE);
-                                btnReConnectPrint.setVisibility(View.VISIBLE);
-                                btnConnectPrint.setVisibility(View.GONE);
-//                                tvPrintListening.setVisibility(View.VISIBLE);
-//                                esvOrderWaiter.setVisibility(View.VISIBLE);
-                                printingOrderDataLayout.setVisibility(View.VISIBLE);
-                                printingOrderDataLayout.removeAllViews();
-                                return;
-                            }
-                        }
-                        tvPrintCode.setText("正在连接中...");
-
-                        Message mainPageUpdateMenuMsg = new Message();
-                        Bundle mainPageUpdateMenuData = new Bundle();
-                        mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
-                        mainPageUpdateMenuData.putString("status", "正在连接中...");
-                        mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
-                        MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                ConnectRunnable connectRunnable = new ConnectRunnable(connectionDeviceCode);
-                                new Thread(connectRunnable).start();
-                            }
-                        }, 200);
-                    } else {
-                        tvPrintCode.setText("蓝牙未启用，打票机无连接");
-                        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(intent, OPEN_BLUETOOTH);
-
-                        Message mainPageUpdateMenuMsg = new Message();
-                        Bundle mainPageUpdateMenuData = new Bundle();
-                        mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
-                        mainPageUpdateMenuData.putString("status", "蓝牙未启用");
-                        mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
-                        MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
-                    }
-                } else {
-                    tvPrintCode.setText("无打票机连接");
-                    btnConnectPrint.setVisibility(View.VISIBLE);
-
-                    Message mainPageUpdateMenuMsg = new Message();
-                    Bundle mainPageUpdateMenuData = new Bundle();
-                    mainPageUpdateMenuMsg.what = MainActivity.MSG_UPDATE_PRINT_MENU_STATE;
-                    mainPageUpdateMenuData.putString("status", "未设置");
-                    mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
-                    MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
-                }
             } else {
                 ComFun.showToast(PrintDialogActivity.this, "对不起，您的设备不支持蓝牙", Toast.LENGTH_SHORT);
 
@@ -505,6 +446,7 @@ public class PrintDialogActivity extends Activity {
     }
 
     public static class ConnectRunnable implements Runnable {
+        private boolean needShowLoading = true;
         private String SerialPortServiceClass_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // 蓝牙串口号
         private String LANAccessUsingPPPServiceClass_UUID = "00001102-0000-1000-8000-00805F9B34FB"; //
 
@@ -528,6 +470,21 @@ public class PrintDialogActivity extends Activity {
             mmSocket = tmp;
         }
 
+        public ConnectRunnable(String blueDeviceAddress, boolean showLoadFlag) {
+            needShowLoading = showLoadFlag;
+            deviceAddress = blueDeviceAddress;
+            BluetoothSocket tmp = null;
+            //赋值给设备
+            mmDevice = MyApplication.mBluetoothAdapter.getRemoteDevice(deviceAddress);
+            try {
+                //根据UUID创建并返回一个BluetoothSocket
+                tmp = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(SerialPortServiceClass_UUID));
+            } catch (IOException e) {
+            }
+            //赋值给BluetoothSocket
+            mmSocket = tmp;
+        }
+
         @Override
         public void run() {
             Message mainPageUpdateMenuMsg = new Message();
@@ -537,7 +494,7 @@ public class PrintDialogActivity extends Activity {
             mainPageUpdateMenuMsg.setData(mainPageUpdateMenuData);
             MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
 
-            if (mHandler != null) {
+            if (needShowLoading && mHandler != null) {
                 // 发送连接蓝牙 Handler
                 Message msg = new Message();
                 Bundle data = new Bundle();
@@ -690,7 +647,7 @@ public class PrintDialogActivity extends Activity {
                     String toastTip = b.getString("toastTip");
                     String deviceAddress = b.getString("deviceAddress");
                     boolean connectionFlag = b.getBoolean("connectionFlag");
-                    ComFun.showToast(PrintDialogActivity.this, toastTip, Toast.LENGTH_SHORT);
+                    ComFun.showToast(PrintDialogActivity.this, toastTip, Toast.LENGTH_LONG);
                     ComFun.hideLoading();
                     if (connectionFlag) {
                         tvPrintCode.setText(deviceAddress);
