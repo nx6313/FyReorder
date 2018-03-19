@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.jpush.android.api.JPushInterface;
+
 public class FyBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "FyBReceiver";
     public static final String ACTION_WRITE_TO_BLUE_DEVICE = "fyOrder:action_write_to_blue_device";
@@ -31,16 +33,22 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
         }
         Log.d(TAG + " 收到广播", intent.getAction() + " -> " + keyValueStr);
         switch (intent.getAction()) {
-            case "cn.jpush.android.intent.NOTIFICATION_RECEIVED":
-                String connectionDeviceCode = SharedPreferencesTool.getFromShared(context, "systemSet", "connectionDeviceCode", "");
-                Intent printDataIntent = new Intent();
-                printDataIntent.putExtra("printDeviceAddress", connectionDeviceCode);
-                printDataIntent.putExtra("title", "赋渔接单测试页");
-                printDataIntent.setAction(FyBroadcastReceiver.ACTION_WRITE_TO_BLUE_DEVICE);
-                context.sendBroadcast(printDataIntent);
+            case JPushInterface.ACTION_MESSAGE_RECEIVED:
+                String orderPrintData = bundle.getString(JPushInterface.EXTRA_EXTRA);
+
+                Intent messagePrintDataIntent = new Intent();
+                messagePrintDataIntent.putExtra("title", "赋渔接单测试页");
+                messagePrintDataIntent.setAction(FyBroadcastReceiver.ACTION_WRITE_TO_BLUE_DEVICE);
+                context.sendBroadcast(messagePrintDataIntent);
+                break;
+            case JPushInterface.ACTION_NOTIFICATION_RECEIVED:
+                Intent notificationPrintDataIntent = new Intent();
+                notificationPrintDataIntent.putExtra("title", "赋渔接单测试页");
+                notificationPrintDataIntent.setAction(FyBroadcastReceiver.ACTION_WRITE_TO_BLUE_DEVICE);
+                context.sendBroadcast(notificationPrintDataIntent);
                 break;
             case ACTION_WRITE_TO_BLUE_DEVICE:
-                String printDeviceAddress = bundle.getString("printDeviceAddress");
+                String printDeviceAddress = SharedPreferencesTool.getFromShared(context, "systemSet", "connectionDeviceCode", "");
                 String print_title = bundle.getString("title");
                 List<byte[]> dataByteList = anayWriteDataList(print_title);
                 BluetoothSocket printDeviceBluetoothSocket = MyApplication.mBluetoothSocketMap.get(printDeviceAddress);
