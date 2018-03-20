@@ -140,6 +140,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             @Override
                             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                roomAdapterList.clear();
                                 if (!s.toString().trim().equals("")) {
                                     // 获取近似项
                                     List<School> schools = getNearSchoolList(s.toString().trim());
@@ -205,7 +206,6 @@ public class RegisterActivity extends AppCompatActivity {
                                                 String curStr = etUserDorm.getText().toString().trim();
                                                 if (userDormId == null) {
                                                     etUserDorm.setText("");
-                                                    roomAdapterList.clear();
                                                 } else {
                                                     if (!curStr.equals("") && !curStr.equals(userDorm)) {
                                                         etUserDorm.setText(userDorm);
