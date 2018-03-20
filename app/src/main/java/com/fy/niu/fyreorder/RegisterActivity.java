@@ -1,14 +1,11 @@
 package com.fy.niu.fyreorder;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ListPopupWindow;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +32,6 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
-import com.fy.niu.fyreorder.util.DisplayUtil;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
 
 import org.json.JSONArray;
 import org.json.JSONException;

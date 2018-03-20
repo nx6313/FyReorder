@@ -25,7 +25,7 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -104,7 +104,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
     private void initData(final boolean isRefFlag) {
         MainOrderFragment.setCurrentPageIndex(1, "complete");
         ComFun.showLoading(CompleteOrderActivity.this, "加载数据中，请稍后");
-        final String userId = SharedPreferencesTool.getFromShared(CompleteOrderActivity.this, "fyLoginUserInfo", "userId");
+        final String userId = UserDataUtil.getUserId(CompleteOrderActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         params.put("pageIndex", "1");
@@ -139,7 +139,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(OkHttpException okHttpE) {
-                if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                     ComFun.showToast(CompleteOrderActivity.this, "获取已完成订单数据超时", Toast.LENGTH_SHORT);
                 } else {
                     ComFun.showToast(CompleteOrderActivity.this, "获取已完成订单数据异常", Toast.LENGTH_SHORT);
@@ -222,7 +222,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
                 case MSG_GET_NEW_PAGE_DATA:
                     final int currentPageIndex = intent.getIntExtra("currentPageIndex", 1);
                     ComFun.showLoading(CompleteOrderActivity.this, "加载数据中，请稍后");
-                    final String userId = SharedPreferencesTool.getFromShared(CompleteOrderActivity.this, "fyLoginUserInfo", "userId");
+                    final String userId = UserDataUtil.getUserId(CompleteOrderActivity.this);
                     RequestParams params = new RequestParams();
                     params.put("userId", userId);
                     params.put("pageIndex", String.valueOf(currentPageIndex));
@@ -253,7 +253,7 @@ public class CompleteOrderActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(OkHttpException okHttpE) {
-                            if(okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
+                            if (okHttpE.getEcode() == Constants.HTTP_OUT_TIME_ERROR) {
                                 ComFun.showToast(CompleteOrderActivity.this, "获取数据超时，请稍后重试", Toast.LENGTH_SHORT);
                             } else {
                                 ComFun.showToast(CompleteOrderActivity.this, "获取数据异常，请稍后重试", Toast.LENGTH_SHORT);

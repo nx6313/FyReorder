@@ -20,7 +20,7 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +60,7 @@ public class OrderActivity extends AppCompatActivity {
 
         setupActionBar();
 
-        userType = SharedPreferencesTool.getFromShared(OrderActivity.this, "fyLoginUserInfo", "ifGive");
+        userType = UserDataUtil.getDataByKey(OrderActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
 
         initView();
         initDatas();
@@ -142,7 +142,7 @@ public class OrderActivity extends AppCompatActivity {
     private void initDatas() {
         // 请求数据库获取数据
         ComFun.showLoading(OrderActivity.this, "正在获取数据，请稍后");
-        final String userId = SharedPreferencesTool.getFromShared(OrderActivity.this, "fyLoginUserInfo", "userId");
+        final String userId = UserDataUtil.getUserId(OrderActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         ConnectorInventory.getOrderNumChargeByday(OrderActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {

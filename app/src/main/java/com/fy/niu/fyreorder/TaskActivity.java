@@ -27,7 +27,7 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,7 +124,7 @@ public class TaskActivity extends AppCompatActivity {
 
     private void initDatas(final boolean isRefFlag) {
         ComFun.showLoading(TaskActivity.this, "正在获取任务列表，请稍后");
-        String userId = SharedPreferencesTool.getFromShared(TaskActivity.this, "fyLoginUserInfo", "userId");
+        String userId = UserDataUtil.getUserId(TaskActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         ConnectorInventory.getTaskList(TaskActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -266,7 +266,7 @@ public class TaskActivity extends AppCompatActivity {
                     break;
                 case MSG_GET_TASK:
                     ComFun.showLoading(TaskActivity.this, "正在领取任务，请稍后");
-                    String userId = SharedPreferencesTool.getFromShared(TaskActivity.this, "fyLoginUserInfo", "userId");
+                    String userId = UserDataUtil.getUserId(TaskActivity.this);
                     String taskId = b.getString("taskId");
                     RequestParams params = new RequestParams();
                     params.put("id", taskId);

@@ -9,10 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fy.niu.fyreorder.OrderActivity;
 import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.util.SerializableObjectList;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -31,7 +30,7 @@ public class HasOrderFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        String userType = SharedPreferencesTool.getFromShared(getActivity(), "fyLoginUserInfo", "ifGive");
+        String userType = UserDataUtil.getDataByKey(getActivity(), UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
         Bundle bundle = getArguments();
         if(bundle != null){
             hasOrderDataType = bundle.getString(BUNDLE_DATA_TYPE);

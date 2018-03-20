@@ -24,7 +24,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -36,7 +35,7 @@ import com.fy.niu.fyreorder.customView.ElasticScrollView;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.MyApplication;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,14 +128,14 @@ public class PrintDialogActivity extends Activity {
         cbPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "printIsOpen", isChecked);
+                UserDataUtil.saveUserData(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_printIsOpen, isChecked);
                 if (isChecked) {
                     if (MyApplication.mBluetoothAdapter != null) {
                         // 注册蓝牙监听
                         PrintDialogActivity.this.registerReceiver(mReceiver, makeFilter());
                         tvPrintTip.setVisibility(View.VISIBLE);
                         tvPrintCode.setVisibility(View.VISIBLE);
-                        final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
+                        final String connectionDeviceCode = UserDataUtil.getDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                         if (ComFun.strNull(connectionDeviceCode)) {
                             if (MyApplication.mBluetoothAdapter.isEnabled()) {
                                 BluetoothSocket curBluetoothSocket = MyApplication.mBluetoothSocketMap.get(connectionDeviceCode);
@@ -195,7 +194,7 @@ public class PrintDialogActivity extends Activity {
                         }
                     } else {
                         cbPrint.setChecked(false);
-                        SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "printIsOpen", false);
+                        UserDataUtil.saveUserData(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_printIsOpen, false);
                         ComFun.showToast(PrintDialogActivity.this, "对不起，您的设备不支持蓝牙", Toast.LENGTH_SHORT);
 
                         Message mainPageUpdateMenuMsg = new Message();
@@ -233,7 +232,7 @@ public class PrintDialogActivity extends Activity {
             }
         });
 
-        Boolean printIsOpenInSave = SharedPreferencesTool.getBooleanFromShared(PrintDialogActivity.this, "systemSet", "printIsOpen");
+        Boolean printIsOpenInSave = UserDataUtil.getBooleanDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_printIsOpen);
         if (printIsOpenInSave) {
             if (MyApplication.mBluetoothAdapter != null) {
                 cbPrint.setChecked(true);
@@ -379,7 +378,7 @@ public class PrintDialogActivity extends Activity {
     public void againConnectionPrintDevice(View view) {
         if (MyApplication.mBluetoothAdapter != null) {
             if (MyApplication.mBluetoothAdapter.isEnabled()) {
-                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
+                final String connectionDeviceCode = UserDataUtil.getDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                 if (ComFun.strNull(connectionDeviceCode)) {
                     tvPrintCode.setText("正在连接中...");
 
@@ -457,7 +456,7 @@ public class PrintDialogActivity extends Activity {
                     int selectedId = blueDevItemWrap.getCheckedRadioButtonId();
                     if (selectedId != -1) {
                         String curSelectedBlueDeviceAddress = blueDevItemWrap.findViewById(blueDevItemWrap.getCheckedRadioButtonId()).getTag(R.id.tag_bluetooth_device_address).toString();
-                        SharedPreferencesTool.addOrUpdate(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", curSelectedBlueDeviceAddress);
+                        UserDataUtil.saveUserData(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode, curSelectedBlueDeviceAddress);
                         btnConnectPrint.setVisibility(View.GONE);
                         mPopupWindow.dismiss();
                         // 断开当前已连接的蓝牙设备
@@ -665,7 +664,7 @@ public class PrintDialogActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OPEN_BLUETOOTH) {
             if (resultCode == -1) {
-                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(PrintDialogActivity.this, "systemSet", "connectionDeviceCode", "");
+                final String connectionDeviceCode = UserDataUtil.getDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                 if (ComFun.strNull(connectionDeviceCode)) {
                     ComFun.showToast(PrintDialogActivity.this, "蓝牙已打开", Toast.LENGTH_SHORT);
                     tvPrintCode.setText("正在连接中...");

@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -17,7 +16,7 @@ import android.widget.TextView;
 import com.fy.niu.fyreorder.fragment.GuideFragment;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.Constants;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +53,11 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         welcomeToAppMain = (TextView) findViewById(R.id.welcomeToAppMain);
         welcomeToAppMain.setVisibility(View.GONE);
 
-        String loginUserId = SharedPreferencesTool.getFromShared(WelcomeActivity.this, "fyLoginUserInfo", "userId");
+        String loginUserId = UserDataUtil.getUserId(WelcomeActivity.this);
         JPushInterface.init(WelcomeActivity.this);
         if (ComFun.strNull(loginUserId)) {
             // 已打开过，直接进入程序
-            boolean needLogin = SharedPreferencesTool.getBooleanFromShared(WelcomeActivity.this, "fyLoginUserInfo", "needLogin");
+            boolean needLogin = UserDataUtil.getBooleanDataByKey(WelcomeActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_needLogin);
             if (needLogin) {
                 toPageType = "toLogin";
                 JPushInterface.deleteAlias(WelcomeActivity.this, Constants.JPUSH_SEQUENCE);

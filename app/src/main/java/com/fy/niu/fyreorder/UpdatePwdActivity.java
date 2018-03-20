@@ -17,7 +17,7 @@ import com.fy.niu.fyreorder.okHttpUtil.listener.DisposeDataListener;
 import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,7 +75,7 @@ public class UpdatePwdActivity extends AppCompatActivity {
         if(ComFun.strNull(oldPwd.trim()) && ComFun.strNull(newPwd.trim()) && ComFun.strNull(reNewPwd.trim())){
             if(newPwd.trim().equals(reNewPwd.trim())){
                 ComFun.showLoading(UpdatePwdActivity.this, "正在处理，请稍后");
-                String userId = SharedPreferencesTool.getFromShared(UpdatePwdActivity.this, "fyLoginUserInfo", "userId");
+                String userId = UserDataUtil.getUserId(UpdatePwdActivity.this);
                 RequestParams params = new RequestParams();
                 params.put("userId", userId);
                 params.put("passOld", oldPwd.trim());
@@ -94,7 +94,7 @@ public class UpdatePwdActivity extends AppCompatActivity {
                             if(code.equals("ajaxSuccess")){
                                 ComFun.showToast(UpdatePwdActivity.this, "修改密码成功，请重新登录", Toast.LENGTH_SHORT);
                                 // 跳转到登录页面
-                                SharedPreferencesTool.addOrUpdate(UpdatePwdActivity.this, "fyLoginUserInfo", "needLogin", true);
+                                UserDataUtil.saveUserData(UpdatePwdActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_needLogin, true);
                                 // 清空后退栈
                                 ComFun.clearAllActiveActivity();
                                 Intent loginIntent = new Intent(UpdatePwdActivity.this, LoginActivity.class);

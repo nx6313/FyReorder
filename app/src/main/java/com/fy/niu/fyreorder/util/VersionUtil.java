@@ -56,7 +56,7 @@ public class VersionUtil {
             alertDialogWrap = ComFun.showLoading(activity, null, true, true);
         }
         // 创建网络请求，进行版本更新数据拿取
-        final String userId = SharedPreferencesTool.getFromShared(activity, "fyLoginUserInfo", "userId");
+        final String userId = UserDataUtil.getUserId(activity);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         Call call = ConnectorInventory.getNewAppVersion(activity, params, new DisposeDataHandle(new DisposeDataListener() {

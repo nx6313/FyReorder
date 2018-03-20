@@ -29,7 +29,7 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,14 +102,14 @@ public class LoginActivity extends AppCompatActivity {
                                 if(data.get("result").equals("success")){
                                     JPushInterface.setAlias(LoginActivity.this, Constants.JPUSH_SEQUENCE, data.getString("userId"));
                                     // 保存登录用户信息
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userId", data.getString("userId"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginName", tvLoginName.getText().toString().trim());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "userLoginPass", tvLoginPwd.getText().toString().trim());
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifGive", data.getString("ifGive"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "ifOpen", data.getString("ifOpen"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floor", data.getString("floor"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "floorName", data.getString("floorName"));
-                                    SharedPreferencesTool.addOrUpdate(LoginActivity.this, "fyLoginUserInfo", "needLogin", false);
+                                    UserDataUtil.setUserId(LoginActivity.this, data.getString(UserDataUtil.key_userId));
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_userLoginName, tvLoginName.getText().toString().trim());
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_userLoginPass, tvLoginPwd.getText().toString().trim());
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive, data.getString("ifGive"));
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifOpen, data.getString("ifOpen"));
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floor, data.getString("floor"));
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floorName, data.getString("floorName"));
+                                    UserDataUtil.saveUserData(LoginActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_needLogin, false);
                                     ComFun.showToast(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT);
                                     mLoginHandler = new Handler();
                                     mLoginTesk = new LoginTask();

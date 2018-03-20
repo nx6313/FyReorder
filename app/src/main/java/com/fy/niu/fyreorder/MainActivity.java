@@ -24,13 +24,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,10 +47,8 @@ import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
-import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.MyApplication;
-import com.fy.niu.fyreorder.util.MyTagHandler;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 import com.fy.niu.fyreorder.util.VersionUtil;
 
 import org.json.JSONArray;
@@ -130,8 +126,8 @@ public class MainActivity extends AppCompatActivity
         // 用户静默登录
         boolean needSilentLogin = getIntent().getBooleanExtra("needSilentLogin", false);
         if (needSilentLogin) {
-            String userAccountNum = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userLoginName");
-            String userAccountPass = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userLoginPass");
+            String userAccountNum = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_userLoginName);
+            String userAccountPass = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_userLoginPass);
             userSilentLogin(userAccountNum, userAccountPass);
         } else {
             initUserData();
@@ -193,7 +189,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initUserData() {
-        String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+        String userId = UserDataUtil.getUserId(MainActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         ConnectorInventory.getUserInfo(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
@@ -263,11 +259,11 @@ public class MainActivity extends AppCompatActivity
 
     private void initPrintSet() {
         MenuItem navMenuItemPrintOrder = navigationView.getMenu().findItem(R.id.nav_print_order);
-        Boolean printIsOpenInSave = SharedPreferencesTool.getBooleanFromShared(this.getApplicationContext(), "systemSet", "printIsOpen");
+        Boolean printIsOpenInSave = UserDataUtil.getBooleanDataByKey(this.getApplicationContext(), UserDataUtil.fySet, UserDataUtil.key_printIsOpen);
         if (printIsOpenInSave) {
             MyApplication.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (MyApplication.mBluetoothAdapter != null) {
-                final String connectionDeviceCode = SharedPreferencesTool.getFromShared(this.getApplicationContext(), "systemSet", "connectionDeviceCode", "");
+                final String connectionDeviceCode = UserDataUtil.getDataByKey(this.getApplicationContext(), UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                 if (ComFun.strNull(connectionDeviceCode)) {
                     if (MyApplication.mBluetoothAdapter.isEnabled()) {
                         BluetoothSocket curBluetoothSocket = MyApplication.mBluetoothSocketMap.get(connectionDeviceCode);
@@ -330,13 +326,13 @@ public class MainActivity extends AppCompatActivity
         MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
         navMenuItemLogginOut.setVisible(false);
 
-        String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
-        String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
+        String ifGive = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
+        String floorName = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floorName);
         MenuItem navMenuItemPayImg = navigationView.getMenu().findItem(R.id.nav_pay_img);
         MenuItem navMenuItemSelectSelfFloor = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
         MenuItem navMenuItemPrintOrder = navigationView.getMenu().findItem(R.id.nav_print_order);
-        String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+        String receiveSelfFloor = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fySet, UserDataUtil.key_receiveSelfFloor);
         if (ifGive.equals("3")) {
             toolbarDbsyTv.setVisibility(View.VISIBLE);
         } else {
@@ -365,7 +361,7 @@ public class MainActivity extends AppCompatActivity
             navMenuItemOpenGive.setVisible(false);
         }
 
-        String ifOpen = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifOpen");
+        String ifOpen = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifOpen);
         if (ifOpen.equals("1")) {
             navMenuItemOpenGive.setTitleCondensed("true");
             if (ifGive.equals("0")) {
@@ -416,10 +412,10 @@ public class MainActivity extends AppCompatActivity
 
         // 请求数据库获取数据
         ComFun.showLoading(MainActivity.this, "正在获取订单列表，请稍后");
-        final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
-        String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
-        String floor = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floor");
-        String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+        final String userId = UserDataUtil.getUserId(MainActivity.this);
+        String ifGive = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
+        String floor = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floor);
+        String receiveSelfFloor = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fySet, UserDataUtil.key_receiveSelfFloor);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {
@@ -847,7 +843,7 @@ public class MainActivity extends AppCompatActivity
         // 解除JPush绑定
         JPushInterface.stopPush(MainActivity.this);
         // 重置登录状态
-        SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "needLogin", true);
+        UserDataUtil.saveUserData(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_needLogin, true);
         // 清空后退栈
         ComFun.clearAllActiveActivity();
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
@@ -859,10 +855,10 @@ public class MainActivity extends AppCompatActivity
      */
     public void toUserIfOpen() {
         final MenuItem navMenuItemOpenGive = navigationView.getMenu().findItem(R.id.nav_open_give);
-        final String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
+        final String ifGive = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
         final String ifOpenFlag = navMenuItemOpenGive.getTitleCondensed().toString();
         ComFun.showLoading(MainActivity.this, "正在处理，请稍后");
-        final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+        final String userId = UserDataUtil.getUserId(MainActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         if (ifOpenFlag.equals("true")) {
@@ -879,7 +875,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(Object responseObj) {
                 if (ifOpenFlag.equals("true")) {
-                    SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "0");
+                    UserDataUtil.saveUserData(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifOpen, "0");
                     navMenuItemOpenGive.setTitleCondensed("false");
                     if (ifGive.equals("0")) {
                         navMenuItemOpenGive.setTitle("点击开始接单");
@@ -889,7 +885,7 @@ public class MainActivity extends AppCompatActivity
                         ComFun.showToast(MainActivity.this, "成功暂停营业啦", Toast.LENGTH_SHORT);
                     }
                 } else {
-                    SharedPreferencesTool.addOrUpdate(MainActivity.this, "fyLoginUserInfo", "ifOpen", "1");
+                    UserDataUtil.saveUserData(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifOpen, "1");
                     navMenuItemOpenGive.setTitleCondensed("true");
                     if (ifGive.equals("0")) {
                         navMenuItemOpenGive.setTitle("当前正在听单，点击停止");
@@ -916,16 +912,16 @@ public class MainActivity extends AppCompatActivity
      * 切换接单楼层
      */
     public void toFloorChange() {
-        String floorName = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floorName");
+        String floorName = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floorName);
         MenuItem navMenuItemFlooeChange = navigationView.getMenu().findItem(R.id.nav_select_self_floor);
         String ifFloorChange = navMenuItemFlooeChange.getTitleCondensed().toString();
         if (ifFloorChange.equals("all")) {
-            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "self");
+            UserDataUtil.saveUserData(MainActivity.this, UserDataUtil.fySet, UserDataUtil.key_receiveSelfFloor, "self");
             navMenuItemFlooeChange.setTitleCondensed("self");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：" + floorName + " 』");
             ComFun.showToast(MainActivity.this, "楼层已切换为：" + floorName, Toast.LENGTH_SHORT);
         } else {
-            SharedPreferencesTool.addOrUpdate(MainActivity.this, "fySet", "receiveSelfFloor", "all");
+            UserDataUtil.saveUserData(MainActivity.this, UserDataUtil.fySet, UserDataUtil.key_receiveSelfFloor, "all");
             navMenuItemFlooeChange.setTitleCondensed("all");
             navMenuItemFlooeChange.setTitle("楼层切换『 当前为：所有 』");
             ComFun.showToast(MainActivity.this, "楼层已切换为：所有", Toast.LENGTH_SHORT);
@@ -1035,7 +1031,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
         if (orderCode == null || (orderCode != null && !orderCode.equals("unCode"))) {
-            final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
+            final String userId = UserDataUtil.getUserId(MainActivity.this);
             RequestParams params = new RequestParams();
             params.put("userId", userId);
             params.put("orderId", orderId);
@@ -1094,10 +1090,10 @@ public class MainActivity extends AppCompatActivity
                 case MSG_GET_NEW_PAGE_DATA:
                     final int currentPageIndex = intent.getIntExtra("currentPageIndex", 1);
                     ComFun.showLoading(MainActivity.this, "加载数据中，请稍后");
-                    final String userId = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "userId");
-                    String ifGive = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "ifGive");
-                    String floor = SharedPreferencesTool.getFromShared(MainActivity.this, "fyLoginUserInfo", "floor");
-                    String receiveSelfFloor = SharedPreferencesTool.getFromShared(MainActivity.this, "fySet", "receiveSelfFloor");
+                    final String userId = UserDataUtil.getUserId(MainActivity.this);
+                    String ifGive = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
+                    String floor = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_floor);
+                    String receiveSelfFloor = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fySet, UserDataUtil.key_receiveSelfFloor);
                     RequestParams params = new RequestParams();
                     params.put("userId", userId);
                     if (ifGive.equals("0") && receiveSelfFloor.equals("self")) {

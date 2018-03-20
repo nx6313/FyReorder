@@ -20,7 +20,7 @@ import com.fy.niu.fyreorder.okHttpUtil.request.RequestParams;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.ConnectorInventory;
 import com.fy.niu.fyreorder.util.Constants;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -91,7 +91,7 @@ public class DbsyActivity extends AppCompatActivity {
 
     private void initData(final boolean isRefFlag) {
         ComFun.showLoading(DbsyActivity.this, "加载数据中，请稍后");
-        final String userId = SharedPreferencesTool.getFromShared(DbsyActivity.this, "fyLoginUserInfo", "userId");
+        final String userId = UserDataUtil.getUserId(DbsyActivity.this);
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         ConnectorInventory.getAgreeList(DbsyActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {

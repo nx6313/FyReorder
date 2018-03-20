@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.Constants;
 import com.fy.niu.fyreorder.util.DateFormatUtil;
 import com.fy.niu.fyreorder.util.SerializableOrderList;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -104,7 +103,7 @@ public class MainOrderFragment extends Fragment {
         // 学生已接 userType.equals("0") && orderData.getOrderState() == 4
         // 商家未接 !userType.equals("0") && orderData.getOrderState() == 2
         // 商家已接 !userType.equals("0") && orderData.getOrderState() == 3
-        final String userType = SharedPreferencesTool.getFromShared(context, "fyLoginUserInfo", "ifGive");
+        final String userType = UserDataUtil.getDataByKey(context, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
         LayoutInflater inflater = LayoutInflater.from(context);
         for (final Order orderData : mOrderDataList) {
             View orderItemView = inflater.inflate(R.layout.order_fragment_item, null);

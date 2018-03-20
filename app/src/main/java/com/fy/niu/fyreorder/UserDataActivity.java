@@ -14,7 +14,7 @@ import com.fy.niu.fyreorder.customView.CircularImage;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DBOpenHelper;
 import com.fy.niu.fyreorder.util.DBUtil;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,23 +72,24 @@ public class UserDataActivity extends AppCompatActivity {
 
         userInfoFloorName = (LinearLayout) findViewById(R.id.userInfoFloorName);
         tvUserInfoFloor = (TextView) findViewById(R.id.tvUserInfoFloor);
-        String ifGive = SharedPreferencesTool.getFromShared(UserDataActivity.this, "fyLoginUserInfo", "ifGive");
-        if(ifGive.equals("0")){
+        String ifGive = UserDataUtil.getDataByKey(UserDataActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_ifGive);
+        if (ifGive.equals("0")) {
             userInfoFloorName.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             userInfoFloorName.setVisibility(View.GONE);
         }
 
-        JSONObject userInfo = DBUtil.find(new DBOpenHelper(UserDataActivity.this), "userInfo", new String[] { "userName", "floorName", "telephone", "orgName" },
+        JSONObject userInfo = DBUtil.find(new DBOpenHelper(UserDataActivity.this), "userInfo", new String[]{"userName", "floorName", "telephone", "orgName"},
                 null, null, null, null, null, null);
         try {
             tvUserInfoName.setText(userInfo.getString("userName"));
             tvUserInfoSchool.setText(userInfo.getString("orgName"));
             tvUserInfoPhone.setText(userInfo.getString("telephone"));
-            if(ifGive.equals("0")){
+            if (ifGive.equals("0")) {
                 tvUserInfoFloor.setText(userInfo.getString("floorName"));
             }
-        } catch (JSONException e) {}
+        } catch (JSONException e) {
+        }
     }
 
     public void updateUserPassword(View view) {

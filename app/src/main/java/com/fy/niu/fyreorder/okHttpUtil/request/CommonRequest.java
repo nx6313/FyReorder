@@ -23,8 +23,8 @@ public class CommonRequest {
         FormBody.Builder mFormBodyBuild = new FormBody.Builder();
 
         // 默认加上当前登录用户Id
-//        String userId = SharedPreferencesTool.getFromShared(context, "BouilliProInfo", "userId");
-        if(params == null){
+//        String userId = UserDataUtil.getUserId(context);
+        if (params == null) {
             params = new RequestParams();
         }
 //        params.put("userId", userId);
@@ -42,8 +42,8 @@ public class CommonRequest {
         StringBuilder urlBuilder = new StringBuilder(url).append("?");
 
         // 默认加上当前登录用户Id
-//        String userId = SharedPreferencesTool.getFromShared(context, "BouilliProInfo", "userId");
-        if(params == null){
+//        String userId = UserDataUtil.getUserId(context);
+        if (params == null) {
             params = new RequestParams();
         }
 //        params.put("userId", userId);
@@ -66,6 +66,7 @@ public class CommonRequest {
 
     /**
      * 文件上传请求
+     *
      * @param url
      * @param params
      * @return
@@ -75,8 +76,8 @@ public class CommonRequest {
         requestBody.setType(MultipartBody.FORM);
 
         // 默认加上当前登录用户Id
-//        String userId = SharedPreferencesTool.getFromShared(context, "BouilliProInfo", "userId");
-        if(params == null){
+//        String userId = UserDataUtil.getUserId(context);
+        if (params == null) {
             params = new RequestParams();
         }
 //        params.put("userId", userId);

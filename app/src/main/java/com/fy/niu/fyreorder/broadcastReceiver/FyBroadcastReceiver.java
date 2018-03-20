@@ -13,7 +13,7 @@ import com.fy.niu.fyreorder.PrintDialogActivity;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.MyApplication;
 import com.fy.niu.fyreorder.util.PrintUtil;
-import com.fy.niu.fyreorder.util.SharedPreferencesTool;
+import com.fy.niu.fyreorder.util.UserDataUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,7 +95,7 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
             case JPushInterface.ACTION_NOTIFICATION_RECEIVED:
                 break;
             case ACTION_WRITE_TO_BLUE_DEVICE:
-                String printDeviceAddress = SharedPreferencesTool.getFromShared(context, "systemSet", "connectionDeviceCode", "");
+                String printDeviceAddress = UserDataUtil.getDataByKey(context, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                 String print_title = bundle.getString("title");
                 PrintOrderData printOrderData = (PrintOrderData) bundle.getSerializable("printOrderData");
                 List<byte[]> dataByteList = anayWriteDataList(print_title, printOrderData);
