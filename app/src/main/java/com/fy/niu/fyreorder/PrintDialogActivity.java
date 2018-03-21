@@ -387,7 +387,7 @@ public class PrintDialogActivity extends Activity {
                         } else {
                             return;
                         }
-                        ((RadioButton) blueDevItemView).setTextColor(Color.parseColor("#FBF481"));
+                        ((RadioButton) blueDevItemView).setTextColor(Color.parseColor("#A21010"));
                         // 已配对的设备
                         String rbTextVal = "";
                         if (ComFun.strNull(device.getName())) {
