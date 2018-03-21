@@ -54,6 +54,7 @@ public class PrintDialogActivity extends Activity {
     private Button btnConnectPrint;
     private TextView tvPrintListening;
     private ElasticScrollView esvOrderWaiter;
+    private GifView wiZiGif;
     private LinearLayout printingOrderDataLayout;
 
     private PopupWindow mPopupWindow = null;
@@ -113,6 +114,10 @@ public class PrintDialogActivity extends Activity {
         btnConnectPrint = (Button) findViewById(R.id.btnConnectPrint);
         tvPrintListening = (TextView) findViewById(R.id.tvPrintListening);
         esvOrderWaiter = (ElasticScrollView) findViewById(R.id.esvOrderWaiter);
+        wiZiGif = (GifView) findViewById(R.id.wiZiGif);
+        wiZiGif.setGifImage(R.drawable.wuzi);
+        wiZiGif.setShowDimension(430, 380);
+        wiZiGif.setGifImageType(GifView.GifImageType.COVER);
         printingOrderDataLayout = (LinearLayout) findViewById(R.id.printingOrderDataLayout);
         cbPrint.setChecked(false);
         tvPrintTip.setVisibility(View.GONE);
@@ -130,7 +135,14 @@ public class PrintDialogActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 UserDataUtil.saveUserData(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_printIsOpen, isChecked);
                 if (isChecked) {
+                    cbPrint.setText("点此关闭蓝牙打票机功能");
+                    wiZiGif.setVisibility(View.GONE);
                     if (MyApplication.mBluetoothAdapter != null) {
+                        if (!MyApplication.mBluetoothAdapter.isEnabled()) {
+                            btnConnectPrint.setEnabled(false);
+                            btnConnectPrint.setText("手机蓝牙开启中...");
+                            MyApplication.mBluetoothAdapter.enable();
+                        }
                         // 注册蓝牙监听
                         PrintDialogActivity.this.registerReceiver(mReceiver, makeFilter());
                         tvPrintTip.setVisibility(View.VISIBLE);
@@ -205,6 +217,8 @@ public class PrintDialogActivity extends Activity {
                         MainActivity.mHandler.sendMessage(mainPageUpdateMenuMsg);
                     }
                 } else {
+                    cbPrint.setText("点此开启蓝牙打票机功能");
+                    wiZiGif.setVisibility(View.VISIBLE);
                     tvPrintTip.setVisibility(View.GONE);
                     btnOpenBluetooth.setVisibility(View.GONE);
                     btnAgainConnectPrint.setVisibility(View.GONE);
@@ -221,6 +235,9 @@ public class PrintDialogActivity extends Activity {
                             } catch (IOException e) {
                             }
                         }
+                    }
+                    if (MyApplication.mBluetoothAdapter != null && MyApplication.mBluetoothAdapter.isEnabled()) {
+                        MyApplication.mBluetoothAdapter.disable();
                     }
                     Message mainPageUpdateMenuMsg = new Message();
                     Bundle mainPageUpdateMenuData = new Bundle();
@@ -270,18 +287,22 @@ public class PrintDialogActivity extends Activity {
                     int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
                     switch (blueState) {
                         case BluetoothAdapter.STATE_TURNING_ON:
-                            Log.e("TAG", "TURNING_ON");
+                            Log.e("TAG", "正在开启手机蓝牙");
+                            btnConnectPrint.setEnabled(false);
+                            btnConnectPrint.setText("手机蓝牙开启中...");
                             break;
                         case BluetoothAdapter.STATE_ON:
                             bluetoothStatus = "on"; // 蓝牙已打开
-                            Log.e("TAG", "STATE_ON");
+                            Log.e("TAG", "手机蓝牙已开启");
+                            btnConnectPrint.setEnabled(true);
+                            btnConnectPrint.setText("连接打票机");
                             break;
                         case BluetoothAdapter.STATE_TURNING_OFF:
-                            Log.e("TAG", "STATE_TURNING_OFF");
+                            Log.e("TAG", "正在关闭手机蓝牙");
                             break;
                         case BluetoothAdapter.STATE_OFF:
                             bluetoothStatus = "off"; // 蓝牙已关闭
-                            Log.e("TAG", "STATE_OFF");
+                            Log.e("TAG", "手机蓝牙已关闭");
                             break;
                     }
                     break;
@@ -342,8 +363,8 @@ public class PrintDialogActivity extends Activity {
                             esvBlueSearchItem.setVisibility(View.GONE);
                             noBluetoothLayout.setVisibility(View.VISIBLE);
                             btnSureThisPrint.setEnabled(false);
-                            btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
-                            btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+                            btnSureThisPrint.setBackgroundColor(Color.parseColor("#FBCFCF"));
+                            btnSureThisPrint.setTextColor(Color.parseColor("#FEECEC"));
                         } else {
                             esvBlueSearchItem.setVisibility(View.VISIBLE);
                             noBluetoothLayout.setVisibility(View.GONE);
@@ -447,8 +468,8 @@ public class PrintDialogActivity extends Activity {
             esvBlueSearchItem.setVisibility(View.GONE);
             btnSureThisPrint.setVisibility(View.VISIBLE);
             btnSureThisPrint.setEnabled(false);
-            btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
-            btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+            btnSureThisPrint.setBackgroundColor(Color.parseColor("#FBCFCF"));
+            btnSureThisPrint.setTextColor(Color.parseColor("#FEECEC"));
             btnReSearch.setVisibility(View.GONE);
             btnSureThisPrint.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -483,8 +504,8 @@ public class PrintDialogActivity extends Activity {
                     esvBlueSearchItem.setVisibility(View.GONE);
                     btnSureThisPrint.setVisibility(View.VISIBLE);
                     btnSureThisPrint.setEnabled(false);
-                    btnSureThisPrint.setBackgroundColor(Color.parseColor("#4B4B4B"));
-                    btnSureThisPrint.setTextColor(Color.parseColor("#7D7D7D"));
+                    btnSureThisPrint.setBackgroundColor(Color.parseColor("#FBCFCF"));
+                    btnSureThisPrint.setTextColor(Color.parseColor("#FEECEC"));
                     btnReSearch.setVisibility(View.GONE);
                     RadioGroup blueDevItemWrap = (RadioGroup) blueDevListPopView.findViewById(R.id.blueDevItemWrap);
                     blueDevItemWrap.removeAllViews();

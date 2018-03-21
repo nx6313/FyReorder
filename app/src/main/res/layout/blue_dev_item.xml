@@ -7,4 +7,4 @@
     android:button="@drawable/radio_button_style"
     android:padding="8dp"
     android:tag="rbBlueDev"
-    android:textColor="#fffafa" />
+    android:textColor="#2e2e2e" />

@@ -16,8 +16,8 @@
         android:id="@+id/cbPrint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="开启蓝牙打票机功能"
-        android:textColor="#e2f7ff" />
+        android:text="点此开启蓝牙打票机功能"
+        android:textColor="#2e2e2e" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="当前连接的打票机："
-            android:textColor="#e2f7ff" />
+            android:textColor="#2e2e2e" />
 
         <Button
             android:id="@+id/btnOpenBluetooth"
@@ -77,12 +77,12 @@
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="无打票机连接"
-        android:textColor="#e2f7ff" />
+        android:textColor="#393939" />
 
     <Button
         android:id="@+id/btnConnectPrint"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="26dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="40dp"
@@ -98,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="正在听单并打印小票中... ..."
-        android:textColor="#fffbd7"
+        android:textColor="#2e2e2e"
         android:textSize="15sp"
         android:visibility="gone" />
 
@@ -169,4 +169,11 @@
             </LinearLayout>
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>
+
+    <com.ant.liao.GifView
+        android:id="@+id/wiZiGif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="18dp" />
 </LinearLayout>
