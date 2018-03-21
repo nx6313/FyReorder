@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="附近没有发现蓝牙设备"
+                android:text="附近没有发现已配对的蓝牙设备"
                 android:textColor="#494949" />
         </LinearLayout>
 

@@ -366,28 +366,31 @@ public class PrintDialogActivity extends Activity {
                     RadioGroup.LayoutParams lp = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
                     blueDevItemView.setLayoutParams(lp);
                     RadioButton rbBlueDev = (RadioButton) blueDevItemView.findViewWithTag("rbBlueDev");
-                    if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+//                    if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+//                        if (!searchGetBluetoothAddressList.contains(device.getAddress())) {
+//                            searchGetBluetoothAddressList.add(device.getAddress());
+//                        } else {
+//                            return;
+//                        }
+//                        blueDevItemView.setTag("unPair");
+//                        String rbTextVal = "";
+//                        if (ComFun.strNull(device.getName())) {
+//                            rbTextVal = "设备蓝牙名称：" + device.getName() + "\n";
+//                        }
+//                        rbTextVal += "设备蓝牙地址：" + device.getAddress() + "\n";
+//                        rbTextVal += "状态：未配对";
+//                        rbBlueDev.setText(rbTextVal);
+//                        rbBlueDev.setTag(R.id.tag_bluetooth_device_address, device.getAddress());
+//                        blueDevItemWrap.addView(blueDevItemView);
+//                    } else
+                    if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
                         if (!searchGetBluetoothAddressList.contains(device.getAddress())) {
                             searchGetBluetoothAddressList.add(device.getAddress());
                         } else {
                             return;
                         }
-                        String rbTextVal = "";
-                        if (ComFun.strNull(device.getName())) {
-                            rbTextVal = "设备蓝牙名称：" + device.getName() + "\n";
-                        }
-                        rbTextVal += "设备蓝牙地址：" + device.getAddress() + "\n";
-                        rbTextVal += "状态：未配对";
-                        rbBlueDev.setText(rbTextVal);
-                        rbBlueDev.setTag(R.id.tag_bluetooth_device_address, device.getAddress());
-                        blueDevItemWrap.addView(blueDevItemView);
-                    } else if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                        if (!searchGetBluetoothAddressList.contains(device.getAddress())) {
-                            searchGetBluetoothAddressList.add(device.getAddress());
-                        } else {
-                            return;
-                        }
-                        ((RadioButton) blueDevItemView).setTextColor(Color.parseColor("#A21010"));
+                        blueDevItemView.setTag("havePair");
+//                        ((RadioButton) blueDevItemView).setTextColor(Color.parseColor("#A21010"));
                         // 已配对的设备
                         String rbTextVal = "";
                         if (ComFun.strNull(device.getName())) {
@@ -661,20 +664,6 @@ public class PrintDialogActivity extends Activity {
                 data.putString("loadingTip", "设备正在连接中...");
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-            }
-            // 先判断是否需要配对
-            int deviceBoundState = mmDevice.getBondState();
-            if (deviceBoundState == BluetoothDevice.BOND_NONE) {
-                Log.e("TAG", "需要配对");
-                if (needShowLoading && mHandler != null) {
-                    // 发送连接蓝牙 Handler
-                    Message msg = new Message();
-                    Bundle data = new Bundle();
-                    msg.what = PrintDialogActivity.MSG_NEED_PEIDUI;
-                    msg.setData(data);
-                    mHandler.sendMessage(msg);
-                }
-                return;
             }
             // 取消发现设备
             MyApplication.mBluetoothAdapter.cancelDiscovery();
