@@ -54,7 +54,7 @@ public class PayDialogActivity extends Activity {
     private void initView() {
         payCardLoading = (GifView) findViewById(R.id.payCardLoading);
         payCardLoading.setGifImage(R.drawable.loading_girl);
-        payCardLoading.setShowDimension(200, 190);
+        payCardLoading.setShowDimension(99, 184);
         payCardLoading.setGifImageType(GifView.GifImageType.COVER);
         // 设置弹框Activity页面大小
         WindowManager.LayoutParams p = getWindow().getAttributes();

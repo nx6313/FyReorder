@@ -198,7 +198,7 @@ public class ComFun {
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading_girl);
-        loadingGif.setShowDimension(200, 190);
+        loadingGif.setShowDimension(99, 184);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
         if (loadingTip != null) {
@@ -228,7 +228,7 @@ public class ComFun {
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading_girl);
-        loadingGif.setShowDimension(200, 190);
+        loadingGif.setShowDimension(99, 184);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
         if (loadingTip != null) {
@@ -267,7 +267,7 @@ public class ComFun {
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading_girl);
-        loadingGif.setShowDimension(200, 190);
+        loadingGif.setShowDimension(99, 184);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
         if (loadingTip != null) {
