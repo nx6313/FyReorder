@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/printDialogLayout"
     android:layout_width="340dp"
-    android:layout_height="320dp"
+    android:layout_height="360dp"
     android:background="@drawable/loading_bg"
     android:orientation="vertical"
     android:paddingBottom="10dp"
@@ -85,12 +85,34 @@
         android:layout_height="26dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edit_table_btn_style"
         android:onClick="connectionPrintDevice"
         android:text="连接打票机"
         android:textColor="#ffecc0"
         android:textSize="15sp" />
+
+    <LinearLayout
+        android:id="@+id/firstUseDept"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="使用说明："
+            android:textColor="#2e2e2e" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingLeft="10dp"
+            android:text="@string/print_use_dept"
+            android:textColor="#2e2e2e" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvPrintListening"
