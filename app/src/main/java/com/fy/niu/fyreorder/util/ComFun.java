@@ -315,7 +315,7 @@ public class ComFun {
         win.setContentView(loadingView);
         GifView loadingGif = (GifView) loadingView.findViewById(R.id.loadingGif);
         loadingGif.setGifImage(R.drawable.loading);
-        loadingGif.setShowDimension(180, 180);
+        loadingGif.setShowDimension(122, 115);
         loadingGif.setGifImageType(GifView.GifImageType.COVER);
         TextView loadingTip = (TextView) loadingView.findViewById(R.id.loadingTip);
         if (loadingTip != null) {
