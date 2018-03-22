@@ -98,6 +98,16 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                 String printDeviceAddress = UserDataUtil.getDataByKey(context, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                 String print_title = bundle.getString("title");
                 PrintOrderData printOrderData = (PrintOrderData) bundle.getSerializable("printOrderData");
+
+                if (PrintDialogActivity.mHandler != null) {
+                    Message printDataMsg = new Message();
+                    Bundle printData = new Bundle();
+                    printDataMsg.what = PrintDialogActivity.MSG_GET_PRINT_DATA;
+                    printData.putSerializable("printData", printOrderData);
+                    printDataMsg.setData(printData);
+                    PrintDialogActivity.mHandler.sendMessage(printDataMsg);
+                }
+
                 List<byte[]> dataByteList = anayWriteDataList(print_title, printOrderData);
                 BluetoothSocket printDeviceBluetoothSocket = MyApplication.mBluetoothSocketMap.get(printDeviceAddress);
                 if (ComFun.strNull(printDeviceBluetoothSocket) && printDeviceBluetoothSocket.isConnected()) {

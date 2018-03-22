@@ -273,13 +273,8 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                         navMenuItemPrintOrder.setTitle("打印订单小票『 正在连接中... 』");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode, false);
-                                new Thread(connectRunnable).start();
-                            }
-                        }, 200);
+                        PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode);
+                        new Thread(connectRunnable).start();
                     } else {
                         navMenuItemPrintOrder.setTitle("打印订单小票『 蓝牙未启用 』");
                         ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启", Toast.LENGTH_LONG);

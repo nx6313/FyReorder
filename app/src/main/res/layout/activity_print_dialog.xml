@@ -67,6 +67,18 @@
             android:text="连接新打票机"
             android:textColor="#ffecc0"
             android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnConnectPrint"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="3"
+            android:background="@drawable/edit_table_btn_style"
+            android:onClick="connectionPrintDevice"
+            android:text="连接打票机"
+            android:textColor="#ffecc0"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <TextView
@@ -76,21 +88,8 @@
         android:layout_marginTop="4dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:text="无打票机连接"
+        android:text="未设置打票机，无打票机连接"
         android:textColor="#393939" />
-
-    <Button
-        android:id="@+id/btnConnectPrint"
-        android:layout_width="match_parent"
-        android:layout_height="26dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/edit_table_btn_style"
-        android:onClick="connectionPrintDevice"
-        android:text="连接打票机"
-        android:textColor="#ffecc0"
-        android:textSize="15sp" />
 
     <LinearLayout
         android:id="@+id/firstUseDept"
@@ -192,10 +191,11 @@
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>
 
-    <com.ant.liao.GifView
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/wiZiGif"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="18dp" />
+        android:layout_marginTop="18dp"
+        android:src="@drawable/wuzi" />
 </LinearLayout>

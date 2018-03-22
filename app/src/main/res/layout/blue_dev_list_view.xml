@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/loading_bg"
@@ -43,22 +44,28 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <com.ant.liao.GifView
+                <pl.droidsonroids.gif.GifImageView
                     android:id="@+id/noBluetoothGif_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/photo_1" />
 
-                <com.ant.liao.GifView
+                <pl.droidsonroids.gif.GifImageView
                     android:id="@+id/noBluetoothGif_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp" />
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/photo_2" />
 
-                <com.ant.liao.GifView
+                <pl.droidsonroids.gif.GifImageView
                     android:id="@+id/noBluetoothGif_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/photo_3" />
             </LinearLayout>
 
             <TextView
@@ -67,29 +74,81 @@
                 android:layout_marginTop="10dp"
                 android:text="附近没有发现已配对的蓝牙设备"
                 android:textColor="#494949" />
+
+            <TextView
+                android:id="@+id/clickShowUnPairList"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center_vertical"
+                android:onClick="showUnPairList"
+                android:text="点击查看未配对的蓝牙列表（x）"
+                android:textColor="#159af9" />
         </LinearLayout>
 
-        <com.fy.niu.fyreorder.customView.ElasticScrollView
-            android:id="@+id/esvBlueSearchItem"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center|top"
-            android:overScrollMode="never"
-            android:scrollbarSize="2dp"
-            android:scrollbarThumbVertical="@color/colorScroll"
-            android:scrollbars="none"
-            android:visibility="gone">
+            android:orientation="vertical">
 
-            <RadioGroup
-                android:id="@+id/blueDevItemWrap"
+            <com.fy.niu.fyreorder.customView.DrawableTextView
+                android:id="@+id/blueDevUnPairItemTip"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="3dp"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
-                android:paddingTop="3dp"></RadioGroup>
-        </com.fy.niu.fyreorder.customView.ElasticScrollView>
+                android:layout_height="30dp"
+                android:clickable="true"
+                android:drawableLeft="@drawable/left_jt"
+                android:drawablePadding="4dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center_vertical"
+                android:onClick="backToPairList"
+                android:text="返回到已配对设备列表"
+                android:textColor="#313131"
+                android:visibility="gone"
+                app:drawableHeight="22dp"
+                app:drawableWidth="24dp" />
+
+            <com.fy.niu.fyreorder.customView.ElasticScrollView
+                android:id="@+id/esvBlueSearchItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center|top"
+                android:overScrollMode="never"
+                android:scrollbarSize="2dp"
+                android:scrollbarThumbVertical="@color/colorScroll"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioGroup
+                        android:id="@+id/blueDevUnPairItemWrap"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:paddingTop="3dp"
+                        android:visibility="gone"></RadioGroup>
+
+                    <RadioGroup
+                        android:id="@+id/blueDevItemWrap"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:paddingTop="3dp"></RadioGroup>
+                </LinearLayout>
+            </com.fy.niu.fyreorder.customView.ElasticScrollView>
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
