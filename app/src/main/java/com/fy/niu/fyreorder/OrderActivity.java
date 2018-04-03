@@ -33,15 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 public class OrderActivity extends AppCompatActivity {
-    private ViewPager orderViewPager;
-    private ViewPagerIndicator orderIndicator;
-
     private TextView receiveOrderSumNum;
     private TextView receiveOrderSumCharge;
-
-    private List<String> mTitles = Arrays.asList("昨日接单", "上周接单", "上月接单");
-    private List<HasOrderFragment> mContents = new ArrayList<>();
-    private FragmentPagerAdapter mAdapter;
 
     private String userType;
 
@@ -66,15 +59,7 @@ public class OrderActivity extends AppCompatActivity {
         initDatas();
 
         if(!userType.equals("0")){
-            mTitles = Arrays.asList("昨日订单", "上周订单", "上月订单");
         }
-
-        orderIndicator.setVisibleTabCount(mTitles.size());
-        orderIndicator.setTabItemTitles(mTitles);
-
-        orderViewPager.setAdapter(mAdapter);
-        orderIndicator.setViewPager(orderViewPager, 0);
-        orderViewPager.setOffscreenPageLimit(mTitles.size());
     }
 
     private void setupActionBar() {
@@ -95,17 +80,14 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        orderViewPager = (ViewPager) findViewById(R.id.orderViewPager);
-        orderIndicator = (ViewPagerIndicator) findViewById(R.id.orderIndicator);
-
         receiveOrderSumNum = (TextView) findViewById(R.id.receiveOrderSumNum);
         receiveOrderSumCharge = (TextView) findViewById(R.id.receiveOrderSumCharge);
         if(!userType.equals("0")){
-            receiveOrderSumNum.setText("总订单数：0");
-            receiveOrderSumCharge.setText("总赚得：0 元");
+            receiveOrderSumNum.setText("订单总数：0");
+            receiveOrderSumCharge.setText("订单总金额：0 元");
         }else{
-            receiveOrderSumNum.setText("总接单数：0");
-            receiveOrderSumCharge.setText("总工资：0 元");
+            receiveOrderSumNum.setText("接单总数：0");
+            receiveOrderSumCharge.setText("接单总工资：0 元");
         }
 
         Map<String, List<Object>> hasOrderDataMap = new LinkedHashMap<>();
@@ -121,22 +103,6 @@ public class OrderActivity extends AppCompatActivity {
         hasOrderDataMap.put("today", todayHasOrderList);
         hasOrderDataMap.put("lastWeek", lastWeekHasOrderList);
         hasOrderDataMap.put("lastMonth", lastMonthHasOrderList);
-        for(Map.Entry<String, List<Object>> hasOrderMap : hasOrderDataMap.entrySet()){
-            HasOrderFragment fragment = HasOrderFragment.newInstance(hasOrderMap.getKey(), hasOrderMap.getValue());
-            mContents.add(fragment);
-        }
-
-        mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
-            @Override
-            public Fragment getItem(int position) {
-                return mContents.get(position);
-            }
-
-            @Override
-            public int getCount() {
-                return mContents.size();
-            }
-        };
     }
 
     private void initDatas() {
@@ -187,29 +153,13 @@ public class OrderActivity extends AppCompatActivity {
 
     private void updateOrderViewPager(ReceivedOrderData receivedOrderData) {
         if(!userType.equals("0")){
-            receiveOrderSumNum.setText("总订单数：" + receivedOrderData.getSumNum());
-            receiveOrderSumCharge.setText("总赚得：" + receivedOrderData.getSumCharge() + " 元");
+            receiveOrderSumNum.setText("订单总数：" + receivedOrderData.getSumNum());
+            receiveOrderSumCharge.setText("订单总金额：" + receivedOrderData.getSumCharge() + " 元");
         }else{
-            receiveOrderSumNum.setText("总接单数：" + receivedOrderData.getSumNum());
-            receiveOrderSumCharge.setText("总工资：" + receivedOrderData.getSumCharge() + " 元");
+            receiveOrderSumNum.setText("接单总数：" + receivedOrderData.getSumNum());
+            receiveOrderSumCharge.setText("接单总工资：" + receivedOrderData.getSumCharge() + " 元");
         }
 
-        TextView tvDayNum = (TextView) orderViewPager.findViewWithTag("tvDayNum");
-        TextView tvDayCharge = (TextView) orderViewPager.findViewWithTag("tvDayCharge");
-        TextView tvWeekNum = (TextView) orderViewPager.findViewWithTag("tvWeekNum");
-        TextView tvWeekCharge = (TextView) orderViewPager.findViewWithTag("tvWeekCharge");
-        TextView tvMonthNum = (TextView) orderViewPager.findViewWithTag("tvMonthNum");
-        TextView tvMonthCharge = (TextView) orderViewPager.findViewWithTag("tvMonthCharge");
-        if(tvDayNum != null && tvDayCharge != null &&
-                tvWeekNum != null && tvWeekCharge != null &&
-                tvMonthNum != null && tvMonthCharge != null){
-            tvDayNum.setText("" + receivedOrderData.getDayNum());
-            tvDayCharge.setText("￥" + receivedOrderData.getDayCharge());
-            tvWeekNum.setText("" + receivedOrderData.getWeekNum());
-            tvWeekCharge.setText("￥" + receivedOrderData.getWeekCharge());
-            tvMonthNum.setText("" + receivedOrderData.getMonthNum());
-            tvMonthCharge.setText("￥" + receivedOrderData.getMonthCharge());
-        }
     }
 
 }
