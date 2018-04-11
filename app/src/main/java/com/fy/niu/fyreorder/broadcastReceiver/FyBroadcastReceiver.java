@@ -14,6 +14,7 @@ import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.MyApplication;
 import com.fy.niu.fyreorder.util.PrintUtil;
 import com.fy.niu.fyreorder.util.UserDataUtil;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +58,7 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                                 String name = orderData.getString("name");
                                 String phone = orderData.getString("phone");
                                 String detail = orderData.getString("detail");
+                                String remark = orderData.getString("remark");
 
                                 PrintOrderData printOrderData = new PrintOrderData();
                                 printOrderData.setShopName(shopName);
@@ -80,6 +82,18 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                                 printOrderData.setName(name);
                                 printOrderData.setPhone(phone);
                                 printOrderData.setDetail(detail);
+                                printOrderData.setRemark(remark);
+
+                                List<PrintOrderData> printDataList = UserDataUtil.getListDataByKey(context, UserDataUtil.fyPrintData, UserDataUtil.key_printDataList, new TypeToken<List<PrintOrderData>>() {
+                                }.getType());
+                                printDataList.add(printOrderData);
+                                UserDataUtil.saveUserData(context, UserDataUtil.fyPrintData, UserDataUtil.key_printDataList, printDataList);
+
+                                if (PrintDialogActivity.mHandler != null) {
+                                    Message updatePrintingLayoutMsg = new Message();
+                                    updatePrintingLayoutMsg.what = PrintDialogActivity.MSG_HAS_NEW_DATA_PRINT;
+                                    PrintDialogActivity.mHandler.sendMessage(updatePrintingLayoutMsg);
+                                }
 
                                 Intent messagePrintDataIntent = new Intent();
                                 messagePrintDataIntent.putExtra("title", "赋渔专送");
@@ -181,6 +195,9 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                 dataList.add(("收货人：" + printOrderData.getName() + "\n").getBytes("GBK"));
                 dataList.add(("手机号：" + printOrderData.getPhone() + "\n").getBytes("GBK"));
                 dataList.add(("地点：" + printOrderData.getDetail() + "\n").getBytes("GBK"));
+                if (ComFun.strNull(printOrderData.getRemark()) && !printOrderData.getRemark().trim().toUpperCase().equals("NULL")) {
+                    dataList.add(("备注信息：" + printOrderData.getRemark() + "\n").getBytes("GBK"));
+                }
             } else {
                 dataList.add(PrintUtil.toCenter);
                 dataList.add((title + "\n").getBytes("GBK"));
@@ -192,7 +209,7 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
         return dataList;
     }
 
-    static class PrintOrderData implements Serializable {
+    public static class PrintOrderData implements Serializable {
         private String shopName;
         private String orderNumber;
         private String orderDate;
@@ -203,6 +220,7 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
         private String name;
         private String phone;
         private String detail;
+        private String remark;
 
         public String getShopName() {
             return shopName;
@@ -282,6 +300,14 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
 
         public void setDetail(String detail) {
             this.detail = detail;
+        }
+
+        public String getRemark() {
+            return remark;
+        }
+
+        public void setRemark(String remark) {
+            this.remark = remark;
         }
 
         public static class PrintOrderChildData implements Serializable {

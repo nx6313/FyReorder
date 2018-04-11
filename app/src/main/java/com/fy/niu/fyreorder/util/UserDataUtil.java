@@ -2,6 +2,13 @@ package com.fy.niu.fyreorder.util;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by nx6313 on 2018/3/20.
  * <p>
@@ -11,6 +18,7 @@ import android.content.Context;
 public class UserDataUtil {
     public static final String fyLoginUserInfo = "fyLoginUserInfo";
     public static final String fySet = "fySet";
+    public static final String fyPrintData = "fyPrintData";
     /////////////////////////// fyLoginUserInfo
     public static final String key_userId = "userId";
     public static final String key_userLoginName = "userLoginName";
@@ -25,6 +33,9 @@ public class UserDataUtil {
     public static final String key_receiveSelfFloor = "receiveSelfFloor";
     public static final String key_printIsOpen = "printIsOpen";
     public static final String key_connectionDeviceCode = "connectionDeviceCode";
+
+    /////////////////////////// fyPrintData
+    public static final String key_printDataList = "printDataList";
 
     public static void setUserId(Context context, String userId) {
         SharedPreferencesTool.addOrUpdate(context, fyLoginUserInfo, key_userId, userId);
@@ -53,11 +64,31 @@ public class UserDataUtil {
         return SharedPreferencesTool.getBooleanFromShared(context, preSharedName + "_" + userId, key);
     }
 
+    public static <T> List<T> getListDataByKey(Context context, String preSharedName, String key, Type classType) {
+        String userId = SharedPreferencesTool.getFromShared(context, fyLoginUserInfo, key_userId, "");
+        List<T> datalist = new ArrayList<>();
+        String dataListStr = SharedPreferencesTool.getFromShared(context, preSharedName + "_" + userId, key);
+        if (!ComFun.strNull(dataListStr)) {
+            return datalist;
+        }
+        Gson gson = new Gson();
+        datalist = gson.fromJson(dataListStr, classType);
+        return datalist;
+    }
+
     public static void saveUserData(Context context, String preSharedName, String key, String val) {
         SharedPreferencesTool.addOrUpdate(context, getKeyForUser(context, preSharedName), key, val);
     }
 
     public static void saveUserData(Context context, String preSharedName, String key, Boolean val) {
         SharedPreferencesTool.addOrUpdate(context, getKeyForUser(context, preSharedName), key, val);
+    }
+
+    public static <T> void saveUserData(Context context, String preSharedName, String key, List<T> datalist) {
+        if (null == datalist || datalist.size() <= 0)
+            return;
+        Gson gson = new Gson();
+        String dataListStr = gson.toJson(datalist);
+        SharedPreferencesTool.addOrUpdate(context, getKeyForUser(context, preSharedName), key, dataListStr);
     }
 }

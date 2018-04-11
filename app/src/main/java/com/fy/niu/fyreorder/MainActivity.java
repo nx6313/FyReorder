@@ -132,6 +132,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             initUserData();
             initDatas(false);
+            // 初始化打票机设置
+            initPrintSet();
             // 进行新版本检测
             VersionUtil.checkNewVersion(MainActivity.this, true);
         }
@@ -273,8 +275,13 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                         navMenuItemPrintOrder.setTitle("打印订单小票『 正在连接中... 』");
-                        PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode);
-                        new Thread(connectRunnable).start();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                PrintDialogActivity.ConnectRunnable connectRunnable = new PrintDialogActivity.ConnectRunnable(connectionDeviceCode);
+                                new Thread(connectRunnable).start();
+                            }
+                        }, 200);
                     } else {
                         navMenuItemPrintOrder.setTitle("打印订单小票『 蓝牙未启用 』");
                         ComFun.showToast(this.getApplicationContext(), "手机蓝牙功能未开启", Toast.LENGTH_LONG);

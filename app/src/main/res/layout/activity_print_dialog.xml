@@ -16,6 +16,7 @@
         android:id="@+id/cbPrint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:checked="false"
         android:text="点此开启蓝牙打票机功能"
         android:textColor="#2e2e2e" />
 
@@ -128,7 +129,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="6dp"
-        android:background="#414141"
+        android:background="#4f6566"
         android:gravity="center|top"
         android:overScrollMode="never"
         android:scrollbarSize="2dp"
@@ -164,27 +165,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="xxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                    android:textColor="#faab2d"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="『 新订单 』20:30 10s"
-                    android:textColor="#72fa2d"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="xxxxxxxxxxxxxxxxxxxxxxxxxsdfsdfsdfsdfsdfsdfsdfdsfsdfsdfsdfsdfsdfxx"
                     android:textColor="#faab2d"
                     android:textSize="13sp" />
             </LinearLayout>

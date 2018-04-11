@@ -17,6 +17,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelUuid;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.DisplayUtil;
 import com.fy.niu.fyreorder.util.MyApplication;
 import com.fy.niu.fyreorder.util.UserDataUtil;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,10 +71,12 @@ public class PrintDialogActivity extends Activity {
     private static final int MSG_HIDE_LOADING = 2;
     public static final int MSG_CONNECTION_DIS = 3;
     public static final int MSG_GET_PRINT_DATA = 4;
+    public static final int MSG_HAS_NEW_DATA_PRINT = 5;
 
     private List<String> searchGetUnPairBluetoothAddressList = new ArrayList<>(); // 保存当前搜索到的蓝牙设备地址，避免重复，未配对设备
     private List<String> searchGetBluetoothAddressList = new ArrayList<>(); // 保存当前搜索到的蓝牙设备地址，避免重复
-    private List<byte[]> writeDataList = new ArrayList<>(); // 要打印的数据字节数组集合
+
+    private final int maxShowPrintingNum = 20;
 
     private String bluetoothStatus;
 
@@ -123,7 +127,6 @@ public class PrintDialogActivity extends Activity {
         esvOrderWaiter = (ElasticScrollView) findViewById(R.id.esvOrderWaiter);
         wiZiGif = (GifImageView) findViewById(R.id.wiZiGif);
         printingOrderDataLayout = (LinearLayout) findViewById(R.id.printingOrderDataLayout);
-        cbPrint.setChecked(false);
         tvPrintTip.setVisibility(View.GONE);
         btnOpenBluetooth.setVisibility(View.GONE);
         btnAgainConnectPrint.setVisibility(View.GONE);
@@ -133,7 +136,7 @@ public class PrintDialogActivity extends Activity {
         btnConnectPrint.setVisibility(View.GONE);
         tvPrintListening.setVisibility(View.GONE);
         esvOrderWaiter.setVisibility(View.GONE);
-        printingOrderDataLayout.setVisibility(View.GONE);
+        updatePrintingOrderListLayout();
 
         cbPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -143,15 +146,16 @@ public class PrintDialogActivity extends Activity {
                     cbPrint.setText("点此关闭蓝牙打票机功能");
                     wiZiGif.setVisibility(View.GONE);
                     if (MyApplication.mBluetoothAdapter != null) {
+                        // 注册蓝牙监听
+                        PrintDialogActivity.this.registerReceiver(mReceiver, makeFilter());
                         if (!MyApplication.mBluetoothAdapter.isEnabled()) {
                             cbPrint.setEnabled(false);
                             btnConnectPrint.setEnabled(false);
                             btnConnectPrint.setText("手机蓝牙开启中...");
                             tvPrintCode.setText("手机蓝牙开启中...");
                             MyApplication.mBluetoothAdapter.enable();
+                            return;
                         }
-                        // 注册蓝牙监听
-                        PrintDialogActivity.this.registerReceiver(mReceiver, makeFilter());
                         tvPrintTip.setVisibility(View.VISIBLE);
                         tvPrintCode.setVisibility(View.VISIBLE);
                         final String connectionDeviceCode = UserDataUtil.getDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
@@ -169,7 +173,6 @@ public class PrintDialogActivity extends Activity {
                                 btnConnectPrint.setVisibility(View.GONE);
                                 tvPrintListening.setVisibility(View.GONE);
                                 esvOrderWaiter.setVisibility(View.GONE);
-                                printingOrderDataLayout.setVisibility(View.GONE);
 
                                 Message mainPageUpdateMenuMsg = new Message();
                                 Bundle mainPageUpdateMenuData = new Bundle();
@@ -215,7 +218,6 @@ public class PrintDialogActivity extends Activity {
                     btnConnectPrint.setVisibility(View.GONE);
                     tvPrintListening.setVisibility(View.GONE);
                     esvOrderWaiter.setVisibility(View.GONE);
-                    printingOrderDataLayout.setVisibility(View.GONE);
                     for (Map.Entry<String, BluetoothSocket> m : MyApplication.mBluetoothSocketMap.entrySet()) {
                         if (m.getValue().isConnected()) {
                             try {
@@ -255,6 +257,60 @@ public class PrintDialogActivity extends Activity {
         }
     }
 
+    // 更新打印数据展示区域显示内容
+    private void updatePrintingOrderListLayout() {
+        printingOrderDataLayout.removeAllViews();
+        List<FyBroadcastReceiver.PrintOrderData> printDataList = UserDataUtil.getListDataByKey(PrintDialogActivity.this, UserDataUtil.fyPrintData, UserDataUtil.key_printDataList, new TypeToken<List<FyBroadcastReceiver.PrintOrderData>>() {
+        }.getType());
+        for (int p = printDataList.size() - 1; p >= 0; p--) {
+            if (p < printDataList.size() - maxShowPrintingNum - 1) {
+                break;
+            }
+            LinearLayout itemLayout = new LinearLayout(PrintDialogActivity.this);
+            itemLayout.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams itemLayoutLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            itemLayoutLp.bottomMargin = DisplayUtil.dip2px(PrintDialogActivity.this, 12);
+            itemLayout.setLayoutParams(itemLayoutLp);
+
+            if (p == printDataList.size() - maxShowPrintingNum - 1) {
+                TextView tvOrderTime = new TextView(PrintDialogActivity.this);
+                LinearLayout.LayoutParams tvOrderTimeLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                tvOrderTime.setLayoutParams(tvOrderTimeLp);
+                tvOrderTime.setText("... ...");
+                tvOrderTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                tvOrderTime.setTextColor(Color.parseColor("#ffffff"));
+                itemLayout.addView(tvOrderTime);
+            } else {
+                TextView tvOrderTime = new TextView(PrintDialogActivity.this);
+                LinearLayout.LayoutParams tvOrderTimeLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                tvOrderTime.setLayoutParams(tvOrderTimeLp);
+                tvOrderTime.setText("『 新订单 』" + printDataList.get(p).getOrderDate());
+                tvOrderTime.setTextColor(Color.parseColor("#72fa2d"));
+                tvOrderTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                itemLayout.addView(tvOrderTime);
+
+                TextView tvOrderDes = new TextView(PrintDialogActivity.this);
+                LinearLayout.LayoutParams tvOrderDesLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                tvOrderDes.setLayoutParams(tvOrderDesLp);
+                String orderDes = "订单内容：";
+                for (FyBroadcastReceiver.PrintOrderData.PrintOrderChildData printOrderChildData : printDataList.get(p).getChildrens()) {
+                    orderDes += printOrderChildData.getProName() + "(" + printOrderChildData.getProNum() + ")，";
+                }
+                orderDes = orderDes.substring(0, orderDes.length() - 1);
+                orderDes += "\n收货人：" + printDataList.get(p).getName() + "，联系方式：" + printDataList.get(p).getPhone();
+                if (ComFun.strNull(printDataList.get(p).getRemark()) && !printDataList.get(p).getRemark().trim().toUpperCase().equals("NULL")) {
+                    orderDes += "\n备注：" + printDataList.get(p).getRemark();
+                }
+                tvOrderDes.setText(orderDes);
+                tvOrderDes.setTextColor(Color.parseColor("#faab2d"));
+                tvOrderDes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                itemLayout.addView(tvOrderDes);
+            }
+
+            printingOrderDataLayout.addView(itemLayout);
+        }
+    }
+
     // 进行蓝牙设备连接操作
     private void doBlueDeviceConnection(final String connectionDeviceCode) {
         wiZiGif.setVisibility(View.GONE);
@@ -269,8 +325,7 @@ public class PrintDialogActivity extends Activity {
                 btnConnectPrint.setVisibility(View.GONE);
                 tvPrintListening.setVisibility(View.VISIBLE);
                 esvOrderWaiter.setVisibility(View.VISIBLE);
-                printingOrderDataLayout.setVisibility(View.VISIBLE);
-                printingOrderDataLayout.removeAllViews();
+//                printingOrderDataLayout.removeAllViews();
                 return;
             }
         }
@@ -325,6 +380,8 @@ public class PrintDialogActivity extends Activity {
                             btnConnectPrint.setEnabled(true);
                             btnConnectPrint.setText("连接打票机");
 
+                            tvPrintTip.setVisibility(View.VISIBLE);
+                            tvPrintCode.setVisibility(View.VISIBLE);
                             final String connectionDeviceCode = UserDataUtil.getDataByKey(PrintDialogActivity.this, UserDataUtil.fySet, UserDataUtil.key_connectionDeviceCode);
                             if (ComFun.strNull(connectionDeviceCode)) {
                                 if (MyApplication.mBluetoothAdapter.isEnabled()) {
@@ -340,7 +397,6 @@ public class PrintDialogActivity extends Activity {
                                     btnConnectPrint.setVisibility(View.GONE);
                                     tvPrintListening.setVisibility(View.GONE);
                                     esvOrderWaiter.setVisibility(View.GONE);
-                                    printingOrderDataLayout.setVisibility(View.GONE);
                                     tvPrintCode.setText("蓝牙未启用，打票机无连接");
 
 //                                  Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -758,15 +814,21 @@ public class PrintDialogActivity extends Activity {
             // 取消发现设备
             MyApplication.mBluetoothAdapter.cancelDiscovery();
             if (uuids != null && uuids.length > 0) {
+                Log.d("连接蓝牙设备", "准备尝试从设备uuid序列组中连接设备，序列总数：" + uuids.length);
                 for (int u = 0; u < uuids.length; u++) {
                     try {
-                        Log.d("连接蓝牙设备", "尝试第" + (u + 1) + "次连接，连接 UUID：" + uuids[u].getUuid().toString());
-                        mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuids[u].getUuid());
+                        Log.d("连接蓝牙设备", "尝试第" + (u + 1) + "次连接，连接 UUID：" + uuids[u].getUuid().toString().toUpperCase());
+                        mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(uuids[u].getUuid().toString().toUpperCase()));
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                        }
                         // 连接到设备
                         mmSocket.connect();
-                        Log.d("连接蓝牙设备", "第" + (u + 1) + "次连接成功，UUID：" + uuids[u].getUuid().toString());
+                        Log.d("连接蓝牙设备", "第" + (u + 1) + "次连接成功，UUID：" + uuids[u].getUuid().toString().toUpperCase());
                         break;
                     } catch (IOException connectException) {
+                        Log.d("连接蓝牙设备", "第" + (u + 1) + "次连接失败，UUID：" + uuids[u].getUuid().toString().toUpperCase() + "，失败原因：" + connectException.getMessage());
                         if (u == uuids.length - 1) {
                             mainPageUpdateMenuMsg = new Message();
                             mainPageUpdateMenuData = new Bundle();
@@ -795,6 +857,7 @@ public class PrintDialogActivity extends Activity {
                     }
                 }
             } else {
+                Log.d("连接蓝牙设备", "设备uuid序列组中无可用uuid值，尝试以默认uuid值连接设备");
                 try {
                     // 连接到设备
                     mmSocket.connect();
@@ -847,7 +910,7 @@ public class PrintDialogActivity extends Activity {
             // 连接成功测试打印
             Intent printDataIntent = new Intent();
             printDataIntent.putExtra("printDeviceAddress", deviceAddress);
-            printDataIntent.putExtra("title", "赋渔接单测试页");
+            printDataIntent.putExtra("title", "赋渔接单测试页 - 连接成功");
             printDataIntent.setAction(FyBroadcastReceiver.ACTION_WRITE_TO_BLUE_DEVICE);
             MyApplication.getInstance().getApplicationContext().sendBroadcast(printDataIntent);
         }
@@ -934,7 +997,6 @@ public class PrintDialogActivity extends Activity {
                     btnConnectPrint.setVisibility(View.GONE);
                     tvPrintListening.setVisibility(View.GONE);
                     esvOrderWaiter.setVisibility(View.GONE);
-                    printingOrderDataLayout.setVisibility(View.GONE);
                     break;
                 case MSG_HIDE_LOADING:
                     String toastTip = b.getString("toastTip");
@@ -950,8 +1012,7 @@ public class PrintDialogActivity extends Activity {
                         btnConnectPrint.setVisibility(View.GONE);
                         tvPrintListening.setVisibility(View.VISIBLE);
                         esvOrderWaiter.setVisibility(View.VISIBLE);
-                        printingOrderDataLayout.setVisibility(View.VISIBLE);
-                        printingOrderDataLayout.removeAllViews();
+//                        printingOrderDataLayout.removeAllViews();
                     } else {
                         // 之前保存到蓝牙地址失效，连接失败
                         tvPrintCode.setText("设备连接失败\n\n\t可能的失败原因：\n\t\t1、正在连接的设备并未开启蓝牙。\n\t\t2、正在连接的设备不在附近。\n\t\t3、正在连接的设备并没有完成配对。\n\n\n您可以：\n\t\t确保所选设备正确后，尝试 再次重试连接 或者 连接新的打票机");
@@ -961,7 +1022,6 @@ public class PrintDialogActivity extends Activity {
                         btnConnectPrint.setVisibility(View.GONE);
                         tvPrintListening.setVisibility(View.GONE);
                         esvOrderWaiter.setVisibility(View.GONE);
-                        printingOrderDataLayout.setVisibility(View.GONE);
                     }
                     break;
                 case MSG_CONNECTION_DIS:
@@ -973,7 +1033,9 @@ public class PrintDialogActivity extends Activity {
                     btnConnectPrint.setVisibility(View.GONE);
                     tvPrintListening.setVisibility(View.GONE);
                     esvOrderWaiter.setVisibility(View.GONE);
-                    printingOrderDataLayout.setVisibility(View.GONE);
+                    break;
+                case MSG_HAS_NEW_DATA_PRINT:
+                    updatePrintingOrderListLayout();
                     break;
             }
             super.handleMessage(msg);
