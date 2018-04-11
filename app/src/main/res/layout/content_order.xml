@@ -17,25 +17,35 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/etStartDate"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:background="@drawable/menu_item_style_2"
-            android:enabled="false"
+            android:background="#309175"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:gravity="center"
             android:hint="选择开始时间"
+            android:onClick="selectStartDate"
             android:textColor="#ffffff"
             android:textColorHint="#ffffff"
             android:textSize="14dp" />
 
         <EditText
+            android:id="@+id/etEndDate"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:background="@drawable/menu_item_style_2"
-            android:enabled="false"
+            android:background="#307991"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:gravity="center"
             android:hint="选择结束时间"
+            android:onClick="selectEndDate"
             android:textColor="#ffffff"
             android:textColorHint="#ffffff"
             android:textSize="14dp" />
@@ -45,6 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/menu_item_style_2"
+            android:onClick="searchData"
             android:text="搜索" />
     </LinearLayout>
 
@@ -63,10 +74,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp">
+            android:paddingTop="100dp">
 
             <LinearLayout
                 android:layout_width="match_parent"

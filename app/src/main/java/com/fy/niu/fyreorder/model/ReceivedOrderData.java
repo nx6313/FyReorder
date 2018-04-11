@@ -3,76 +3,58 @@ package com.fy.niu.fyreorder.model;
 import java.io.Serializable;
 
 public class ReceivedOrderData implements Serializable {
-    private int dayNum;
-    private String dayCharge;
-    private int weekNum;
-    private String weekCharge;
-    private int monthNum;
-    private String monthCharge;
-    private int sumNum;
-    private String sumCharge;
+    private int weiPayCount;
+    private String weiPayMoney;
+    private int huoDaoCount;
+    private String huoDaoMoney;
+    private int allCount;
+    private String allMoney;
 
-    public int getDayNum() {
-        return dayNum;
+    public int getWeiPayCount() {
+        return weiPayCount;
     }
 
-    public void setDayNum(int dayNum) {
-        this.dayNum = dayNum;
+    public void setWeiPayCount(int weiPayCount) {
+        this.weiPayCount = weiPayCount;
     }
 
-    public String getDayCharge() {
-        return dayCharge;
+    public String getWeiPayMoney() {
+        return weiPayMoney;
     }
 
-    public void setDayCharge(String dayCharge) {
-        this.dayCharge = dayCharge;
+    public void setWeiPayMoney(String weiPayMoney) {
+        this.weiPayMoney = weiPayMoney;
     }
 
-    public int getWeekNum() {
-        return weekNum;
+    public int getHuoDaoCount() {
+        return huoDaoCount;
     }
 
-    public void setWeekNum(int weekNum) {
-        this.weekNum = weekNum;
+    public void setHuoDaoCount(int huoDaoCount) {
+        this.huoDaoCount = huoDaoCount;
     }
 
-    public String getWeekCharge() {
-        return weekCharge;
+    public String getHuoDaoMoney() {
+        return huoDaoMoney;
     }
 
-    public void setWeekCharge(String weekCharge) {
-        this.weekCharge = weekCharge;
+    public void setHuoDaoMoney(String huoDaoMoney) {
+        this.huoDaoMoney = huoDaoMoney;
     }
 
-    public int getMonthNum() {
-        return monthNum;
+    public int getAllCount() {
+        return allCount;
     }
 
-    public void setMonthNum(int monthNum) {
-        this.monthNum = monthNum;
+    public void setAllCount(int allCount) {
+        this.allCount = allCount;
     }
 
-    public String getMonthCharge() {
-        return monthCharge;
+    public String getAllMoney() {
+        return allMoney;
     }
 
-    public void setMonthCharge(String monthCharge) {
-        this.monthCharge = monthCharge;
-    }
-
-    public int getSumNum() {
-        return sumNum;
-    }
-
-    public void setSumNum(int sumNum) {
-        this.sumNum = sumNum;
-    }
-
-    public String getSumCharge() {
-        return sumCharge;
-    }
-
-    public void setSumCharge(String sumCharge) {
-        this.sumCharge = sumCharge;
+    public void setAllMoney(String allMoney) {
+        this.allMoney = allMoney;
     }
 }

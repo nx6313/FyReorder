@@ -53,5 +53,6 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
     compile 'cn.jiguang.sdk:jpush:3.0.9'
     compile 'cn.jiguang.sdk:jcore:1.1.7'
+    compile 'cn.aigestudio.datepicker:DatePicker:2.2.0'
     testCompile 'junit:junit:4.12'
 }

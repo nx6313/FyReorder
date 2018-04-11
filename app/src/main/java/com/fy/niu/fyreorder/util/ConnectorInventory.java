@@ -14,14 +14,14 @@ public class ConnectorInventory {
     /**
      * 用户登录
      */
-    public static void  userLogin(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+    public static void userLogin(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "toAppLogin", params), dataHandle);
     }
 
     /**
      * 用户注册
      */
-    public static void  userRegister(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+    public static void userRegister(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "appRegister", params), dataHandle);
     }
 
@@ -86,6 +86,13 @@ public class ConnectorInventory {
      */
     public static void getOrderNumChargeByday(Context context, RequestParams params, DisposeDataHandle dataHandle) {
         CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "getOrderNumChargeByday", params), dataHandle);
+    }
+
+    /**
+     * 获取接单数据统计
+     */
+    public static void getOrderChargeByDate(Context context, RequestParams params, DisposeDataHandle dataHandle) {
+        CommonOkHttpClient.post(CommonRequest.createGetRequest(context, Constants.HTTP_URL_BASE_NEW + "getCountMoney", params), dataHandle);
     }
 
     /**
