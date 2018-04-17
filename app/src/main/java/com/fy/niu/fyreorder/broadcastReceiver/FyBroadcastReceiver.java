@@ -40,6 +40,9 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
         }
         Log.d(TAG + " 收到广播", intent.getAction() + " -> " + keyValueStr);
         switch (intent.getAction()) {
+            case JPushInterface.ACTION_REGISTRATION_ID:
+                Log.d(TAG + " 极光推送注册", "JPush用户注册成功");
+                break;
             case JPushInterface.ACTION_MESSAGE_RECEIVED:
                 String orderPrintData = bundle.getString(JPushInterface.EXTRA_EXTRA);
                 if (ComFun.strNull(orderPrintData)) {

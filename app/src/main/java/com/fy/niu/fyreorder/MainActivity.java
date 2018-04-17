@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
             String userAccountPass = UserDataUtil.getDataByKey(MainActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_userLoginPass);
             userSilentLogin(userAccountNum, userAccountPass);
         } else {
-            initUserData();
+            initUserData(false);
             initDatas(false);
             // 初始化打票机设置
             initPrintSet();
@@ -162,18 +162,19 @@ public class MainActivity extends AppCompatActivity
                     Log.d("静默登陆成功，用户信息", responseObj.toString());
                     JSONObject data = new JSONObject(responseObj.toString());
                     if (data.get("result").equals("success")) {
-                        initUserData();
+                        initUserData(false);
                         initDatas(false);
                         // 进行新版本检测
                         VersionUtil.checkNewVersion(MainActivity.this, true);
                         // 初始化打票机设置
                         initPrintSet();
                     } else {
+                        JPushInterface.deleteAlias(MainActivity.this, Constants.JPUSH_SEQUENCE);
                         // 登录失败，提示用户，需要手动重新登录
                         leftMenuUserName.setTag("needLogin");
-                        leftMenuUserName.setText("登录失效，点击登录");
+                        leftMenuUserName.setText("登录信息失效\n点击头像重新登录");
                         leftMenuUserType.setVisibility(View.GONE);
-                        ComFun.showToast(MainActivity.this, "登录失效，需重新登录", Toast.LENGTH_SHORT);
+                        ComFun.showToast(MainActivity.this, "登录信息失效，需重新登录", Toast.LENGTH_SHORT);
                     }
                 } catch (JSONException e) {
                 }
@@ -183,21 +184,29 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(OkHttpException okHttpE) {
                 // 登录失败，提示用户，需要手动重新登录
                 leftMenuUserName.setTag("needLogin");
-                leftMenuUserName.setText("登录失效，点击登录");
+                leftMenuUserName.setText("登录信息失效\n点击头像重新登录");
                 leftMenuUserType.setVisibility(View.GONE);
-                ComFun.showToast(MainActivity.this, "登录失效，请重新登录", Toast.LENGTH_SHORT);
+                ComFun.showToast(MainActivity.this, "登录信息失效，需重新登录", Toast.LENGTH_SHORT);
             }
         }));
     }
 
-    private void initUserData() {
+    private void initUserData(boolean getUserInfoAgain) {
         String userId = UserDataUtil.getUserId(MainActivity.this);
+        if (!getUserInfoAgain) {
+            // 此处已经获取到登录用户的id值，但是以下将会执行登录用户的详细信息获取的网络操作，有可能获取用户详细信息会失败
+            // 如果获取用户信息失败，提示用户重新获取就好了，并不影响使用用户id注册的推送功能
+            JPushInterface.init(MainActivity.this);
+            JPushInterface.setAlias(MainActivity.this, Constants.JPUSH_SEQUENCE, userId);
+        } else {
+            ComFun.showLoading(MainActivity.this, "正在获取您的详细信息");
+        }
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         ConnectorInventory.getUserInfo(MainActivity.this, params, new DisposeDataHandle(new DisposeDataListener() {
             @Override
             public void onFinish() {
-
+                ComFun.hideLoading();
             }
 
             @Override
@@ -251,8 +260,8 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(OkHttpException okHttpE) {
                 MenuItem navMenuItemLogginOut = navigationView.getMenu().findItem(R.id.nav_exit);
                 navMenuItemLogginOut.setVisible(false);
-                leftMenuUserName.setTag("needLogin");
-                leftMenuUserName.setText("登录失效，点击登录");
+                leftMenuUserName.setTag("needGetUserInfoAgain");
+                leftMenuUserName.setText("获取个人信息失败\n点击头像重新获取");
                 leftMenuUserType.setVisibility(View.GONE);
                 ComFun.showToast(MainActivity.this, "获取个人信息异常", Toast.LENGTH_SHORT);
             }
@@ -318,6 +327,9 @@ public class MainActivity extends AppCompatActivity
                 } else if (leftMenuUserName.getTag().toString().equals("needLogin")) {
                     // 需要登录
                     toUserLoginOut();
+                } else if (leftMenuUserName.getTag().toString().equals("needGetUserInfoAgain")) {
+                    // 需要重新获取用户信息
+                    initUserData(true);
                 }
             }
         });
@@ -1082,6 +1094,14 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(refPageDataBroadcastReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        if (JPushInterface.isPushStopped(MainActivity.this)) {
+            JPushInterface.resumePush(MainActivity.this);
+        }
+        super.onResume();
     }
 
     class RefPageDataBroadcastReceiver extends BroadcastReceiver {

@@ -54,7 +54,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         welcomeToAppMain.setVisibility(View.GONE);
 
         String loginUserId = UserDataUtil.getUserId(WelcomeActivity.this);
-        JPushInterface.init(WelcomeActivity.this);
         if (ComFun.strNull(loginUserId)) {
             // 已打开过，直接进入程序
             boolean needLogin = UserDataUtil.getBooleanDataByKey(WelcomeActivity.this, UserDataUtil.fyLoginUserInfo, UserDataUtil.key_needLogin);
@@ -63,7 +62,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
                 JPushInterface.deleteAlias(WelcomeActivity.this, Constants.JPUSH_SEQUENCE);
             } else {
                 toPageType = "toMain";
-                JPushInterface.setAlias(WelcomeActivity.this, Constants.JPUSH_SEQUENCE, loginUserId);
             }
             mWelcomeHandler = new Handler();
             mWelcomeTesk = new WelcomeTask();
@@ -83,14 +81,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             mWelcomeTesk = new WelcomeTask();
             mWelcomeHandler.postDelayed(mWelcomeTesk, 2000);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        if (JPushInterface.isPushStopped(WelcomeActivity.this)) {
-            JPushInterface.resumePush(WelcomeActivity.this);
-        }
-        super.onResume();
     }
 
     /**
