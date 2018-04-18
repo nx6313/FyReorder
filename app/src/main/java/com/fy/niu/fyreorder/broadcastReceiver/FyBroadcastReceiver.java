@@ -1,15 +1,19 @@
 package com.fy.niu.fyreorder.broadcastReceiver;
 
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.fy.niu.fyreorder.MainActivity;
 import com.fy.niu.fyreorder.PrintDialogActivity;
+import com.fy.niu.fyreorder.R;
 import com.fy.niu.fyreorder.util.ComFun;
 import com.fy.niu.fyreorder.util.MyApplication;
 import com.fy.niu.fyreorder.util.PrintUtil;
@@ -26,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class FyBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "FyBReceiver";
@@ -44,6 +50,19 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                 Log.d(TAG + " 极光推送注册", "JPush用户注册成功");
                 break;
             case JPushInterface.ACTION_MESSAGE_RECEIVED:
+                // 显示状态栏通知
+                String orderSoundUri = UserDataUtil.getDataByKey(context, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
+                NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
+                notification.setAutoCancel(true).setSmallIcon(R.mipmap.ic_launcher);
+                if (ComFun.strNull(orderSoundUri) && !orderSoundUri.equals("default")) {
+                    notification.setSound(Uri.parse(orderSoundUri));
+                } else {
+                    notification.setSound(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.order_default_sound));
+                }
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.notify(1, notification.build());
+
+                // 解析推送的订单数据，进行打印操作
                 String orderPrintData = bundle.getString(JPushInterface.EXTRA_EXTRA);
                 if (ComFun.strNull(orderPrintData)) {
                     if (ComFun.getJSONType(orderPrintData).equals(ComFun.JSON_TYPE.JSON_TYPE_OBJECT)) {

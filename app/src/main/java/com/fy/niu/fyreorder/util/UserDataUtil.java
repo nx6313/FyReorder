@@ -34,6 +34,7 @@ public class UserDataUtil {
     public static final String key_printIsOpen = "printIsOpen";
     public static final String key_connectionDeviceCode = "connectionDeviceCode";
     public static final String key_orderSoundUri = "orderSoundUri";
+    public static final String key_orderSoundName = "orderSoundName";
 
     /////////////////////////// fyPrintData
     public static final String key_printDataList = "printDataList";

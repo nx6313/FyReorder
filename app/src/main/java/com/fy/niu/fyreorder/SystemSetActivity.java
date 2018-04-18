@@ -1,12 +1,16 @@
 package com.fy.niu.fyreorder;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,8 +77,15 @@ public class SystemSetActivity extends AppCompatActivity {
 
     public void initData() {
         String orderSoundUri = UserDataUtil.getDataByKey(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
+        String orderSoundName = UserDataUtil.getDataByKey(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundName);
         if (!ComFun.strNull(orderSoundUri)) {
             UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri, "default");
+        }
+        if (!ComFun.strNull(orderSoundName)) {
+            UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundName, "默认提示音效");
+            tvOrderSoundSetData.setText("默认提示音效");
+        } else {
+            tvOrderSoundSetData.setText(orderSoundName);
         }
     }
 
@@ -91,22 +102,22 @@ public class SystemSetActivity extends AppCompatActivity {
             String orderSoundUri = UserDataUtil.getDataByKey(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
             if (orderSoundUri.equals("default")) {
                 mMediaMusic = MediaPlayer.create(this, R.raw.order_default_sound);
-                mMediaMusic.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        view.setTag("no_play");
-                        Drawable sound = SystemSetActivity.this.getResources().getDrawable(R.drawable.sound);
-                        sound.setBounds(0, 0, DisplayUtil.dip2px(SystemSetActivity.this, 16), DisplayUtil.dip2px(SystemSetActivity.this, 16));
-                        ((TextView) view).setCompoundDrawables(sound, null, null, null);
-                        ((TextView) view).setTextColor(Color.parseColor("#262626"));
-                        ((RelativeLayout) view.getParent()).setBackgroundColor(Color.parseColor("#FAFAFA"));
-                    }
-                });
-                if (!mMediaMusic.isPlaying()) {
-                    mMediaMusic.start();
-                }
             } else {
-
+                mMediaMusic = MediaPlayer.create(this, Uri.parse(orderSoundUri));
+            }
+            mMediaMusic.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    view.setTag("no_play");
+                    Drawable sound = SystemSetActivity.this.getResources().getDrawable(R.drawable.sound);
+                    sound.setBounds(0, 0, DisplayUtil.dip2px(SystemSetActivity.this, 16), DisplayUtil.dip2px(SystemSetActivity.this, 16));
+                    ((TextView) view).setCompoundDrawables(sound, null, null, null);
+                    ((TextView) view).setTextColor(Color.parseColor("#262626"));
+                    ((RelativeLayout) view.getParent()).setBackgroundColor(Color.parseColor("#FAFAFA"));
+                }
+            });
+            if (!mMediaMusic.isPlaying()) {
+                mMediaMusic.start();
             }
         } else {
             view.setTag("no_play");
@@ -138,6 +149,7 @@ public class SystemSetActivity extends AppCompatActivity {
         orderSoundDoPaneLayout.setVisibility(View.GONE);
         tvOrderSoundSetData.setText("默认提示音效");
         UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri, "default");
+        UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundName, "默认提示音效");
     }
 
     // 点击从手机设置订单音效按钮
@@ -146,7 +158,7 @@ public class SystemSetActivity extends AppCompatActivity {
         String orderSoundUri = UserDataUtil.getDataByKey(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "设置订单提示铃声");
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "设置订单提示音效");
         if (ComFun.strNull(orderSoundUri) && !orderSoundUri.equals("default")) {
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(orderSoundUri)); //将已经勾选过的铃声传递给系统铃声界面进行显示
         }
@@ -155,13 +167,40 @@ public class SystemSetActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            Uri pickedName = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_TITLE); //获取用户选择的铃声数据
-            Uri pickedUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI); //获取用户选择的铃声数据
-            Log.d("-=-====-=>> ", "选择的音效：" + pickedName + " -->> " + pickedUri.toString());
-            UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri, pickedUri.toString());
-        } catch (Exception e) {
+        if (requestCode == 0) {
+            try {
+                Uri pickedUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI); //获取用户选择的铃声数据
+                String path = getRealFilePath(SystemSetActivity.this, pickedUri);
+                String fileName = path.substring(path.lastIndexOf("/") + 1, path.length());
+                UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri, pickedUri.toString());
+                UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundName, fileName);
+                tvOrderSoundSetData.setText(fileName);
+            } catch (Exception e) {
+            }
         }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public static String getRealFilePath(final Context context, final Uri uri) {
+        if (null == uri) return null;
+        final String scheme = uri.getScheme();
+        String data = null;
+        if (scheme == null)
+            data = uri.getPath();
+        else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
+            data = uri.getPath();
+        } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+            Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
+            if (null != cursor) {
+                if (cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                    if (index > -1) {
+                        data = cursor.getString(index);
+                    }
+                }
+                cursor.close();
+            }
+        }
+        return data;
     }
 }

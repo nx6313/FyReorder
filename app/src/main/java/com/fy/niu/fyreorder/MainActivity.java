@@ -1,6 +1,5 @@
 package com.fy.niu.fyreorder;
 
-import android.app.Notification;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
@@ -62,7 +61,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.jpush.android.api.BasicPushNotificationBuilder;
 import cn.jpush.android.api.JPushInterface;
 
 public class MainActivity extends AppCompatActivity
@@ -200,16 +198,6 @@ public class MainActivity extends AppCompatActivity
             // 如果获取用户信息失败，提示用户重新获取就好了，并不影响使用用户id注册的推送功能
             JPushInterface.init(MainActivity.this);
             JPushInterface.setAlias(MainActivity.this, Constants.JPUSH_SEQUENCE, userId);
-
-            // 设置通知样式
-            BasicPushNotificationBuilder builder = new BasicPushNotificationBuilder(MainActivity.this);
-            // builder.statusBarDrawable = R.drawable.jpush_notification_icon; // 指定最顶层状态栏小图标
-            builder.notificationFlags = Notification.FLAG_AUTO_CANCEL
-                    | Notification.FLAG_SHOW_LIGHTS;  //设置为自动消失和呼吸灯闪烁
-            builder.notificationDefaults = Notification.DEFAULT_SOUND
-                    | Notification.DEFAULT_VIBRATE
-                    | Notification.DEFAULT_LIGHTS;  // 设置为铃声、震动、呼吸灯闪烁都要
-            JPushInterface.setPushNotificationBuilder(1, builder);
         } else {
             ComFun.showLoading(MainActivity.this, "正在获取您的详细信息");
         }
