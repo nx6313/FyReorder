@@ -84,6 +84,11 @@
             android:name=".DateDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyDialogStyle" />
+        <activity
+            android:name=".SystemSetActivity"
+            android:label="@string/title_activity_system_set"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -115,7 +120,6 @@
                 <action android:name="fyOrder:action_write_to_blue_device" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

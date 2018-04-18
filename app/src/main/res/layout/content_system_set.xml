@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.fy.niu.fyreorder.SystemSetActivity"
+    tools:showIn="@layout/activity_system_set">
+
+    <com.fy.niu.fyreorder.customView.ElasticScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|top"
+        android:overScrollMode="never"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/colorScroll"
+        android:scrollbars="none"
+        app:overScrollType="bottom">
+
+        <LinearLayout
+            android:id="@+id/systemSetLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|top"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#FAFAFA">
+
+                <TextView
+                    android:id="@+id/tvOrderSoundItemTip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:drawableLeft="@drawable/sound"
+                    android:drawablePadding="10dp"
+                    android:focusable="true"
+                    android:gravity="left|center"
+                    android:onClick="playCurrentOrderSound"
+                    android:paddingLeft="16dp"
+                    android:tag="no_play"
+                    android:text="订单提示音"
+                    android:textColor="#262626"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvOrderSoundSetData"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@+id/tvOrderSoundItemTip"
+                    android:clickable="true"
+                    android:ellipsize="end"
+                    android:focusable="true"
+                    android:gravity="right|center"
+                    android:onClick="setOrderSound"
+                    android:paddingRight="16dp"
+                    android:singleLine="true"
+                    android:text="默认提示音效"
+                    android:textColor="#737373" />
+
+                <LinearLayout
+                    android:id="@+id/orderSoundDoPaneLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#FAFAFA"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center|right"
+                    android:orientation="horizontal"
+                    android:paddingRight="10dp"
+                    android:visibility="gone">
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:background="@drawable/edit_table_btn_style"
+                        android:onClick="tryPlayOrderSound"
+                        android:text="播放试听"
+                        android:textColor="#fff5dd"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="6dp"
+                        android:background="@drawable/edit_table_btn_style"
+                        android:onClick="setOrderSoundToDefault"
+                        android:text="设为默认"
+                        android:textColor="#fff5dd"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="6dp"
+                        android:background="@drawable/edit_table_btn_style"
+                        android:onClick="setOrderSoundFromPhone"
+                        android:text="从手机选择"
+                        android:textColor="#fff5dd"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="#E7E7E7" />
+        </LinearLayout>
+    </com.fy.niu.fyreorder.customView.ElasticScrollView>
+</android.support.constraint.ConstraintLayout>

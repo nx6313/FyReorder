@@ -49,6 +49,9 @@
     <item android:title="程序相关设置">
         <menu>
             <item
+                android:id="@+id/nav_sys_set"
+                android:title="系统设置" />
+            <item
                 android:id="@+id/nav_update"
                 android:title="检查新版本" />
             <item

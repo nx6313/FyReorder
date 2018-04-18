@@ -9,6 +9,7 @@
     <string name="title_activity_complete_order">已完成订单</string>
     <string name="title_activity_register">新用户注册</string>
     <string name="title_activity_dbsy">代办事宜</string>
+    <string name="title_activity_system_set">系统设置</string>
 
     <item name="tag_bluetooth_device_address" type="id"></item>
 

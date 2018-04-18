@@ -33,6 +33,7 @@ public class UserDataUtil {
     public static final String key_receiveSelfFloor = "receiveSelfFloor";
     public static final String key_printIsOpen = "printIsOpen";
     public static final String key_connectionDeviceCode = "connectionDeviceCode";
+    public static final String key_orderSoundUri = "orderSoundUri";
 
     /////////////////////////// fyPrintData
     public static final String key_printDataList = "printDataList";
