@@ -1,12 +1,16 @@
 package com.fy.niu.fyreorder;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -139,5 +143,25 @@ public class SystemSetActivity extends AppCompatActivity {
     // 点击从手机设置订单音效按钮
     public void setOrderSoundFromPhone(View view) {
         orderSoundDoPaneLayout.setVisibility(View.GONE);
+        String orderSoundUri = UserDataUtil.getDataByKey(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "设置订单提示铃声");
+        if (ComFun.strNull(orderSoundUri) && !orderSoundUri.equals("default")) {
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(orderSoundUri)); //将已经勾选过的铃声传递给系统铃声界面进行显示
+        }
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            Uri pickedName = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_TITLE); //获取用户选择的铃声数据
+            Uri pickedUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI); //获取用户选择的铃声数据
+            Log.d("-=-====-=>> ", "选择的音效：" + pickedName + " -->> " + pickedUri.toString());
+            UserDataUtil.saveUserData(SystemSetActivity.this, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri, pickedUri.toString());
+        } catch (Exception e) {
+        }
     }
 }
