@@ -14,7 +14,6 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -114,6 +113,11 @@ public class SystemSetActivity extends AppCompatActivity {
                     ((TextView) view).setCompoundDrawables(sound, null, null, null);
                     ((TextView) view).setTextColor(Color.parseColor("#262626"));
                     ((RelativeLayout) view.getParent()).setBackgroundColor(Color.parseColor("#FAFAFA"));
+                    if (mMediaMusic.isPlaying()) {
+                        mMediaMusic.stop();
+                    }
+                    mMediaMusic.release();
+                    mMediaMusic = null;
                 }
             });
             if (!mMediaMusic.isPlaying()) {
@@ -129,6 +133,8 @@ public class SystemSetActivity extends AppCompatActivity {
 
             if (mMediaMusic != null && mMediaMusic.isPlaying()) {
                 mMediaMusic.stop();
+                mMediaMusic.release();
+                mMediaMusic = null;
             }
         }
     }
