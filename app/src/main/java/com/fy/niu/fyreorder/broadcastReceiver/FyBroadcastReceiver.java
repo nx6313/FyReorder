@@ -53,14 +53,15 @@ public class FyBroadcastReceiver extends BroadcastReceiver {
                 // 显示状态栏通知
                 String orderSoundUri = UserDataUtil.getDataByKey(context, UserDataUtil.fySet, UserDataUtil.key_orderSoundUri);
                 NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
-                notification.setAutoCancel(true).setSmallIcon(R.mipmap.ic_launcher);
+                notification.setAutoCancel(true).setSmallIcon(R.drawable.order_notification_icon);
+                notification.setContentText("速达有新订单了，请速速接单");
                 if (ComFun.strNull(orderSoundUri) && !orderSoundUri.equals("default")) {
                     notification.setSound(Uri.parse(orderSoundUri));
                 } else {
                     notification.setSound(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.order_default_sound));
                 }
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-                notificationManager.notify(1, notification.build());
+                notificationManager.notify((int) System.currentTimeMillis(), notification.build());
 
                 // 解析推送的订单数据，进行打印操作
                 String orderPrintData = bundle.getString(JPushInterface.EXTRA_EXTRA);

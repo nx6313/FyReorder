@@ -112,16 +112,6 @@
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:background="#E7E7E7" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/has_order_card_bg"
-                android:padding="4dp"
-                android:text="功能维护中，暂时无法使用"
-                android:textColor="#FBF5F7"
-                android:textSize="12sp" />
         </LinearLayout>
     </com.fy.niu.fyreorder.customView.ElasticScrollView>
 </android.support.constraint.ConstraintLayout>
